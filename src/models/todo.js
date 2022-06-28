@@ -1,30 +1,27 @@
-const Sequelize = require("sequelize");
+const Sequelize = require("sequelize")
 
 // User model
-module.exports = class User extends Sequelize.Model {
+module.exports = class Todo extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        userId: {
-          primaryKey : true,
-          unique : true,
-          autoIncrement : true,
-          type : Sequelize.INTEGER,
-        }
+        text: {
+          type: Sequelize.STRING,
+        },
       },
       {
         sequelize,
         timestamps: true,
         underscored: false,
-        modelName: "Room",
-        tableName: "Rooms",
+        modelName: "todo",
+        tableName: "todos",
         paranoid: false,
         charset: "utf8mb4",
         collate: "utf8mb4_general_ci",
       }
-    );
+    )
   }
   static associate(db) {
     db.User.hasMany()
   }
-};
+}
