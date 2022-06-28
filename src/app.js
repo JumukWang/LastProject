@@ -5,7 +5,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const Router = require("./routers");
-const { sequelize } = require("./models");
+const {sequelize} = require("./models");
 const port = process.env.PORT;
 
 sequelize

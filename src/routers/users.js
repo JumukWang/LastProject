@@ -1,6 +1,5 @@
 require("dotenv").config()
-const express = require("express")
-const router = express.Router()
+const router = require("express").Router();
 
 // 회원가입
 router.post("/user", (req, res, next) => {

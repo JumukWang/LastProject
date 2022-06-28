@@ -1,16 +1,28 @@
-const app = require('./app');
-const socket = require('http').Server(app);
-const io = require('socket.io')(socket);
-const port = process.env.PORT || 3000;
+const app = require("./app")
+const io = require("socket.io")(socket)
+const { Op } = sequelize
 
+const socket = require("http").Server(app)
+// db 들어갈 자리
 
+const socketIo = require("socket.io")(socket, {
+  cors: {
+    origin: "*",
+    credentials: true,
+  },
+})
 
-io.on('connection', (socket) => {
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg);
-  });
-});
+/** 
+ * peerId
+ * userId
+ * roomId
+ * nickname
+ */
 
-http.listen(port, () => {
-  console.log(`Socket.IO server running at http://localhost:${port}/`);
-});
+io.on("connection", (socket) => {
+  // 변수 들어갈 자리
+
+  socket.on("", (msg) => {
+    io.emit("", msg)
+  })
+})
