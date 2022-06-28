@@ -1,10 +1,11 @@
 const router = require("./users")
 const userRouter = require("./users")
-const studyTimeRouter = require("./times")
 const authRouter = require("./auth")
+const roomRouter = require("./room")
 
 router.use("/users", userRouter)
-router.use("/users", authRouter)
-router.use("/users", studyTimeRouter)
+router.use("/", authRouter)
+router.use("/", roomRouter)
+
 
 module.exports = router

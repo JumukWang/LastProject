@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { server } = require("./socket");
+const { server } = require("../connection/socket");
 const port = process.env.PORT;
 
 

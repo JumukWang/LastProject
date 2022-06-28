@@ -5,8 +5,13 @@ const morgan = require("morgan")
 const helmet = require("helmet")
 const Router = require("./routers")
 const { sequelize } = require("./models")
+const passport = require('passport');
+const passportConfig = require('./passport');
 const path = require("path")
 const app = express()
+
+// 패스포트 설정
+passportConfig(); 
 
 // 시퀄라이즈 연결
 sequelize

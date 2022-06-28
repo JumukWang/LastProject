@@ -6,7 +6,7 @@ module.exports = class Todo extends Sequelize.Model {
     return super.init(
       {
         text: {
-          type: Sequelize.STRING,
+          type: Sequelize.TEXT,
         },
       },
       {

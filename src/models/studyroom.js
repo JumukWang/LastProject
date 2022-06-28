@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize")
 
 // User model
-module.exports = class chatroom extends Sequelize.Model {
+module.exports = class studyroom extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
@@ -13,14 +13,27 @@ module.exports = class chatroom extends Sequelize.Model {
         },
         title: {
           type: Sequelize.STRING,
+          allowNull: false,
+        },
+        content: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        password: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        date: {
+          type: Sequelize.STRING,
+          allowNull: false,
         }
       },
       {
         sequelize,
         timestamps: true,
         underscored: false,
-        modelName: "Room",
-        tableName: "Rooms",
+        modelName: "studyroom",
+        tableName: "studyrooms",
         paranoid: false,
         charset: "utf8mb4",
         collate: "utf8mb4_general_ci",
@@ -28,6 +41,8 @@ module.exports = class chatroom extends Sequelize.Model {
     )
   }
   static associate(db) {
-    db.User.hasMany()
+    db.studyroom.hasMany(db.User,{
+      
+    })
   }
 }

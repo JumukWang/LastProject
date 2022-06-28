@@ -1,11 +1,13 @@
-const { Room, PersonInRoom } = require("../models")
+const  Room  = require("../models/studyroom")
 const { Sequelize } = require("sequelize")
 const router = require("express").Router()
 
 // 방조회
 router.get("/room", (req, res, next) => {
   try {
-
+    const allRoomList = Room.findAll({
+      order: "createA"
+    })
   } catch (error) {
     return res.status(400).send({
       success: false,

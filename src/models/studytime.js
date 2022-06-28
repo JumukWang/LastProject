@@ -22,6 +22,6 @@ module.exports = class studyTime extends Sequelize.Model {
     );
   }
   static associate(db) {
-    db.User.hasMany()
+    db.studyTime.hasMany()
   }
 };
