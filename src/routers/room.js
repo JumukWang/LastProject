@@ -39,7 +39,7 @@ router.post("/room/enter-room/:password", (req, res, next) => {
   }
 })
 // 방삭제
-router.delete("/room/remove/:userid/:password", (req, res, next) => {
+router.delete("/room/remove/:email/:password", (req, res, next) => {
   try {
 
   } catch (error) {
