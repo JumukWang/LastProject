@@ -6,13 +6,13 @@ module.exports = class chatroom extends Sequelize.Model {
     return super.init(
       {
         roomId: {
+          type: Sequelize.INTEGER,
           primaryKey: true,
           unique: true,
           autoIncrement: true,
-          type: Sequelize.INTEGER,
         },
         title: {
-          
+          type: Sequelize.STRING,
         }
       },
       {
