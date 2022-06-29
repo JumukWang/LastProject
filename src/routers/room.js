@@ -1,12 +1,13 @@
-const  Room  = require("../models/studyroom")
+const Room = require("../models/studyroom")
 const { Sequelize } = require("sequelize")
 const router = require("express").Router()
 
 // 방조회
 router.get("/room", (req, res, next) => {
   try {
-    const allRoomList = Room.findAll({
-      order: "createA"
+    const roomList = Room.findAll({
+      attributes: "roomId",
+      order: "createAt",
     })
   } catch (error) {
     return res.status(400).send({
@@ -16,10 +17,10 @@ router.get("/room", (req, res, next) => {
     })
   }
 })
+  
 // 방생성
 router.post("/room/create", (req, res, next) => {
   try {
-
   } catch (error) {
     return res.status(400).send({
       success: false,
@@ -31,7 +32,6 @@ router.post("/room/create", (req, res, next) => {
 // 방입장
 router.post("/room/enter-room/:password", (req, res, next) => {
   try {
-
   } catch (error) {
     return res.status(400).send({
       success: false,
@@ -43,7 +43,6 @@ router.post("/room/enter-room/:password", (req, res, next) => {
 // 방삭제
 router.delete("/room/remove/:email/:password", (req, res, next) => {
   try {
-
   } catch (error) {
     return res.status(400).send({
       success: false,
@@ -55,7 +54,6 @@ router.delete("/room/remove/:email/:password", (req, res, next) => {
 // 방나가기
 router.get("/room/exit", (req, res, next) => {
   try {
-    
   } catch (error) {
     return res.status(400).send({
       success: false,

@@ -1,4 +1,4 @@
-const { token } = require("morgan");
+
 const passport = require("passport");
 const KaKaoStrategy = require("passport-kakao").Strategy;
 
