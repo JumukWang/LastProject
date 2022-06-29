@@ -3,15 +3,10 @@ const express = require("express")
 const cors = require("cors")
 const morgan = require("morgan")
 const helmet = require("helmet")
-const Router = require("./routers")
 const { sequelize } = require("./models")
-const passport = require('passport');
-const passportConfig = require('./passport');
 const path = require("path")
 const app = express()
-
-// 패스포트 설정
-passportConfig(); 
+const Router = require("./routes")
 
 // 시퀄라이즈 연결
 sequelize
@@ -24,16 +19,15 @@ sequelize
   })
 
 //미들웨어
-app.use(express.json())
 app.use(cors())
+app.use(express.json())
 app.use(helmet())
 app.use(morgan("tiny"))
 app.use(express.urlencoded({ extended: false }))
-app.use(express.static("public"))
 app.use(express.static(path.join(__dirname, "public")))
 
 // 라우터
-app.use("/", Router)
+app.use("/api", Router)
 
 // 서버 에러 처리
 app.use((req, res, next) => {

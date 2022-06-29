@@ -1,6 +1,6 @@
-const app = require("../app")
+const app = require("./app")
 const sequelize = require("sequelize")
-const { Room, User } = require("../models")
+const { Room, User } = require("./models")
 const { Op } = sequelize
 
 const server = require("http").createServer(app)
@@ -14,6 +14,7 @@ const io = require("socket.io")(server, {
 })
 
 /**
+ * 
  * nickname
  * myStreamId
  * userId

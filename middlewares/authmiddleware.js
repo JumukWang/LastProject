@@ -30,9 +30,7 @@ module.exports = (req, res, next) => {
       const userInfo = jwt.decode(authToken, SECRET_KEY);
       console.log("userInfo", userInfo);
       const nickname = userInfo.nickname;
-
       let refreshtoken;
-
       User.findOne({ nickname }).then((user) => {
         
         console.log(refreshtoken);
