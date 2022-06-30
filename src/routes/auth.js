@@ -17,7 +17,7 @@ const {
 const user = require("../models/user")
 
 // 회원가입
-router.post("/signup", authMiddleware, async (req, res, next) => {
+router.post("/signup", async (req, res, next) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck } = req.body
