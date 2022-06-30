@@ -57,8 +57,10 @@ router.post("/signup", async (req, res, next) => {
 router.post("/login", authMiddleware, async (req, res, next) => {
   try {
     // 여기도 중복검사, 해쉬화된 비밀번호 검증
-    const { email, password } = req.body
+    const { email, password} = req.body
     const user = await User.findOne({ email })
+    
+    console.log(user);
 
     if (!user) {
       return res.status(400).send({
@@ -86,6 +88,7 @@ router.post("/login", authMiddleware, async (req, res, next) => {
     await User.updateOne({ email: user.email }, { refreshToken: refreshToken })
 
     res.status(200).send({
+      nickname: user.nickname,
       result: true,
       msg: "로그인 되었습니다",
       token: accessToken,
