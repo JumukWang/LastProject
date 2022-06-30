@@ -19,7 +19,7 @@ const {
 router.post("/signup", async (req, res, next) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
-    const { email, nickname, password, passwordCheck, profileImg } = req.body
+    const { email, nickname, password, passwordCheck } = req.body
 
     const salt = await Bcrypt.genSalt(Number(SALT_NUM))
     const hashPassword = await Bcrypt.hash(password, salt)
@@ -37,7 +37,6 @@ router.post("/signup", async (req, res, next) => {
       nickname,
       password: hashPassword,
       refreshToken: null,
-      profileImg,
     })
     return res.status(200).send({
       result: true,
