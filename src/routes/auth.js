@@ -22,9 +22,6 @@ router.post("/signup", async (req, res, next) => {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck } = req.body
 
-    const salt = await Bcrypt.genSalt(Number(SALT_NUM))
-    const hashPassword = await Bcrypt.hash(password, salt)
-
     if (password !== passwordCheck) {
       res.status(400).send({
         message: "비밀번호 확인란이 일치하지 않습니다.",
@@ -32,6 +29,8 @@ router.post("/signup", async (req, res, next) => {
       })
       return
     }
+    const salt = await Bcrypt.genSalt(Number(SALT_NUM))
+    const hashPassword = await Bcrypt.hash(password, salt)
 
     const user = new User({
       email,
@@ -61,10 +60,13 @@ router.post("/login", authMiddleware, async (req, res, next) => {
     const { email, password } = req.body
     const user = await User.findOne({ email })
 
-    let bcpassword = ""
-    if (user) {
-      bcpassword = await Bcrypt.compare(password, user.password)
+    if (!user) {
+      return res.status(400).send({
+        msg: "아이디 혹은 비밀번호를 확인해주세요.",
+      })
     }
+
+    const bcpassword = Bcrypt.compareSync(password, user.password)
 
     if (!bcpassword) {
       res.status(400).send({
