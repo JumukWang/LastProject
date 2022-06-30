@@ -2,11 +2,11 @@ require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
 const morgan = require("morgan")
+const connect = require("./database/database.js");
 const helmet = require("helmet")
 const path = require("path")
 const app = express()
 const Router = require("./routes")
-const connect = require("./database/database.js");
 
 connect();
 

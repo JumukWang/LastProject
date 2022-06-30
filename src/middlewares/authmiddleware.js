@@ -1,8 +1,8 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 const SECRET_KEY = process.env.SECRET_KEY;
 const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY;
+const User = require("../models/user");
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
@@ -28,7 +28,7 @@ module.exports = (req, res, next) => {
       const decodedToken = jwt.decode(authToken, SECRET_KEY);
       console.log("decodedToken정보입니다.", decodedToken);
       const nickname = decodedToken.nickname;
-      const user = User.find({ nickname }).then((user) => {
+      User.findOne({ nickname }).then((user) => {
         console.log(user);
         const targetRefreshToken = user.refreshToken
         console.log('찾은 유저의 refreshtoken정보입니다.',targetRefreshToken);

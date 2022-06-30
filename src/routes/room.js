@@ -1,5 +1,5 @@
-const {Room} = require("../models/studyroom")
-const { Sequelize } = require("sequelize")
+const Room= require("../models/studyroom")
+
 const router = require("express").Router()
 
 // 방조회

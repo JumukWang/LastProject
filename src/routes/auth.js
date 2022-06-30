@@ -5,7 +5,6 @@ const Bcrypt = require("bcrypt")
 const SALT_NUM = process.env.SALT_NUM
 const SECRET_KEY = process.env.SECRET_KEY
 const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY
-const authMiddleware = require("../middlewares/authmiddleware")
 
 const router = require("express").Router()
 
@@ -67,7 +66,7 @@ router.post("/login", async (req, res, next) => {
     }
     let bcpassword = ""
     if (user) {
-      bcpassword = await Bcrypt.compare(password, user.password)
+      bcpassword = Bcrypt.compare(password, user.password)
     }
     if (!bcpassword) {
       res.status(400).send({

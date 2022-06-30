@@ -1,6 +1,6 @@
+const { server } = require("./socket")
 
 // const { server, https } = require("./socket");
-const { server } = require("./socket")
 // const port = process.env.PORT
 
 // https.listen(443, () => {
