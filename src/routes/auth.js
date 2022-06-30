@@ -54,22 +54,21 @@ router.post("/signup", async (req, res, next) => {
 })
 
 // 로그인
-router.post("/login", authMiddleware, async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
   try {
     // 여기도 중복검사, 해쉬화된 비밀번호 검증
-    const { email, password} = req.body
+    const { email, password } = req.body
     const user = await User.findOne({ email })
-    
-    console.log(user);
 
     if (!user) {
       return res.status(400).send({
         msg: "아이디 혹은 비밀번호를 확인해주세요.",
       })
     }
-
-    const bcpassword = Bcrypt.compareSync(password, user.password)
-
+    let bcpassword = ""
+    if (user) {
+      bcpassword = await Bcrypt.compare(password, user.password)
+    }
     if (!bcpassword) {
       res.status(400).send({
         errorMessage: "이메일 또는 패스워드가 틀렸습니다.",

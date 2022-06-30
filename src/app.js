@@ -8,7 +8,6 @@ const app = express()
 const Router = require("./routes")
 const connect = require("./database/database.js");
 
-
 connect();
 
 //미들웨어

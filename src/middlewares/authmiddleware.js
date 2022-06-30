@@ -28,8 +28,8 @@ module.exports = (req, res, next) => {
       const decodedToken = jwt.decode(authToken, SECRET_KEY);
       console.log("decodedToken정보입니다.", decodedToken);
       const nickname = decodedToken.nickname;
-      User.find({ nickname }).then((user) => {
-        
+      const user = User.find({ nickname }).then((user) => {
+        console.log(user);
         const targetRefreshToken = user.refreshToken
         console.log('찾은 유저의 refreshtoken정보입니다.',targetRefreshToken);
         const refreshTokenCheck = verifyrefeshToken(targetRefreshToken);
