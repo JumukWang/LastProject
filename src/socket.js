@@ -1,7 +1,6 @@
 const app = require("./app")
-const sequelize = require("sequelize")
 const Room = require("./models/studyroom")
-const { Op } = sequelize
+// const { Op } = sequelize
 
 const server = require("http").createServer(app)
 // db 들어갈 자리

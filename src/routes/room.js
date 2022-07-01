@@ -1,5 +1,4 @@
 const {Room} = require("../models/studyroom")
-const { Sequelize } = require("sequelize")
 const router = require("express").Router()
 
 // 방조회
