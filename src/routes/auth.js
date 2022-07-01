@@ -158,6 +158,8 @@ router.get(
   }
 );
 
+
+
 router.get('/kakao/logout', async (req,res)=>{
   // https://kapi.kakao/com/v1/user/logout
   try {
@@ -183,3 +185,7 @@ router.get('/kakao/logout', async (req,res)=>{
 
 
 module.exports = router
+
+
+// http://13.124.252.225/api/auth/kakao
+

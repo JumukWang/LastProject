@@ -7,16 +7,8 @@ const userSchema = new Schema(
     userId: { type: Number, unique: true, default: 0 },
     email: { type: String, required: true, unique: true },
     nickname: { type: String, required: true, unique: true },
-    password: { type: String, requried: true },
+    password: { type: String, required: true },
     refreshToken: { type: String },
-    provider: {
-      type: String,
-      require: true,
-    },
-    snsId: {
-      type: String,
-      require: true,
-    },
   },
   {
     timestamps: true,
