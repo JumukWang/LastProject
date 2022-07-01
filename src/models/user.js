@@ -9,6 +9,14 @@ const userSchema = new Schema(
     nickname: { type: String, required: true, unique: true },
     password: { type: String, requried: true },
     refreshToken: { type: String },
+    provider: {
+      type: String,
+      require: true,
+    },
+    snsId: {
+      type: String,
+      require: true,
+    },
   },
   {
     timestamps: true,
