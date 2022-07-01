@@ -9,10 +9,17 @@ const app = express()
 const connect = require("./database/database.js")
 const Router = require("./routes")
 const passport = require("passport")
-const passportConfig = require("./passport/kakaoStrategy")
+const passportConfig = require("./passport")
 
 passportConfig() // 패스포트 설정
 connect()
+
+const corsOption = {
+  origin: [
+    'http://13.124.252.225'
+  ],
+  credential: true,
+}
 
 //미들웨어
 app.use(cors())
