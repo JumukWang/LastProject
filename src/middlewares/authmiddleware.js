@@ -21,19 +21,26 @@ module.exports = (req, res, next) => {
   }
   try {
     const myToken = verifyToken(authToken);
+
     console.log("accessToken 유효성 검사 정보입니다.",myToken)
     if (myToken == "jwt expired") {
       // access token 만료
       console.log("accessToken이 만료되었습니다.");
+
       const decodedToken = jwt.decode(authToken, SECRET_KEY);
       console.log("decodedToken정보입니다.", decodedToken);
-      const nickname = decodedToken.nickname;
-      User.findOne({ nickname }).then((user) => {
+      const email = decodedToken.email;
+      console.log(decodedToken.email);
+      User.findOne({ email }).then((user) => {                                                
         console.log(user);
         const targetRefreshToken = user.refreshToken
+
         console.log('찾은 유저의 refreshtoken정보입니다.',targetRefreshToken);
+
         const refreshTokenCheck = verifyrefeshToken(targetRefreshToken);
+
         console.log("RefreshToken 유효성 검사 정보입니다.", refreshTokenCheck);
+
         if (refreshTokenCheck == "jwt expired") {
           console.log('두 토큰 모두 만료된 상태')
           return res.status(401).send({ message : "로그인이 필요합니다." });
@@ -45,7 +52,7 @@ module.exports = (req, res, next) => {
             { expiresIn: "1h" }
           );
           let newToken = {
-            nickname,
+            email,
             myNewToken
           }
           console.log('accessToken만 만료니까, 쿠키에다가 accesstoken넣어주기')
@@ -55,9 +62,9 @@ module.exports = (req, res, next) => {
         }
       });
     } else {
-      const { nickname } = jwt.verify(authToken, SECRET_KEY);
+      const { email } = jwt.verify(authToken, SECRET_KEY);
       console.log('이 닉네임뭐지',nickname)
-      User.findOne({ nickname }).then((user) => {
+      User.findOne({ email }).then((user) => {
         res.locals.user = user;
         next();
       });

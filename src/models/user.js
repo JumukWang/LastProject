@@ -1,9 +1,8 @@
 const mongoose = require("mongoose")
-const autoIncrement = require("mongoose-auto-increment")
-autoIncrement.initialize(mongoose.connection)
+const AutoIncrement = require("mongoose-sequence")(mongoose)
 
 const { Schema } = mongoose
-const UserSchema = new Schema(
+const userSchema = new Schema(
   {
     userId: { type: Number, unique: true, default: 0 },
     email: { type: String, required: true, unique: true },
@@ -16,11 +15,6 @@ const UserSchema = new Schema(
   }
 )
 
-UserSchema.plugin(autoIncrement.plugin, {
-  model: "User",
-  field: "userId",
-  startAt: 1, //시작
-  increment: 1, // 증가
-})
+userSchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "userId" })
 
-module.exports = mongoose.model("User", UserSchema)
+module.exports = mongoose.model("User", userSchema)

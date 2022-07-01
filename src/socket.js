@@ -1,7 +1,5 @@
 const app = require("./app")
 const Room = require("./models/studyroom")
-
-
 const server = require("http").createServer(app)
 // db 들어갈 자리
 

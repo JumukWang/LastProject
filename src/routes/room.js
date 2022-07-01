@@ -1,4 +1,4 @@
-const Room= require("../models/studyroom")
+const Room = require("../models/studyroom")
 
 const router = require("express").Router()
 
@@ -62,5 +62,23 @@ router.get("/room/exit", (req, res, next) => {
     })
   }
 })
+
+// 방 찾기
+// router.get("/room/search", (req, res, next) => {
+//   const { word } = req.params;
+//   const { title } = req.body;
+//   let postArr = [];
+//   let posts = await Room.find({ title });
+//   try {
+//     for (let i in posts) {
+//       if (posts[i].title.includes(word)) {
+//         postArr.push(posts[i]);
+//       }
+//     }
+//     return res.status(200).send(postArr);
+//   } catch (error) {
+//     return res.status(400).json({ result: false, Message: "찾으시는 스터디가 없습니다." });
+//   }
+// })
 
 module.exports = router

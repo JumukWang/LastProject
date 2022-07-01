@@ -5,6 +5,7 @@ const Bcrypt = require("bcrypt")
 const SALT_NUM = process.env.SALT_NUM
 const SECRET_KEY = process.env.SECRET_KEY
 const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY
+const authMiddleware = require("../middlewares/authmiddleware")
 
 const router = require("express").Router()
 
@@ -77,7 +78,7 @@ router.post("/login", async (req, res, next) => {
     }
 
     const accessToken = jwt.sign({ email: user.email }, SECRET_KEY, {
-      expiresIn: "10m",
+      expiresIn: "30m",
     })
     const refreshToken = jwt.sign({}, REFRESH_SECRET_KEY, {
       expiresIn: "10d",
@@ -144,6 +145,10 @@ router.get("/user/exnickname", async (req, res, next) => {
   } catch (error) {
     error.message
   }
+})
+
+router.get("/test", authMiddleware, async (req, res, next) => {
+  return res.send({ test: "nickname" })
 })
 
 module.exports = router
