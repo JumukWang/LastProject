@@ -1,8 +1,7 @@
-require("dotenv").config()
 const passport = require("passport");
 const KaKaoStrategy = require("passport-kakao").Strategy;
 
-const kakaoUser = require("../models/kakaoAuth");
+const User = require("../models/user");
 
 module.exports = () => {
   passport.use(
@@ -14,7 +13,7 @@ module.exports = () => {
       async (accessToken, refreshToken, profile, done) => {
         console.log("kakao profile", profile);
         try{
-            const exUser = await kakaoUser.findOne({
+            const exUser = await User.findOne({
                 snsId: profile.id,
                 provider: "kakao",
             });
@@ -22,7 +21,7 @@ module.exports = () => {
             if(exUser){
                 done(null, exUser);
             }else {
-                const newUser = await kakaoUser.create({
+                const newUser = await User.create({
                     email: profile._json && profile._json.kakao_account_email,
                     nickname: profile.displayName,
                     snsId: profile.id,

@@ -158,32 +158,6 @@ router.get(
   }
 );
 
-
-
-router.get('/kakao/logout', async (req,res)=>{
-  // https://kapi.kakao/com/v1/user/logout
-  try {
-    const ACCESS_TOKEN = res.locals.user.accessToken;
-    let logout = await axios({
-      method:'post',
-      url:'https://kapi.kakao.com/v1/user/unlink',
-      headers:{
-        'Authorization': `Bearer ${ACCESS_TOKEN}`
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.json(error);
-  }
-  // 세션 정리
-  req.logout();
-  req.session.destroy();
-  
-  res.redirect('/');
-})
-
-
-
 module.exports = router
 
 
