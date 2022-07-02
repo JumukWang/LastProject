@@ -18,10 +18,8 @@ const userSchema = new Schema(
       require: true,
       unique: true,
     },
-    nick: {
+    profileImg: {
         type: String,
-        unique: true,
-        required: true,
     }
   },
   {
@@ -31,4 +29,5 @@ const userSchema = new Schema(
 
 userSchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "userId" })
 
-module.exports = mongoose.model("User", userSchema)
+const User = mongoose.model("User", userSchema)
+module.exports = User;

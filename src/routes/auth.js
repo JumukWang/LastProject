@@ -1,19 +1,19 @@
 require("dotenv").config()
-const User = require("../models/user")
+const {User} = require("../models/user")
 const jwt = require("jsonwebtoken")
 const Bcrypt = require("bcrypt")
-const passport = require("passport")
+const passport = require('passport');
 const SALT_NUM = process.env.SALT_NUM
 const SECRET_KEY = process.env.SECRET_KEY
 const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY
 const router = require("express").Router()
+
 
 const {
   validateEmail,
   validateNick,
   validatePwd,
 } = require("../middlewares/validation")
-const user = require("../models/user")
 
 // 회원가입
 router.post("/signup", async (req, res, next) => {
@@ -146,7 +146,7 @@ router.get("/user/exnickname", async (req, res, next) => {
   }
 })
 
-router.get("/kakao", passport.authenticate("kakao"));
+router.get('/kakao', passport.authenticate('kakao'));
 
 router.get(
   "/kakao/callback",
@@ -154,10 +154,10 @@ router.get(
     failureRedirect: "/",
   }),
   (req, res) => {
-    res.redirect("/");
+    res.redirect("/").sned({ message: "제발 제발 "})
   }
 );
 
-module.exports = router
 
-// http://13.124.252.225/api/auth/kakao
+
+module.exports = router
