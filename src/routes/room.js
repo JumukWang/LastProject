@@ -6,8 +6,7 @@ const router = require("express").Router()
 router.get("/room", (req, res, next) => {
   try {
     const roomList = Room.findAll({
-      attributes: "roomId",
-      order: "createAt",
+      
     })
   } catch (error) {
     return res.status(400).send({

@@ -17,17 +17,16 @@ const studySchema = new Schema({
         type: String,
     },
     tagId: {
-
+        type: Number,
     },
     roomId: {
-
+        type: Number,
+        unique: true,
     },
     word: {
         type: String,
     }
 });
 
-
-
-
+studySchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "roomId" })
 module.exports = mongoose.model("studyRoom", studySchema);

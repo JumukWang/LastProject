@@ -37,6 +37,7 @@ app.use(
 )
 app.use(passport.initialize())
 app.use(passport.session())
+
 // 라우터
 app.use("/api", Router)
 
