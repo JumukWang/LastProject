@@ -2,7 +2,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = process.env.SECRET_KEY;
 const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY;
-const User = require("../models/user");
+const {User} = require("../models");
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
@@ -47,7 +47,7 @@ module.exports = (req, res, next) => {
         } else {
           console.log('accessToken만 만료된 상태')
           const myNewToken = jwt.sign(
-            { nickname: user.nickname },
+            { email: user.email },
             SECRET_KEY,
             { expiresIn: "1h" }
           );
@@ -63,7 +63,7 @@ module.exports = (req, res, next) => {
       });
     } else {
       const { email } = jwt.verify(authToken, SECRET_KEY);
-      console.log('이 닉네임뭐지',nickname)
+      console.log('이 닉네임뭐지',email)
       User.findOne({ email }).then((user) => {
         res.locals.user = user;
         next();

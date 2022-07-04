@@ -18,7 +18,7 @@ router.get("/rooms", (req, res, next) => {
 })
 
 // 방생성
-router.post("/room/create", authMiddleware, async (req, res, next) => {
+router.post("/create", authMiddleware, async (req, res, next) => {
   try {
     const { roomId, tagId, title, content, password, date } = req.body
     const { userId } = res.locals.user
@@ -30,9 +30,7 @@ router.post("/room/create", authMiddleware, async (req, res, next) => {
       content,
       password,
       date,
-      createAt,
     })
-
     return res
       .status(201)
       .send({ msg: "스터디 룸을 생성하였습니다.", roomInfo: newStudyRoom })
