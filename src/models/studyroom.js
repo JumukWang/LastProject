@@ -26,6 +26,10 @@ const studySchema = new Schema({
     },
     word: {
         type: String,
+    },
+    createAt: {
+        type: Date,
+        default: Date.now()
     }
 });
 

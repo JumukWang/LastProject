@@ -1,13 +1,13 @@
 const Room = require("../models/studyroom")
+const User = require("../models/user")
+const authMiddleware = require("../middlewares/authmiddleware")
 
 const router = require("express").Router()
 
 // 방조회
-router.get("/room", (req, res, next) => {
+router.get("/rooms", (req, res, next) => {
   try {
-    const roomList = Room.findAll({
-      
-    })
+    const roomList = Room.findAll({})
   } catch (error) {
     return res.status(400).send({
       success: false,
@@ -16,10 +16,26 @@ router.get("/room", (req, res, next) => {
     })
   }
 })
-  
+
 // 방생성
-router.post("/room/create", (req, res, next) => {
+router.post("/room/create", authMiddleware, async (req, res, next) => {
   try {
+    const { roomId, tagId, title, content, password, date } = req.body
+    const { userId } = res.locals.user
+    const newStudyRoom = await Room.create({
+      roomId,
+      tagId,
+      userId,
+      title,
+      content,
+      password,
+      date,
+      createAt,
+    })
+
+    return res
+      .status(201)
+      .send({ msg: "스터디 룸을 생성하였습니다.", roomInfo: newStudyRoom })
   } catch (error) {
     return res.status(400).send({
       success: false,
@@ -28,9 +44,19 @@ router.post("/room/create", (req, res, next) => {
     })
   }
 })
-// 방입장
-router.post("/enter-room/:password", (req, res, next) => {
+
+// 공개방 입장
+router.post("/enter-room/roomId", (req, res, next) => {
   try {
+    const { roomId } = req.params
+    const { nickname } = res.locals.user
+
+    if(1){
+      res.status(202).send({ msg: "스터디룸 정원초과입니다." })
+    }
+
+    res.status(200).send(`${nickname}님이 입장하셨습니다`)
+
   } catch (error) {
     return res.status(400).send({
       success: false,
