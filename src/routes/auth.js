@@ -157,16 +157,33 @@ router.get(
   }
 )
 
-router.get("/google", passport.authenticate("google"), { scope: ["profile"] })
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }))
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/",
-  }),
-  (req, res) => {
-    res.redirect("/")
-  }
-)
+router.get("/google/callback", (req, res, next) => {
+  passport.authenticate(
+    "google",
+    { failureRedirect: "/" },
+    (err, user, info) => {
+      if (err) return next(err)
+      const { userId, nickname } = user
+      const token = jwt.sign({ userId, nickname }, process.env.SECRET_KEY)
+      result = {
+        token,
+        nickname,
+      }
+      res.send({ user: result })
+    }
+  )(req, res, next)
+})
+
+// router.get(
+//   "/google/callback",
+//   passport.authenticate("google", {
+//     failureRedirect: "/",
+//   }),
+//   (req, res) => {
+//     res.redirect("/")
+//   }
+// )
 
 module.exports = router

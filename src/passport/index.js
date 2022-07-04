@@ -1,8 +1,7 @@
 const passport = require('passport')
-const  User  = require('../models/user')
-// const local = require('./localStrategy'); // 로컬서버로 로그인할때
-const kakao = require('./kakaoStrategy') // 카카오서버로 로그인할때
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const  {User}  = require('../models/user')
+const kakao = require('./soscialStrategy') // 카카오서버로 로그인할때
+const google = require('./soscialStrategy') // 구글 서버로 로그인할때
 
 module.exports = () => {
     passport.serializeUser((user, done) => {
@@ -14,7 +13,6 @@ module.exports = () => {
             .then((user) => done(null, user))
             .catch((err) => done(err))
     })
-
     kakao()
     google()
 }

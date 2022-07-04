@@ -5,7 +5,7 @@ const { Schema } = mongoose
 const userSchema = new Schema(
   {
     userId: { type: Number, unique: true, default: 0 },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, unique: true, required: true },
     nickname: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     refreshToken: { type: String },
@@ -26,8 +26,6 @@ const userSchema = new Schema(
     timestamps: true,
   }
 )
-
+// , required: true
 userSchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "userId" })
-
-const User = mongoose.model("User", userSchema)
-module.exports = User;
+module.exports = mongoose.model("User", userSchema);

@@ -29,7 +29,7 @@ router.post("/room/create", (req, res, next) => {
   }
 })
 // 방입장
-router.post("/room/enter-room/:password", (req, res, next) => {
+router.post("/enter-room/:password", (req, res, next) => {
   try {
   } catch (error) {
     return res.status(400).send({
@@ -51,7 +51,7 @@ router.delete("/room/remove/:email/:password", (req, res, next) => {
   }
 })
 // 방나가기
-router.get("/room/exit", (req, res, next) => {
+router.post("/room/exit", (req, res, next) => {
   try {
   } catch (error) {
     return res.status(400).send({

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose)
 
 const { Schema } = mongoose;
 const studySchema = new Schema({
