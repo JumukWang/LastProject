@@ -6,7 +6,6 @@ const authmiddleware = require("../middlewares/authmiddleware");
 const moment = require("moment");
 
 // today,week Start Point
-
 function timeSet() {
   // 1. 현재 날짜정보, 오늘 타임스탬프, 오늘 요일 출력
   const now = new Date();
@@ -16,10 +15,10 @@ function timeSet() {
 
   // 2. 금주 월요일과 어제의 timestamp 출력.
   const [mondayStamp, yesterdayStamp] = [
-    nowTimestamp - nowDay * dayToMs,
+    nowTimestamp - (nowDay-1) * dayToMs,
     nowTimestamp - dayToMs,
   ];
-
+  
   // 3. 현재시각, 년, 월, 오늘날짜, 어제날짜, 금주 월요일 날짜를 출력.
   const [currentTime, year, month, today, yesterday, monday] = [
     now.getHours(),
@@ -32,9 +31,9 @@ function timeSet() {
 
   let weekStart = `${year}-${month}-${monday}T00:00:00.000Z`;
   let todayStart;
-  currentTime < 9
-    ? (todayStart = `${year}-${month}-${yesterday}T00:00:00.000Z`)
-    : (todayStart = `${year}-${month}-${today}T00:00:00.000Z`);
+  currentTime < 24 //UTC시간이라서 변경한거임!! (삼항연산자사용!!)
+    ? (todayStart = `${year}-${month}-${today}T00:00:00.000Z`)
+    : (todayStart = `${year}-${month}-${yesterday}T00:00:00.000Z`);
 
   return { todayStart, weekStart };
 }
@@ -113,8 +112,6 @@ router.get('/', authmiddleware, async (req,res, next) => {
     console.log(arr_allinTime)
     console.log(arr_alloutTime)
 
-    const a = arr_allinTime - arr_alloutTime 
-    
     function changeTime(time) {
       let seconds = parseInt((time/1000)%60)
           , minutes = parseInt((time/(1000*60))%60)
@@ -126,16 +123,30 @@ router.get('/', authmiddleware, async (req,res, next) => {
 
       return hours + ":" + minutes + ":" + seconds;
     }
-    
-    console.log(changeTime(a))
 
+    const timedif =  arr_alloutTime - arr_allinTime
+    if(arr_alloutTime<arr_allinTime) {
+      res.status(200).send({
+        result: false,
+        message: "타임아웃시간을 눌러주세요"
+      })
+      return;
+    } 
+    console.log(timedif)
+    
     const user = await Studytime.find({ userId })
-    const day = user.map(x=>x.day)
-    console.log(day)
+    const day = user.filter(function(x) { return x.inTimestamp}).map(x=>x.day)
+    const days = day[day.length-1];
+    
+    const today = new Date(todayStart);
+    // +1은 다음날을 기준으로 하기위해서 한것이고 -9시간은 UTC와 KRA 시간이 달라서 조정하기 위해 뺀것!!
+    const tommorownum = today.getTime() + 24*60*60*1000 - 9*60*60*1000; 
+    console.log(tommorownum)
+    console.log(tommorownum - arr_allinTime);
     res.status(200).send({
       result: true,
-      studyTime : changeTime(a)
-
+      studyTime : changeTime(timedif),
+      day : days
   })
   } catch (error) {
     res.status(400).send({
