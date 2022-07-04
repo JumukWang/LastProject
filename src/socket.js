@@ -1,5 +1,5 @@
 const app = require("./app")
-const Room = require("./models/studyroom")
+const {studyroom, User} = require("./models")
 const server = require("http").createServer(app)
 // db 들어갈 자리
 
@@ -20,19 +20,17 @@ const io = require("socket.io")(server, {
  */
 
 io.on("connection", (socket) => {
-  let nickname
-  let roomTitle
-  let roomID
   socket.on("join_room", async (nickname, roomTitle, roomId) => {
-    nickname = nickname
-    roomTitle = title
+    let nickName = User.nickname
+    let title = roomTitle
+    let roomID = roomId
     try {
       socket.join(roomID)
-      socket.emit("connect", nickname)
+      socket.emit("connect", nickName)
       
 
-      console.log(`User with ID: ${nickname} joined room: ${roomID}`)
-      socket.emit("welcome_msg", nickname, roomID)
+      console.log(`User with ID: ${nickName} joined room: ${roomID}`)
+      socket.emit("welcome_msg", nickName, roomID)
 
       socket.on("send_message", (message) => {
         console.log("메시지: ", message)

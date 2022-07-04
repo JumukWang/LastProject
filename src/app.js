@@ -20,7 +20,7 @@ app.use(cors())
 app.use(express.json())
 app.use(helmet())
 app.use(morgan("tiny"))
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, "public")))
 
 app.use(cookieParser(process.env.COOKIE_SECRET))
