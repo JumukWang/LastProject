@@ -5,7 +5,7 @@ autoIncrement.initialize(mongoose.connection)
 const { Schema } = mongoose;
 const studyTimeSchema = new Schema({
     studytime : {
-        type: Number,
+        type: String,
     },
     timeId : {
         type: Number,
@@ -28,6 +28,9 @@ const studyTimeSchema = new Schema({
         type: Number,
     },
     outTimestamp: {
+        type: Number,
+    },
+    timedif: {
         type: Number,
     }
 });
