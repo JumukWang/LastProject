@@ -1,0 +1,66 @@
+require("dotenv").config()
+const express = require("express")
+const cors = require("cors")
+const morgan = require("morgan")
+const session = require("express-session")
+const helmet = require("helmet")
+const path = require("path")
+const connect = require("./src/database/database")
+const Router = require("./src/routes")
+const passport = require("passport")
+const passportConfig = require("./src/passport")
+const cookieParser = require("cookie-parser")
+const redis = require("redis");
+const redisStore = require("connect-redis")(session)
+const app = express()
+
+passportConfig() // 패스포트 설정
+connect()
+
+const redisClient = redis.createClient({
+  url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+  password: process.env.REDIS_PASSWORD,
+})
+
+//미들웨어
+app.use(cors())
+app.use(express.json())
+app.use(helmet())
+app.use(morgan("tiny"))
+app.use(express.urlencoded({ extended: false }))
+app.use(express.static(path.join(__dirname, "public")))
+
+app.use(cookieParser(process.env.COOKIE_SECRET))
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+    },
+    store : new redisStore({ client: redisClient }),
+  })
+)
+app.use(passport.initialize())
+app.use(passport.session())
+
+// 라우터
+app.use("/api", Router)
+
+// 서버 에러 처리
+app.use((req, res, next) => {
+  const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`)
+  error.status = 404
+  next(error)
+})
+
+app.use((error, req, res) => {
+  res.local.message = error.message
+  res.local.error = process.env.NODE_ENV !== "production" ? error : {}
+  res.status(error.status || 500)
+  res.render("error")
+})
+
+module.exports = app
