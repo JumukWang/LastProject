@@ -1,30 +1,33 @@
-const Sequelize = require("sequelize");
+const mongoose = require("mongoose")
+const AutoIncrement = require("mongoose-sequence")(mongoose)
 
-// User model
-module.exports = class User extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        userId: {
-          primaryKey : true,
-          unique : true,
-          autoIncrement : true,
-          type : Sequelize.INTEGER,
-        }
-      },
-      {
-        sequelize,
-        timestamps: true,
-        underscored: false,
-        modelName: "Room",
-        tableName: "Rooms",
-        paranoid: false,
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
-      }
-    );
+const { Schema } = mongoose
+const userSchema = new Schema(
+  {
+    userId: { type: Number, unique: true, default: 0 },
+    email: { type: String, unique: true, required: true },
+    nickname: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    refreshToken: { type: String },
+    provider: {
+      type: String,
+      require: true,
+    },
+    snsId: {
+      type: String,
+      require: true,
+      unique: true,
+    },
+    profileImg: {
+        type: String,
+    }
+  },
+  {
+    timestamps: true,
   }
-  static associate(db) {
-    db.User.hasMany()
-  }
-};
+)
+// , required: true
+userSchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "userId" })
+
+const User = mongoose.model("User", userSchema)
+module.exports = {User};

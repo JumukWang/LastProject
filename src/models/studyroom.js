@@ -1,30 +1,38 @@
-const Sequelize = require("sequelize")
+const mongoose = require("mongoose");
+const AutoIncrement = require("mongoose-sequence")(mongoose)
 
-// User model
-module.exports = class chatroom extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        roomId: {
-          primaryKey: true,
-          unique: true,
-          autoIncrement: true,
-          type: Sequelize.INTEGER,
-        },
-      },
-      {
-        sequelize,
-        timestamps: true,
-        underscored: false,
-        modelName: "Room",
-        tableName: "Rooms",
-        paranoid: false,
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
-      }
-    )
-  }
-  static associate(db) {
-    db.User.hasMany()
-  }
-}
+const { Schema } = mongoose;
+const studySchema = new Schema({
+    title: {
+        type: String,
+        require: true,
+    },
+    password: {
+        type: Number,
+        require: true
+    },
+    content: {
+        type: String,
+    },
+    date: {
+        type: String,
+    },
+    tagId: {
+        type: Number,
+    },
+    roomId: {
+        type: Number,
+        unique: true,
+    },
+    word: {
+        type: String,
+    },
+    createAt: {
+        type: Date,
+        default: Date.now()
+    }
+});
+
+studySchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "roomId" })
+const studyroom = mongoose.model("studyroom", studySchema)
+module.exports = studyroom;

@@ -1,27 +1,9 @@
-const Sequelize = require("sequelize")
+const mongoose = require("mongoose");
 
-// User model
-module.exports = class Todo extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        text: {
-          type: Sequelize.STRING,
-        },
-      },
-      {
-        sequelize,
-        timestamps: true,
-        underscored: false,
-        modelName: "todo",
-        tableName: "todos",
-        paranoid: false,
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
-      }
-    )
-  }
-  static associate(db) {
-    db.User.hasMany()
-  }
-}
+const { Schema } = mongoose;
+const todoSchema = new Schema({
+    
+});
+
+
+module.exports = mongoose.model("todo", todoSchema);
