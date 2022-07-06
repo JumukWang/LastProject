@@ -3,8 +3,23 @@ const jwt = require("jsonwebtoken");
 const SECRET_KEY = process.env.SECRET_KEY;
 const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY;
 const {User} = require("../models");
+const redis = require("redis");
+// const redisStore = require("connect-redis")(session)
 
-module.exports = (req, res, next) => {
+const redisClient = redis.createClient({
+  url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+  // password: process.env.REDIS_PASSWORD,
+})
+module.exports = async (req, res, next) => {
+  await redisClient.connect();
+
+  let token = await redisClient.get("key")
+  // 프론트에서 쿠키에 세션 아이디를 쿠키에 담아서 키로 벨류를 비교
+  // 세션 아이디를 확인 세션아이디 토큰 확인 ex) 이메일 / 토큰
+  if(token) {
+    return;
+  }
+  
   const { authorization } = req.headers;
   if (authorization == null) {
     res.status(401).send({
@@ -31,7 +46,7 @@ module.exports = (req, res, next) => {
       console.log("decodedToken정보입니다.", decodedToken);
       const email = decodedToken.email;
       console.log(decodedToken.email);
-      User.findOne({ email }).then((user) => {                                                
+      User.findOne({ email }).then(async(user) => {                                                
         console.log(user);
         const targetRefreshToken = user.refreshToken
 
@@ -58,6 +73,7 @@ module.exports = (req, res, next) => {
           console.log('accessToken만 만료니까, 쿠키에다가 accesstoken넣어주기')
           res.cookie('accessToken', myNewToken);//쿠키에 access토큰 저장되는지 확인
           res.locals.user = newToken; //로컬스토리지에 저장되는지 프론트분께 물어보기, 둘중에 하나 지워야할듯
+          await redisClient.setEx("key", 1800, JSON.stringify(newToken));// JSON.stringify() 객체를 스트링으로 바꿔준다
           next();
         }
       });

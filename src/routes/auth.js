@@ -161,9 +161,9 @@ router.get("/google", passport.authenticate("google", { scope: ["profile", "emai
 
 router.get("/google/callback", (req, res, next) => {
   passport.authenticate(
-    "google",
+    "google",                                                                         
     { failureRedirect: "/" },
-    (err, user, info) => {
+    (err, user, info) => { // user 객체 뜯어보기
       if (err) return next(err)
       const { userId, nickname } = user
       const token = jwt.sign({ userId, nickname }, process.env.SECRET_KEY)

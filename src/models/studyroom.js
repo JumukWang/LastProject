@@ -30,9 +30,9 @@ const studySchema = new Schema({
     createAt: {
         type: Date,
         default: Date.now()
-    }
+    },
 });
 
 studySchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "roomId" })
-const studyroom = mongoose.model("studyroom", studySchema)
-module.exports = studyroom;
+const Room = mongoose.model("studyroom", studySchema)
+module.exports = {Room};

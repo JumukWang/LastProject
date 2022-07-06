@@ -10,18 +10,18 @@ const io = require("socket.io")(server, {
     credentials: true,
   },
 })
-io.adapter(redis({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  password: process.env.REDIS_PASSWORD
-}))
+// io.adapter(redis({
+//   host: process.env.REDIS_HOST,
+//   port: process.env.REDIS_PORT,
+//   password: process.env.REDIS_PASSWORD
+// }))
 
 
 io.on("connection", (socket) => {
   socket.on("join_room", async (nickname, roomTitle) => {
     try {
       socket.join(roomTitle)
-      socket.to(roomTitle).emit("welcome", { author: nickname })
+      socket.to(roomTitle).emit("welcome", { nickname })
       console.log(`User with ID: ${nickname} joined room: ${roomTitle}`)
       socket.emit("welcome_msg", nickname) //roomID
 

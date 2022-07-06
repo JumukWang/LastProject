@@ -10,17 +10,13 @@ const Router = require("./src/routes")
 const passport = require("passport")
 const passportConfig = require("./src/passport")
 const cookieParser = require("cookie-parser")
-const redis = require("redis");
-const redisStore = require("connect-redis")(session)
+
 const app = express()
 
 passportConfig() // 패스포트 설정
 connect()
 
-const redisClient = redis.createClient({
-  url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
-  password: process.env.REDIS_PASSWORD,
-})
+
 
 //미들웨어
 app.use(cors())
@@ -40,7 +36,6 @@ app.use(
       httpOnly: true,
       secure: false,
     },
-    store : new redisStore({ client: redisClient }),
   })
 )
 app.use(passport.initialize())

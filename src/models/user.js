@@ -22,6 +22,7 @@ const userSchema = new Schema(
         type: String,
     }
   },
+
   {
     timestamps: true,
   }
@@ -31,3 +32,5 @@ userSchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "userId" })
 
 const User = mongoose.model("User", userSchema)
 module.exports = {User};
+
+// roomid 
