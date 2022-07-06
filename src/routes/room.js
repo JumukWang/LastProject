@@ -21,7 +21,6 @@ router.get("/rooms", (req, res, next) => {
 router.post("/create", authMiddleware, async (req, res, next) => {
   try {
     const { roomId, tagId, title, content, password, date } = req.body
-    
     const newStudyRoom = await Room.create({
       roomId,
       tagId,
@@ -43,7 +42,7 @@ router.post("/create", authMiddleware, async (req, res, next) => {
 })
 
 // 공개방 입장
-router.post("/enter-room/:roomId", (req, res, next) => {
+router.post("/public-room/:roomId", (req, res, next) => {
   try {
     // 공개방 비공개방
     const { nickname } = res.locals.use
@@ -61,16 +60,16 @@ router.post("/enter-room/:roomId", (req, res, next) => {
 
 router.post("/private-room/:roomId", async (req, res, next) => {
   try {
-    // 공개방 비공개방
+    //비공개방
+    const { roomId } = req.params
     const { nickname } = res.locals.use
-    const passwordCheck = await Room.findOne({ password })
-    if(!passwordCheck) {
+    const { password } = req.body
+    const passwordCheck = await Room.findOne({ roomId })
+    if(passwordCheck.password !== password) {
       return res.status(200).send({ msg: "비밀번호가 틀렸습니다 "})
     }
 
     return res.status(200).send(`${nickname}님이 입장하셨습니다`)
-
-
 
   } catch (error) {
     return res.status(400).send({
@@ -83,7 +82,7 @@ router.post("/private-room/:roomId", async (req, res, next) => {
 
 
 // 방삭제
-router.delete("/rooms/:roomId", async (req, res, next) => {
+router.delete("/:roomId", async (req, res, next) => {
   try {
     // 비밀번호 헤더로 넘기는 방법
     const { roomId } = req.params
@@ -98,7 +97,7 @@ router.delete("/rooms/:roomId", async (req, res, next) => {
   }
 })
 // 방나가기
-router.post("/room/exit", (req, res, next) => {
+router.post("/exit", (req, res, next) => {
   try {
     res.status(201).send({ 
       success: true,
