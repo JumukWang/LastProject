@@ -8,7 +8,7 @@ const studySchema = new Schema({
         require: true,
     },
     password: {
-        type: String,
+        type: Number,
         require: true
     },
     content: {
