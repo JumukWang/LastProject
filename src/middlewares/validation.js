@@ -15,7 +15,7 @@ const validateEmail = [
     .isEmail()
     .withMessage("이메일 형식을 입력해 주세요")
     .normalizeEmail(),
-    validate
+  validate,
 ]
 
 const validateNick = [
@@ -23,7 +23,7 @@ const validateNick = [
     .trim()
     .isLength({ min: 2 })
     .withMessage("닉네임은 두 글자 이상 입력해 주세요"),
-    validate
+  validate,
 ]
 
 const validatePwd = [
@@ -32,5 +32,9 @@ const validatePwd = [
     .withMessage(
       "비밀번호는 특수문자 제외 4자리 이상에서 16자리 이하로 써주십시오"
     ),
-    validate
+  validate,
 ]
+
+const validateAll = [validateEmail, validateNick, validatePwd]
+
+module.exports = { validateAll, validateEmail, validateNick, validatePwd }

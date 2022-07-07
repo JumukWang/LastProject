@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
         socket.rooms.forEach((roomTitle) => socket.to(roomTitle).emit("bye"))
         console.log(roomTitle)
       })
-
+      
       socket.on("disconnect", () => {
         console.log("User Disconnected", socket.id)
       })

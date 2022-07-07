@@ -1,12 +1,12 @@
-const Room = require("../models/studyroom")
-const User = require("../models/user")
+const {Room} = require("../models")
+const {User} = require("../models")
 const authMiddleware = require("../middlewares/authmiddleware")
 const router = require("express").Router()
 
 // 방조회
-router.get("/rooms", (req, res, next) => {
+router.get("/rooms", async (req, res, next) => {
   try {
-    const roomList = Room.findAll({}).sort(-createAt)
+    const roomList = await Room.find({}).sort({ createAt: -1 })
     return res.status(201).send({
       result: true,
       roomList,
@@ -24,15 +24,14 @@ router.get("/rooms", (req, res, next) => {
 // 방생성
 router.post("/create", authMiddleware, async (req, res, next) => {
   try {
-    const { roomId, tagId, title, content, password, date } = req.body
+    const { roomId, tagName, title, content, password, date } = req.body
     const newStudyRoom = await Room.create({
       roomId,
-      tagId,
+      tagName,
       title,
       content,
       password,
       date,
-      
     })
     return res
       .status(201)

@@ -5,9 +5,9 @@ const { Schema } = mongoose
 const userSchema = new Schema(
   {
     userId: { type: Number, unique: true, default: 0 },
-    email: { type: String, unique: true, required: true },
-    nickname: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    email: { type: String, unique: true },
+    nickname: { type: String, unique: true },
+    password: { type: String, },
     refreshToken: { type: String },
     provider: {
       type: String,

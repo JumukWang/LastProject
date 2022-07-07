@@ -17,8 +17,9 @@ const studySchema = new Schema({
     date: {
         type: String,
     },
-    tagId: {
-        type: Number,
+    tagName: {
+        type: Array,
+        require: true,
     },
     roomId: {
         type: Number,
@@ -31,6 +32,7 @@ const studySchema = new Schema({
         type: Date,
         default: Date.now()
     },
+    
 });
 
 studySchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "roomId" })

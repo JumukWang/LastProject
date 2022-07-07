@@ -12,10 +12,11 @@ const {
   validateEmail,
   validateNick,
   validatePwd,
+  validateAll
 } = require("../middlewares/validation")
 
 // 회원가입
-router.post("/signup", async (req, res, next) => {
+router.post("/signup", validateAll, validatePwd, async (req, res, next) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck } = req.body
@@ -100,7 +101,7 @@ router.post("/login", async (req, res, next) => {
 })
 
 // 이메일 중복검사
-router.get("/user/exemail", async (req, res, next) => {
+router.get("/user/exemail", validateEmail, async (req, res, next) => {
   try {
     const { email } = req.body
     const exisEmail = await User.findOne({
@@ -123,7 +124,7 @@ router.get("/user/exemail", async (req, res, next) => {
 })
 
 // 닉네임 중복검사
-router.get("/user/exnickname", async (req, res, next) => {
+router.get("/user/exnickname", validateNick, async (req, res, next) => {
   try {
     const { nickname } = req.body
     const exitNick = await User.findOne({
