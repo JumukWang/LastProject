@@ -8,6 +8,7 @@ const userSchema = new Schema(
     email: { type: String, unique: true },
     nickname: { type: String, unique: true },
     password: { type: String, },
+    profile_url: { type: String },
     refreshToken: { type: String },
     provider: {
       type: String,
