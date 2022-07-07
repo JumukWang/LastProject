@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const autoIncrement = require("mongoose-auto-increment")
-autoIncrement.initialize(mongoose.connection)
+
 
 const { Schema } = mongoose;
 const studyTimeSchema = new Schema({
@@ -35,11 +34,6 @@ const studyTimeSchema = new Schema({
     }
 });
 
-studyTimeSchema.plugin(autoIncrement.plugin, {
-    model: "Time",
-    field: "timeId",
-    startAt: 1, //시작
-    increment: 1, // 증가
-  })
+
 
 module.exports = mongoose.model("studyTime", studyTimeSchema);

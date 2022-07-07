@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken")
 const Bcrypt = require("bcrypt")
 const passport = require("passport")
 const router = require("express").Router()
+const redisClient = require('../util/jwt-util');
 const SALT_NUM = process.env.SALT_NUM
 const SECRET_KEY = process.env.SECRET_KEY
 const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY

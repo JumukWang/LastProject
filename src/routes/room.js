@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 const {Room} = require("../models")
 const {User} = require("../models")
 const authMiddleware = require("../middlewares/authmiddleware")
-=======
-const {Room} = require("../models/studyroom")
->>>>>>> origin/yechan2
+
 const router = require("express").Router()
 
 // 방조회

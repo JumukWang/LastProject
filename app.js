@@ -10,9 +10,11 @@ const Router = require("./src/routes")
 const passport = require("passport")
 const passportConfig = require("./src/passport")
 const cookieParser = require("cookie-parser")
+const initRedisClient = require("./src/database/redis")
 
 const app = express()
 
+initRedisClient();
 passportConfig() // 패스포트 설정
 connect()
 
