@@ -1,13 +1,15 @@
 require("dotenv").config()
 const { User } = require("../models")
-const jwt = require("jsonwebtoken")
 const Bcrypt = require("bcrypt")
 const passport = require("passport")
 const router = require("express").Router()
-const redisClient = require('../util/jwt-util');
+const jwt = require('../util/jwt-util');
+const redisClient = require('../database/redis');
+
+
+
 const SALT_NUM = process.env.SALT_NUM
-const SECRET_KEY = process.env.SECRET_KEY
-const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY
+
 
 const {
   validateEmail,
@@ -17,7 +19,7 @@ const {
 } = require("../middlewares/validation")
 
 // 회원가입
-router.post("/signup", validateAll, validatePwd, async (req, res, next) => {
+router.post("/signup", validateAll, async (req, res, next) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck } = req.body
@@ -39,9 +41,13 @@ router.post("/signup", validateAll, validatePwd, async (req, res, next) => {
       refreshToken: null,
     })
     await user.save()
+
+    const token = jwt.authSign(user);
+
     return res.status(200).send({
       result: true,
       msg: "회원가입이 되었습니다.",
+      accesstoken: token,
     })
   } catch (error) {
     console.error(error)
@@ -54,7 +60,7 @@ router.post("/signup", validateAll, validatePwd, async (req, res, next) => {
 })
 
 // 로그인
-router.post("/login", async (req, res, next) => {
+router.post("/login", validatePwd, async (req, res, next) => {
   try {
     // 여기도 중복검사, 해쉬화된 비밀번호 검증
     const { email, password } = req.body
@@ -76,21 +82,19 @@ router.post("/login", async (req, res, next) => {
       })
       return
     }
-
-    const accessToken = jwt.sign({ email: user.email }, SECRET_KEY, {
-      expiresIn: "30m",
-    })
-    const refreshToken = jwt.sign({}, REFRESH_SECRET_KEY, {
-      expiresIn: "10d",
-    })
-
-    await User.updateOne({ email: user.email }, { refreshToken: refreshToken })
+    
+    const accessToken = jwt.authSign(user)
+    const refreshToken = jwt.refreshToken()
+    
+    redisClient.set(user.email, refreshToken);
 
     res.status(200).send({
+      email: user.email,
       nickname: user.nickname,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
       result: true,
       msg: "로그인 되었습니다",
-      token: accessToken,
     })
   } catch (error) {
     return res.status(400).send({
@@ -177,6 +181,9 @@ router.get("/google/callback", (req, res, next) => {
     }
   )(req, res, next)
 })
+
+
+
 
 // router.get(
 //   "/google/callback",

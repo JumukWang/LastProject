@@ -1,20 +1,23 @@
 const { promisify } = require("util")
 const jwt = require("jsonwebtoken")
-const redisClient = require("redis")
+const redisClient = require("../database/redis")
 const SECRET = process.env.SECRET_KEY
 
 module.exports = {
   // access 토큰 발급
-  authSign: (user) => {
+  authSign: (user, res, req) => {
     const payload = {
       email: user.email,
       nickname: user.nickname,
+      
     }
-
     return jwt.sign(payload, SECRET, {
       // token 발급
-      expiresIn: "30m",
+      algorithm: 'HS256',
+      expiresIn: "10s",
     })
+    
+    
   },
   tokenVerify: (authToken) => {
     // token 검증
@@ -35,7 +38,8 @@ module.exports = {
   },
   refreshToken: () => {
     return jwt.sign({}, SECRET, {
-      expiresIn: "10d",
+      algorithm: 'HS256',
+      expiresIn: "14d",
     })
   },
   refreshVerify: async (token, userId) => {

@@ -30,7 +30,7 @@
     "jest": "^28.1.2",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.4",
-    "mongoose": "^6.4.1",
+    "mongoose": "^6.4.3",
     "mongoose-sequence": "^5.3.1",
     "morgan": "^1.10.0",
     "passport": "^0.6.0",
@@ -38,6 +38,7 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-kakao": "^1.0.1",
     "redis": "^4.2.0",
+    "redis-cli": "^2.1.2",
     "socket.io": "^4.5.1",
     "socket.io-redis": "^6.1.1",
     "util": "^0.12.4"

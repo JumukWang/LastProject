@@ -21,17 +21,20 @@ const userSchema = new Schema(
     },
     profileImg: {
         type: String,
+    },
+    hostRoom: {
+      type: Array,
+    },
+    attendRoom: {
+      type: Array,
     }
   },
-
   {
     timestamps: true,
   }
 )
-// , required: true
 userSchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "userId" })
 
 const User = mongoose.model("User", userSchema)
 module.exports = {User};
 
-// roomid 

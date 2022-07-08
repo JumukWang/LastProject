@@ -1,20 +1,21 @@
 require("dotenv").config()
-const express = require("express")
+const path = require("path")
 const cors = require("cors")
 const morgan = require("morgan")
-const session = require("express-session")
 const helmet = require("helmet")
-const path = require("path")
-const connect = require("./src/database/database")
-const Router = require("./src/routes")
+const express = require("express")
 const passport = require("passport")
-const passportConfig = require("./src/passport")
+const session = require("express-session")
 const cookieParser = require("cookie-parser")
-const initRedisClient = require("./src/database/redis")
+const RedisStore = require("connect-redis")(session)
+const Router = require("./src/routes")
+const passportConfig = require("./src/passport")
+const connect = require("./src/database/database")
+const redisClient = require("./src/database/redis")
 
+
+redisClient.connect();
 const app = express()
-
-initRedisClient();
 passportConfig() // 패스포트 설정
 connect()
 
@@ -38,6 +39,7 @@ app.use(
       httpOnly: true,
       secure: false,
     },
+    store: new RedisStore({ client: redisClient })
   })
 )
 app.use(passport.initialize())

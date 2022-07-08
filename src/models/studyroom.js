@@ -28,6 +28,17 @@ const studySchema = new Schema({
     word: {
         type: String,
     },
+    imgUrl: {
+        type: String,
+    },
+    groupNum: {
+        type: Number,
+        default: 0
+    },
+    isLiked: {
+        type: Boolean,
+        default: false,
+    },
     createAt: {
         type: Date,
         default: Date.now()
@@ -36,5 +47,5 @@ const studySchema = new Schema({
 });
 
 studySchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "roomId" })
-const Room = mongoose.model("studyroom", studySchema)
+const Room = mongoose.model("Room", studySchema)
 module.exports = {Room};
