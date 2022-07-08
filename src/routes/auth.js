@@ -86,7 +86,6 @@ router.post("/login", validatePwd, async (req, res, next) => {
     redisClient.set(user.email, refreshToken)
 
     res.status(200).send({
-      email: user.email,
       nickname: user.nickname,
       accessToken: accessToken,
       refreshToken: refreshToken,

@@ -17,6 +17,7 @@ module.exports = async (req, res, next) => {
   }
   
   try {
+    // 헤더에서 인증, 토큰 비교 검증
     if (req.headers.authorization && req.headers.refreshToken) {
       const authToken = req.headers.authorization.split("Bearer ")[1]
       const refreshToken = req.headers.refreshToken
@@ -54,7 +55,7 @@ module.exports = async (req, res, next) => {
           })
         }
       } else {
-        res.status(400).send({
+        res.status(400).send({ // 토큰이 둘 다 만료된 상황
           result: false,
           msg: "refresh token, access token 갱신이 필요합니다.",
         })
