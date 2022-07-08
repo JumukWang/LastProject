@@ -124,6 +124,7 @@ router.delete("/:roomId", authMiddleware, async (req, res, next) => {
   try {
     // 비밀번호 헤더로 넘기는 방법
     const { roomId } = req.params
+    const { password } = req.body
     await Room.deleteOne({ roomId })
     // 호스트 유저만 삭제할 수 있게 만들어야함
 

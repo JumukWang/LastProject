@@ -3,19 +3,16 @@ const { User } = require("../models")
 const Bcrypt = require("bcrypt")
 const passport = require("passport")
 const router = require("express").Router()
-const jwt = require('../util/jwt-util');
-const redisClient = require('../database/redis');
-
-
+const jwt = require("../util/jwt-util")
+const redisClient = require("../database/redis")
 
 const SALT_NUM = process.env.SALT_NUM
-
 
 const {
   validateEmail,
   validateNick,
   validatePwd,
-  validateAll
+  validateAll,
 } = require("../middlewares/validation")
 
 // 회원가입
@@ -42,7 +39,7 @@ router.post("/signup", validateAll, async (req, res, next) => {
     })
     await user.save()
 
-    const token = jwt.authSign(user);
+    const token = jwt.authSign(user)
 
     return res.status(200).send({
       result: true,
@@ -82,11 +79,11 @@ router.post("/login", validatePwd, async (req, res, next) => {
       })
       return
     }
-    
+
     const accessToken = jwt.authSign(user)
     const refreshToken = jwt.refreshToken()
-    
-    redisClient.set(user.email, refreshToken);
+
+    redisClient.set(user.email, refreshToken)
 
     res.status(200).send({
       email: user.email,
@@ -153,28 +150,16 @@ router.get("/user/exnickname", validateNick, async (req, res, next) => {
 
 router.get("/kakao", passport.authenticate("kakao"))
 
-router.get(
-  "/kakao/callback",
-  passport.authenticate("kakao", {
-    failureRedirect: "/",
-  }),
-  (req, res) => {
-    res.redirect("/")
-  }
-)
-
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }))
-
-router.get("/google/callback", (req, res, next) => {
+router.get("/kakao/callback", (req, res, next) => {
   passport.authenticate(
-    "google",                                                                         
+    "kakao",
     { failureRedirect: "/" },
-    (err, user, info) => { // user 객체 뜯어보기
+    (err, user, info) => {
       if (err) return next(err)
       const { userId, nickname } = user
-      const token = jwt.sign({ userId, nickname }, process.env.SECRET_KEY)
+      const accessToken = jwt.authSign({ userId, nickname })
       result = {
-        token,
+        accessToken,
         nickname,
       }
       res.send({ user: result })
@@ -182,8 +167,28 @@ router.get("/google/callback", (req, res, next) => {
   )(req, res, next)
 })
 
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+)
 
-
+router.get("/google/callback", (req, res, next) => {
+  passport.authenticate(
+    "google",
+    { failureRedirect: "/" },
+    (err, user, info) => {
+      // user 객체 뜯어보기
+      if (err) return next(err)
+      const { userId, nickname } = user
+      const accessToken = jwt.authSign({ userId, nickname })
+      result = {
+        accessToken,
+        nickname,
+      }
+      res.send({ user: result })
+    }
+  )(req, res, next)
+})
 
 // router.get(
 //   "/google/callback",
