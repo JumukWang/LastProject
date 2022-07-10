@@ -29,6 +29,7 @@ router.post("/create/:userId", authMiddleware, async (req, res, next) => {
     const { tagName, title, content, password, date, imgUrl } = req.body
     const host = Number(req.params.userId)
     const newStudyRoom = await Room.create({
+      // 바로 넣어주기 hostId
       tagName,
       title,
       content,
@@ -36,7 +37,9 @@ router.post("/create/:userId", authMiddleware, async (req, res, next) => {
       date,
       imgUrl,
     })
-    // await Room.updateOne({ hostId }, { $set: { hostId: host } });
+    console.log(newStudyRoom.roomId)
+    const roomNum = Number(newStudyRoom.roomId)
+    await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
     return res
     .status(201)
     .send({ msg: "스터디룸을 생성하였습니다.", roomInfo: newStudyRoom })

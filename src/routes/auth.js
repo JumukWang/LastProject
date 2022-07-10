@@ -35,7 +35,6 @@ router.post("/signup", validateAll, async (req, res, next) => {
       email,
       nickname,
       password: hashPassword,
-      refreshToken: null,
     })
     await user.save()
 
