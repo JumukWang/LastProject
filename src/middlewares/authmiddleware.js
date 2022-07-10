@@ -5,9 +5,10 @@ module.exports = async (req, res, next) => {
   if (req.headers.authorization) {
     const authToken = req.headers.authorization.split("Bearer ")[1]
     const tokenRsult = tokenVerify(authToken) // 엑세스 토큰 넘어옴
-    if (tokenRsult.msg) { // 엑세스 토큰 만료시 false, msg 'jwt expired'
-      req.email, req.nickname
-      next()
+    if (tokenRsult.result) { // 엑세스 토큰 만료시 false, msg 'jwt expired'
+      req.email = tokenRsult.email
+      req.nickname = tokenRsult.nickname
+      next();   
     }
   } else {
     res.status(401).send({
@@ -26,7 +27,7 @@ module.exports = async (req, res, next) => {
       const accessResult = tokenVerify(authToken)
       // access token 디코딩
       const decode = jwt.decode(authToken)
-
+      
       if (decode === null) {
         res.status(401).send({
           result: false,
@@ -52,6 +53,7 @@ module.exports = async (req, res, next) => {
               accessToken: newToken,
               refreshToken,
             },
+    
           })
         }
       } else {

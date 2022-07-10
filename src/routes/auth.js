@@ -40,7 +40,7 @@ router.post("/signup", validateAll, async (req, res, next) => {
     await user.save()
 
     const token = jwt.authSign(user)
-
+    
     return res.status(200).send({
       result: true,
       msg: "회원가입이 되었습니다.",
@@ -73,19 +73,20 @@ router.post("/login", validatePwd, async (req, res, next) => {
       bcpassword = Bcrypt.compare(password, user.password)
     }
     if (!bcpassword) {
-      res.status(400).send({
+      return res.status(400).send({
         errorMessage: "이메일 또는 패스워드가 틀렸습니다.",
         result: false,
       })
-      return
     }
 
     const accessToken = jwt.authSign(user)
     const refreshToken = jwt.refreshToken()
 
-    redisClient.set(user.email, refreshToken)
+    redisClient.set(user.id, refreshToken)
 
-    res.status(200).send({
+    return res.status(200).send({
+      userId: user.userId,
+      eamil: user.nickname,
       nickname: user.nickname,
       accessToken: accessToken,
       refreshToken: refreshToken,

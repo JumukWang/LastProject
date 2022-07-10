@@ -9,15 +9,14 @@ const userSchema = new Schema(
     nickname: { type: String, unique: true },
     password: { type: String, },
     profile_url: { type: String },
-    refreshToken: { type: String },
-    provider: {
-      type: String,
-      require: true,
-    },
     snsId: {
       type: String,
       require: true,
       unique: true,
+    },
+    provider: {
+      type: String,
+      require: true,
     },
     profileImg: {
         type: String,
@@ -33,7 +32,7 @@ const userSchema = new Schema(
     timestamps: true,
   }
 )
-userSchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "userId" })
+userSchema.plugin(AutoIncrement, { inc_field: "userId" })
 
 const User = mongoose.model("User", userSchema)
 module.exports = {User};

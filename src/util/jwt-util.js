@@ -5,16 +5,16 @@ const SECRET = process.env.SECRET_KEY
 
 module.exports = {
   // access 토큰 발급
-  authSign: (user, res, req) => {
+  authSign: (user, req, res) => {
     const payload = {
+      userId: user.userId,
       email: user.email,
       nickname: user.nickname,
-      
     }
     return jwt.sign(payload, SECRET, {
       // token 발급
       algorithm: 'HS256',
-      expiresIn: "10s",
+      expiresIn: "30m",
     })
     
     
@@ -26,6 +26,7 @@ module.exports = {
       decode = jwt.verify(authToken, SECRET)
       return {
         result: true,
+        userId: decode.userId,
         email: decode.email,
         nickname: decode.nickname,
       }

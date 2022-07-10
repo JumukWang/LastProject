@@ -3,6 +3,14 @@ const AutoIncrement = require("mongoose-sequence")(mongoose)
 
 const { Schema } = mongoose;
 const studySchema = new Schema({
+    roomId: {
+        type: Number,
+        unique: true,
+    },
+    hostId: {
+        type: Number,
+        default: 0
+    },
     title: {
         type: String,
         require: true,
@@ -16,14 +24,6 @@ const studySchema = new Schema({
     },
     date: {
         type: String,
-    },
-    tagName: {
-        type: Array,
-        require: true,
-    },
-    roomId: {
-        type: Number,
-        unique: true,
     },
     word: {
         type: String,
@@ -43,9 +43,13 @@ const studySchema = new Schema({
         type: Date,
         default: Date.now()
     },
+    tagName: {
+        type: Array,
+        require: true,
+    },
     
 });
 
-studySchema.plugin(AutoIncrement, { start_seq: 1, inc_field: "roomId" })
+studySchema.plugin(AutoIncrement, { inc_field: "roomId" })
 const Room = mongoose.model("Room", studySchema)
 module.exports = {Room};

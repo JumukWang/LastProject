@@ -22,7 +22,6 @@ router.get("/", async (req, res, next) => {
 // 유저에 배열 만들어서 저장해야함
 // res.locals.user 못쓰니까 불러와서 써야함
 router.post("/like/:roomId", authMiddleware, async (req, res, next) => {
-  let flag = false
   const roomId = Number(req.params.roomId)
   if (roomId) {
     let flag = true
@@ -36,7 +35,6 @@ router.post("/like/:roomId", authMiddleware, async (req, res, next) => {
 })
 
 router.post("/dislike/:roomId", authMiddleware, async (req, res, next) => {
-  let flag = true
   const roomId = Number(req.params.roomId)
   if (roomId) {
     let flag = false

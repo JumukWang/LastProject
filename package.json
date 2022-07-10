@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint *.js",
+    "lint : fix": "eslint --fix *.js"
   },
   "repository": {
     "type": "git",
