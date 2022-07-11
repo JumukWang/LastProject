@@ -3,13 +3,14 @@ const passport = require("passport")
 const KakaoStrategy = require("passport-kakao").Strategy
 const GoogleStrategy = require("passport-google-oauth20").Strategy
 const {User} = require("../models/")
+const config = require("../config")
 
 module.exports = () => {
   passport.use(
     new KakaoStrategy(
       {
-        clientID: process.env.KAKAO_ID,
-        callbackURL: process.env.KAKAO_REDIRECT_URI,
+        clientID: config.KAKAO_ID,
+        callbackURL: config.KAKAO_REDIRECT_URI,
       },
 
       //카카오서버에서 보낸 카카오 계정정보
@@ -43,9 +44,9 @@ module.exports = () => {
   passport.use(
     new GoogleStrategy(
       {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_SECRET,
-        callbackURL: process.env.GOOGLE_REDIRECT_URI,
+        clientID: config.GOOGLE_CLIENT_ID,
+        clientSecret: config.GOOGLE_SECRET,
+        callbackURL: config.GOOGLE_REDIRECT_URI,
       },
       async (accessToken, refreshToken, profile, done) => {
         console.log("google profile", profile)

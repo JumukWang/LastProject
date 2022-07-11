@@ -1,9 +1,10 @@
 require("dotenv").config();
+const config = require("../config")
 
 const mongoose = require("mongoose");
 
 const connect = () => {
-    mongoose.connect(process.env.MONGO_URL, { ignoreUndefined: true }).catch((err) => {
+    mongoose.connect(config.MONGO_URL, { ignoreUndefined: true }).catch((err) => {
         console.error(err);
     });
 };

@@ -1,9 +1,10 @@
 // redis.js
 const redis = require('redis');
+const config = require("../config")
 
 const redisClient = redis.createClient({
-    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
-    password: process.env.REDIS_PASSWORD,
+    url: `redis://${config.REDIS_HOST}:${config.REDIS_PORT}`,
+    password: config.REDIS_PASSWORD,
 });
 
 module.exports = redisClient

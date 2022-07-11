@@ -36,7 +36,7 @@ module.exports = async (req, res, next) => {
       }
 
       //access token decoding 값에서 id를 가져와 refresh token 검증
-      const refreshResult = refreshVerify(refreshToken, decode.id)
+      const refreshResult = refreshVerify(refreshToken, decode.email)
 
       if (accessResult.msg === "jwt expired" && accessResult.result === false) {
         if (refreshResult.result === false) {

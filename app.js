@@ -12,7 +12,7 @@ const Router = require("./src/routes")
 const passportConfig = require("./src/passport")
 const connect = require("./src/database/database")
 const redisClient = require("./src/database/redis")
-
+const config = require("./src/config")
 
 redisClient.connect();
 const app = express()
@@ -29,12 +29,12 @@ app.use(morgan("tiny"))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, "public")))
 
-app.use(cookieParser(process.env.COOKIE_SECRET))
+app.use(cookieParser(config.COOKIE_SECRET))
 app.use(
   session({
     resave: false,
     saveUninitialized: false,
-    secret: process.env.COOKIE_SECRET,
+    secret: config.COOKIE_SECRET,
     cookie: {
       httpOnly: true,
       secure: false,

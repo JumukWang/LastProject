@@ -4,7 +4,7 @@ const authMiddleware = require("../middlewares/authmiddleware")
 const User = require("../models/user")
 const Bcrypt = require("bcrypt");
 const authmiddleware = require("../middlewares/authmiddleware");
-const SALT_NUM = process.env.SALT_NUM
+const config = require("../config")
 
 // 마이페이지
 router.get('/', authMiddleware, async (req, res) => {
@@ -42,7 +42,7 @@ router.put('/update', authMiddleware, async (req, res) => {
             })
         }
         
-        const salt = await Bcrypt.genSalt(Number(SALT_NUM))
+        const salt = await Bcrypt.genSalt(Number(config.SALT_NUM))
         const hashPassword = await Bcrypt.hash(password, salt)
 
         const user = await User.updateOne({ userId }, 

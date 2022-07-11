@@ -1,17 +1,17 @@
 const { promisify } = require("util")
 const jwt = require("jsonwebtoken")
 const redisClient = require("../database/redis")
-const SECRET = process.env.SECRET_KEY
+const config = require("../config")
+
 
 module.exports = {
   // access 토큰 발급
   authSign: (user, req, res) => {
     const payload = {
-      userId: user.id,
       email: user.email,
       nickname: user.nickname,
     }
-    return jwt.sign(payload, SECRET, {
+    return jwt.sign(payload, config.SECRET_KEY, {
       // token 발급
       algorithm: 'HS256',
       expiresIn: "30m",
@@ -23,10 +23,9 @@ module.exports = {
     // token 검증
     let decode = null
     try {
-      decode = jwt.verify(authToken, SECRET)
+      decode = jwt.verify(authToken, config.SECRET_KEY)
       return {
         result: true,
-        userId: decode.id,
         email: decode.email,
         nickname: decode.nickname,
       }
@@ -38,7 +37,7 @@ module.exports = {
     }
   },
   refreshToken: () => {
-    return jwt.sign({}, SECRET, {
+    return jwt.sign({}, config.SECRET_KEY, {
       algorithm: 'HS256',
       expiresIn: "14d",
     })
@@ -51,7 +50,7 @@ module.exports = {
       const recieveToken = await getAsync(userId)
       if (token === recieveToken) {
         try {
-          jwt.verify(token, SECRET)
+          jwt.verify(token, config.SECRET_KEY)
           return true
         } catch (error) {
           return {

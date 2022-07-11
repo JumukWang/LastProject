@@ -5,8 +5,7 @@ const passport = require("passport")
 const router = require("express").Router()
 const jwt = require("../util/jwt-util")
 const redisClient = require("../database/redis")
-
-const SALT_NUM = process.env.SALT_NUM
+const config = require("../config")
 
 const {
   validateEmail,
