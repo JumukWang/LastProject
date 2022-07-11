@@ -13,9 +13,9 @@ const passportConfig = require("./src/passport")
 const connect = require("./src/database/database")
 const redisClient = require("./src/database/redis")
 const config = require("./src/config")
+const app = express()
 
 redisClient.connect();
-const app = express()
 passportConfig() // 패스포트 설정
 connect()
 
@@ -57,7 +57,7 @@ app.use((req, res, next) => {
 
 app.use((error, req, res) => {
   res.local.message = error.message
-  res.local.error = process.env.NODE_ENV !== "production" ? error : {}
+  res.local.error = config.NODE_ENV !== "production" ? error : {}
   res.status(error.status || 500)
   res.render("error")
 })

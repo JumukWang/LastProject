@@ -1,8 +1,9 @@
 const app = require("./app")
 const redis = require("redis")
+const config = require("./src/config")
+const server = require("http").createServer(app)
 const { createAdapter } = require("@socket.io/redis-adapter")
 const { Room, User } = require("./src/models")
-const server = require("http").createServer(app)
 // db 들어갈 자리
 
 const io = require("socket.io")(server, {
@@ -13,12 +14,11 @@ const io = require("socket.io")(server, {
 })
 
 const pubClient = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  password: process.env.REDIS_PASSWORD,
+  host: config.REDIS_HOST,
+  port: config.REDIS_PORT,
+  password: config.REDIS_PASSWORD,
 })
 const subClient = pubClient.duplicate()
-
 io.adapter(createAdapter(pubClient, subClient))
 
 io.on("connection", (socket) => {
