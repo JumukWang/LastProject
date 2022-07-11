@@ -27,7 +27,7 @@ router.post("/signup", validateAll, async (req, res, next) => {
       })
       return
     }
-    const salt = await Bcrypt.genSalt(Number(SALT_NUM))
+    const salt = await Bcrypt.genSalt(Number(config.SALT_NUM))
     const hashPassword = await Bcrypt.hash(password, salt)
 
     const user = new User({

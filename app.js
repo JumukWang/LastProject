@@ -10,9 +10,10 @@ const cookieParser = require("cookie-parser")
 const RedisStore = require("connect-redis")(session)
 const Router = require("./src/routes")
 const passportConfig = require("./src/passport")
-const connect = require("./src/database/database")
+const connect = require("./src/database")
 const redisClient = require("./src/database/redis")
 const config = require("./src/config")
+const logger = require("./src/config/winston")
 const app = express()
 
 redisClient.connect();
@@ -52,6 +53,7 @@ app.use("/api", Router)
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`)
   error.status = 404
+  logger.error(error)
   next(error)
 })
 
@@ -60,6 +62,7 @@ app.use((error, req, res) => {
   res.local.error = config.NODE_ENV !== "production" ? error : {}
   res.status(error.status || 500)
   res.render("error")
+  logger.error(error)
 })
 
 module.exports = app
