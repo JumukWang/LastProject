@@ -1,8 +1,7 @@
-const { promisify } = require("util")
-const jwt = require("jsonwebtoken")
-const redisClient = require("../database/redis")
-const config = require("../config")
-
+const { promisify } = require('util');
+const jwt = require('jsonwebtoken');
+const redisClient = require('../database/redis');
+const config = require('../config');
 
 module.exports = {
   // access 토큰 발급
@@ -10,62 +9,60 @@ module.exports = {
     const payload = {
       email: user.email,
       nickname: user.nickname,
-    }
+    };
     return jwt.sign(payload, config.SECRET_KEY, {
       // token 발급
       algorithm: 'HS256',
-      expiresIn: "30m",
-    })
-    
-    
+      expiresIn: '30m',
+    });
   },
   tokenVerify: (authToken) => {
     // token 검증
-    let decode = null
+    let decode = null;
     try {
-      decode = jwt.verify(authToken, config.SECRET_KEY)
+      decode = jwt.verify(authToken, config.SECRET_KEY);
       return {
         result: true,
         email: decode.email,
         nickname: decode.nickname,
-      }
+      };
     } catch (error) {
       return {
         result: false,
         msg: error.message,
-      }
+      };
     }
   },
   refreshToken: () => {
     return jwt.sign({}, config.SECRET_KEY, {
       algorithm: 'HS256',
-      expiresIn: "14d",
-    })
+      expiresIn: '14d',
+    });
   },
   refreshVerify: async (token, userId) => {
     // refresh 검증
     // redis 모듈은 promise를 반환하지 않으므로 promisify를 써준다.
-    const getAsync = promisify(redisClient.get).bind(redisClient)
+    const getAsync = promisify(redisClient.get).bind(redisClient);
     try {
-      const recieveToken = await getAsync(userId)
+      const recieveToken = await getAsync(userId);
       if (token === recieveToken) {
         try {
-          jwt.verify(token, config.SECRET_KEY)
-          return true
+          jwt.verify(token, config.SECRET_KEY);
+          return true;
         } catch (error) {
           return {
             result: false,
             msg: error.message,
-          }
+          };
         }
       } else {
-        return false
+        return false;
       }
     } catch (error) {
       return {
         result: false,
         msg: error.message,
-      }
+      };
     }
   },
-}
+};

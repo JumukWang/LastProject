@@ -41,14 +41,14 @@ module.exports = async (req, res, next) => {
 
       if (accessResult.msg === 'jwt expired' && accessResult.result === false) {
         if (refreshResult.result === false) {
-          res.status(401).send({
+          return res.status(401).send({
             result: false,
             msg: '인증에 실패했습니다.',
           });
         } else {
           const newToken = authSign(user);
 
-          res.status(200).send({
+          return res.status(200).send({
             result: true,
             token: {
               accessToken: newToken,
@@ -57,7 +57,7 @@ module.exports = async (req, res, next) => {
           });
         }
       } else {
-        res.status(400).send({
+        return res.status(400).send({
           // 토큰이 둘 다 만료된 상황
           result: false,
           msg: 'refresh token, access token 갱신이 필요합니다.',
@@ -65,7 +65,7 @@ module.exports = async (req, res, next) => {
       }
     }
   } catch (error) {
-    res.status(401).send({
+    return res.status(401).send({
       result: false,
       msg: error.message,
     });
