@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/JumukWang/LastProject#readme",
   "dependencies": {
+    "@socket.io/redis-adapter": "^7.2.0",
     "bcrypt": "^5.0.1",
     "connect-redis": "^6.1.3",
     "cookie-parser": "^1.4.6",
