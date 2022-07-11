@@ -1,15 +1,14 @@
-require("dotenv").config();
-const config = require("../config")
+require('dotenv').config();
+const config = require('../config');
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const connect = () => {
-    mongoose.connect(config.MONGO_URL, { ignoreUndefined: true }).catch((err) => {
-        console.error(err);
-    });
+  mongoose.connect(config.MONGO_URL, { ignoreUndefined: true }).catch((err) => {
+    console.error(err);
+  });
 };
 
 // 여기에 스키마 함수 만들기
-
 
 module.exports = connect;

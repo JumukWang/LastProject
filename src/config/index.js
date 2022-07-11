@@ -12,7 +12,7 @@ const CONFIG = {
   REDIS_PORT: process.env.REDIS_PORT,
   REDIS_PASSWORD: process.env.REDIS_PASSWORD,
   MONGO_URL: process.env.MONGO_URL,
-  NODE_ENV : process.env.NODE_ENV || "production"
-}
+  NODE_ENV: process.env.NODE_ENV || 'production',
+};
 
-module.exports = CONFIG
+module.exports = CONFIG;

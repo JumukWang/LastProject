@@ -38,7 +38,7 @@ router.post("/signup", validateAll, async (req, res, next) => {
     await user.save()
 
     const token = jwt.authSign(user)
-    
+
     return res.status(200).send({
       result: true,
       msg: "회원가입이 되었습니다.",
