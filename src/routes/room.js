@@ -55,7 +55,7 @@ router.post("/create/:userId", authMiddleware, async (req, res, next) => {
 router.post("/public-room/:roomId", authMiddleware, async (req, res, next) => {
   try {
     const roomId = Number(req.params.roomId)
-    const [targetRoom] = await Room.find({ roomId })
+    const [targetRoom] = await Room.findOne({ roomId: roomId })
     const { groupNum } = targetRoom
 
     if (groupNum >= 4) {

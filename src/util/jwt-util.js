@@ -7,7 +7,7 @@ module.exports = {
   // access 토큰 발급
   authSign: (user, req, res) => {
     const payload = {
-      userId: user.userId,
+      userId: user.id,
       email: user.email,
       nickname: user.nickname,
     }
@@ -26,7 +26,7 @@ module.exports = {
       decode = jwt.verify(authToken, SECRET)
       return {
         result: true,
-        userId: decode.userId,
+        userId: decode.id,
         email: decode.email,
         nickname: decode.nickname,
       }

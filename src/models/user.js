@@ -26,6 +26,9 @@ const userSchema = new Schema(
     },
     attendRoom: {
       type: Array,
+    },
+    userLike: {
+      type: Array,
     }
   },
   {
