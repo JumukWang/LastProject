@@ -8,5 +8,7 @@ const connect = () => {
     });
 };
 
+// 여기에 스키마 함수 만들기
+
 
 module.exports = connect;

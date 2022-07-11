@@ -22,14 +22,13 @@ router.get("/rooms", async (req, res, next) => {
   }
 })
 // 호스트 / 참여중
-// 스키마 
+// 스키마
 // 방생성
 router.post("/create/:userId", authMiddleware, async (req, res, next) => {
   try {
-    const { tagName, title, content, password, date, imgUrl } = req.body
     const host = Number(req.params.userId)
+    const { tagName, title, content, password, date, imgUrl } = req.body
     const newStudyRoom = await Room.create({
-      // 바로 넣어주기 hostId
       tagName,
       title,
       content,
@@ -37,12 +36,12 @@ router.post("/create/:userId", authMiddleware, async (req, res, next) => {
       date,
       imgUrl,
     })
-    console.log(newStudyRoom.roomId)
     const roomNum = Number(newStudyRoom.roomId)
-    await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+    await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } })
+    await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } })
     return res
-    .status(201)
-    .send({ msg: "스터디룸을 생성하였습니다.", roomInfo: newStudyRoom })
+      .status(201)
+      .send({ msg: "스터디룸을 생성하였습니다.", roomInfo: newStudyRoom })
   } catch (error) {
     return res.status(400).send({
       result: false,
@@ -76,16 +75,15 @@ router.post("/public-room/:roomId", authMiddleware, async (req, res, next) => {
   }
 })
 
-// 아직 미완성 아직 더 해야함
 router.post("/private-room/:roomId", authMiddleware, async (req, res, next) => {
   try {
-    //비공개방
-    const { password } = req.body
     const roomId = Number(req.params.roomId)
-    const passwordCheck = await Room.findOne({ roomId })
+    const { password } = req.body
+    const nickname = req.nickname
+    const passCheck = await Room.findOne({ roomId: roomId })
 
-    if (passwordCheck.password !== password) {
-      return res.status(200).send({ msg: "비밀번호가 틀렸습니다 " })
+    if (passCheck.password !== password) {
+      return res.status(401).send({ msg: "비밀번호가 틀렸습니다 " })
     }
     return res.status(200).send(`${nickname}님이 입장하셨습니다`)
   } catch (error) {
@@ -119,13 +117,29 @@ router.post("/exit/:roomId", async (req, res, next) => {
 })
 
 // 방삭제
-router.delete("/:roomId", authMiddleware, async (req, res, next) => {
+router.delete("/:roomId/:userId", authMiddleware, async (req, res, next) => {
   try {
-    const { roomId } = req.params
+    const roomId = Number(req.params.roomId)
+    const userId = Number(req.params.userId)
     const { password } = req.body
+    const roomCheck = await Room.findOne({ roomId: roomId })
 
-    await Room.deleteOne({ roomId })
-    // 호스트 유저만 삭제할 수 있게 만들어야함
+    const user = await User.findOne({userId})
+    console.log(user);
+
+    if (roomCheck.password !== password) {
+      return res.status(401).send({
+        result: false,
+        msg: "비밀번호가 틀렸습니다",
+      })
+    }
+    if(userId !== roomCheck.hostId) {
+      return res.status(401).send({
+        result: false,
+        msg: "방의 호스트만 삭제할 수 있습니다."
+      })
+    }
+    await Room.deleteOne({ roomId: roomId })
 
     return res.json({ result: true, msg: "스터디 룸이 삭제되었습니다." })
   } catch (error) {

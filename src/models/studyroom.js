@@ -16,8 +16,7 @@ const studySchema = new Schema({
         require: true,
     },
     password: {
-        type: Number,
-        require: true
+        type: String,
     },
     content: {
         type: String,
