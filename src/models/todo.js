@@ -1,9 +1,6 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
-const todoSchema = new Schema({
-    
-});
+const todoSchema = new Schema({});
 
-
-module.exports = mongoose.model("todo", todoSchema);
+module.exports = mongoose.model('todo', todoSchema);

@@ -1,6 +1,6 @@
 const { server } = require('./socket');
-const config = require('./src/config');
-const logger = require('./src/config/winston');
+const config = require('../config');
+const logger = require('../config/winston');
 const port = config.PORT;
 
 server.listen(port, () => {

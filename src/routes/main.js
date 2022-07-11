@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Room, User } = require('../models');
+const { Room } = require('../models');
 const router = require('express').Router();
 const { tokenVerify } = require('../util/jwt-util');
 const authMiddleware = require('../middlewares/authmiddleware');

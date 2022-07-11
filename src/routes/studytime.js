@@ -1,6 +1,5 @@
 require('dotenv').config();
 const Studytime = require('../models/studytime');
-const User = require('../models/user');
 const router = require('express').Router();
 const authmiddleware = require('../middlewares/authmiddleware');
 const moment = require('moment');
@@ -113,7 +112,6 @@ router.post('/timeout', authmiddleware, async (req, res, next) => {
 // 화상스터디방 나가기( 이때 공부시간 데이터 값을 저장시켜 주자!!)
 
 router.put('/exit', authmiddleware, async (req, res, next) => {
-  const { userId } = res.locals.user;
   const { todayStart, weekStart } = timeSet();
   console.log(todayStart, weekStart);
   try {

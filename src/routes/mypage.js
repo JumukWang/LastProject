@@ -34,7 +34,6 @@ router.put('/update', authMiddleware, async (req, res) => {
   const { nickname, password, passwordCheck } = req.body;
   console.log(user);
   try {
-    const myPage = await User.findOne({ userId });
     if (passwordCheck !== password) {
       return res.send({
         result: false,

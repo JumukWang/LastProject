@@ -1,13 +1,13 @@
-const mongoose = require("mongoose")
-const AutoIncrement = require("mongoose-sequence")(mongoose)
+const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
-const { Schema } = mongoose
+const { Schema } = mongoose;
 const userSchema = new Schema(
   {
     userId: { type: Number, unique: true, default: 0 },
     email: { type: String, unique: true },
     nickname: { type: String, unique: true },
-    password: { type: String, },
+    password: { type: String },
     profile_url: { type: String },
     snsId: {
       type: String,
@@ -19,7 +19,7 @@ const userSchema = new Schema(
       require: true,
     },
     profileImg: {
-        type: String,
+      type: String,
     },
     hostRoom: {
       type: Array,
@@ -29,14 +29,13 @@ const userSchema = new Schema(
     },
     userLike: {
       type: Array,
-    }
+    },
   },
   {
     timestamps: true,
-  }
-)
-userSchema.plugin(AutoIncrement, { inc_field: "userId" })
+  },
+);
+userSchema.plugin(AutoIncrement, { inc_field: 'userId' });
 
-const User = mongoose.model("User", userSchema)
-module.exports = {User};
-
+const User = mongoose.model('User', userSchema);
+module.exports = { User };

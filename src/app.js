@@ -8,12 +8,12 @@ const passport = require('passport');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const RedisStore = require('connect-redis')(session);
-const Router = require('./src/routes');
-const passportConfig = require('./src/passport');
-const connect = require('./src/database');
-const redisClient = require('./src/database/redis');
-const config = require('./src/config');
-const logger = require('./src/config/winston');
+const Router = require('./routes');
+const passportConfig = require('./passport');
+const connect = require('./database');
+const redisClient = require('./database/redis');
+const config = require('./config');
+const logger = require('./config/winston');
 const app = express();
 
 redisClient.connect();
