@@ -13,7 +13,7 @@ const { validateEmail, validateNick, validatePwd, validateAll } = require('../mi
 router.post('/signup', validateAll, async (req, res, next) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
-    const { email, nickname, password, passwordCheck } = req.body;
+    const { email, nickname, password, passwordCheck, profile_url } = req.body;
 
     if (password !== passwordCheck) {
       res.status(400).send({
@@ -29,6 +29,7 @@ router.post('/signup', validateAll, async (req, res, next) => {
       email,
       nickname,
       password: hashPassword,
+      profile_url,
     });
     await user.save();
 
@@ -55,7 +56,7 @@ router.post('/login', validatePwd, async (req, res, next) => {
     // 여기도 중복검사, 해쉬화된 비밀번호 검증
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-
+    console.log(user);
     if (!user) {
       return res.status(400).send({
         msg: '아이디 혹은 비밀번호를 확인해주세요.',
@@ -81,6 +82,7 @@ router.post('/login', validatePwd, async (req, res, next) => {
       userId: user.userId,
       eamil: user.nickname,
       nickname: user.nickname,
+      userImg: user.profile_url,
       accessToken: accessToken,
       refreshToken: refreshToken,
       result: true,

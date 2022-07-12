@@ -13,30 +13,27 @@ const io = require('socket.io')(server, {
   },
 });
 
-const pubClient = redis.createClient({
-  host: config.REDIS_HOST,
-  port: config.REDIS_PORT,
-  password: config.REDIS_PASSWORD,
-});
-const subClient = pubClient.duplicate();
-io.adapter(createAdapter(pubClient, subClient));
+// const pubClient = redis.createClient({
+//   host: config.REDIS_HOST,
+//   port: config.REDIS_PORT,
+//   password: config.REDIS_PASSWORD,
+// });
+// const subClient = pubClient.duplicate();
+// io.adapter(createAdapter(pubClient, subClient));
 
 io.on('connection', (socket) => {
-  socket.on('join_room', async (nickname, roomTitle) => {
+  socket.on('join', async (nickname, title) => {
     try {
-      socket.join(roomTitle);
-      socket.to(roomTitle).emit('welcome', { nickname });
-      console.log(`User with ID: ${nickname} joined room: ${roomTitle}`);
+      socket.join(title);
+      socket.to(title).emit('welcome', { nickname });
+
       socket.emit('welcome_msg', nickname); //roomID
 
       socket.on('send_message', (message) => {
-        console.log('메시지: ', message);
-        socket.to(roomTitle).emit('receive_message', message);
-        console.log(message);
+        socket.to(title).emit('receive_message', message);
       });
       socket.on('disconnecting', () => {
-        socket.rooms.forEach((roomTitle) => socket.to(roomTitle).emit('bye'));
-        console.log(roomTitle);
+        socket.rooms.forEach((title) => socket.to(title).emit('bye'));
       });
 
       socket.on('disconnect', () => {

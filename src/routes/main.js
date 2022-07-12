@@ -26,7 +26,6 @@ router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   let userInfo = req.headers.authorization.split('Bearer ')[1];
   const decode = tokenVerify(userInfo);
-  console.log(decode.nickname);
 
   if (roomId) {
     let flag = true;

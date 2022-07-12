@@ -5,7 +5,7 @@ const config = require('../config');
 
 module.exports = {
   // access 토큰 발급
-  authSign: (user, req, res) => {
+  authSign: (user) => {
     const payload = {
       email: user.email,
       nickname: user.nickname,
@@ -13,7 +13,7 @@ module.exports = {
     return jwt.sign(payload, config.SECRET_KEY, {
       // token 발급
       algorithm: 'HS256',
-      expiresIn: '30m',
+      expiresIn: '1h',
     });
   },
   tokenVerify: (authToken) => {
