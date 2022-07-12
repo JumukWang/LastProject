@@ -1,9 +1,9 @@
-const app = require('../app');
+const app = require('./app');
 const redis = require('redis');
-const config = require('../config');
+const config = require('./src/config');
 const server = require('http').createServer(app);
 const { createAdapter } = require('@socket.io/redis-adapter');
-const { Room, User } = require('../models');
+const { Room, User } = require('./src/models');
 // db 들어갈 자리
 
 const io = require('socket.io')(server, {
