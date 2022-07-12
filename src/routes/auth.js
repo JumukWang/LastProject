@@ -106,7 +106,6 @@ router.get('/user/exemail', validateEmail, async (req, res, next) => {
       return res.status(400).send({
         result: false,
         msg: '이미 사용중인 이메일 입니다.',
-        message: error.message,
       });
     }
     return res.status(200).send({
@@ -129,7 +128,6 @@ router.get('/user/exnickname', validateNick, async (req, res, next) => {
       return res.status(400).send({
         result: false,
         msg: '이미 사용중인 닉네임 입니다.',
-        message: error.message,
       });
     }
     return res.status(200).send({
@@ -148,7 +146,7 @@ router.get('/kakao/callback', (req, res, next) => {
     if (err) return next(err);
     const { userId, nickname } = user;
     const accessToken = jwt.authSign({ userId, nickname });
-    result = {
+    const result = {
       accessToken,
       nickname,
     };
@@ -164,7 +162,7 @@ router.get('/google/callback', (req, res, next) => {
     if (err) return next(err);
     const { userId, nickname } = user;
     const accessToken = jwt.authSign({ userId, nickname });
-    result = {
+    const result = {
       accessToken,
       nickname,
     };

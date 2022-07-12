@@ -13,7 +13,7 @@
 //   // 실행 후 딱 한번만 실행되는 명령어
 //   afterAll(() => {});
 
-//   // 실제 실행 함수
+//   // 실제 실행 함수 mock
 //   test('should work', (done) => {
 //     io.on('connection', (socket) => {
 //       expect(arg).toBe('world');
