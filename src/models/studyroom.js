@@ -20,9 +20,11 @@ const studySchema = new Schema({
   },
   content: {
     type: String,
+    require: true,
   },
   date: {
     type: String,
+    require: true,
   },
   word: {
     type: String,

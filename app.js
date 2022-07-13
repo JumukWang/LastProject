@@ -20,8 +20,13 @@ redisClient.connect();
 passportConfig(); // 패스포트 설정
 connect();
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+};
+
 //미들웨어
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(helmet());
 app.use(morgan('tiny'));

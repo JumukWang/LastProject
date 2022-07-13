@@ -26,14 +26,13 @@ router.get('/rooms', async (req, res, next) => {
 router.post('/create/:userId', authMiddleware, async (req, res, next) => {
   try {
     const host = Number(req.params.userId);
-    const { tagName, title, content, password, date, imgUrl } = req.body;
+    const { tagName, title, content, password, date } = req.body;
     const newStudyRoom = await Room.create({
-      tagName,
       title,
-      content,
       password,
+      content,
       date,
-      imgUrl,
+      tagName,
     });
     const roomNum = Number(newStudyRoom.roomId);
     await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
@@ -55,7 +54,7 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
     const roomId = Number(req.params.roomId);
     const { groupNum, title } = await Room.findOne({ roomId: roomId });
     await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
-    
+
     if (groupNum >= 4) {
       return res.status(400).send({
         result: false,

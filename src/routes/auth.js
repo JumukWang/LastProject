@@ -152,6 +152,7 @@ router.get('/kakao/callback', (req, res, next) => {
       accessToken,
       nickname,
     };
+    console.log(user);
     res.send({ user: result });
   })(req, res, next);
 });
@@ -166,7 +167,6 @@ router.get('/google/callback', (req, res, next) => {
     const accessToken = jwt.authSign({ userId, nickname });
     const result = {
       accessToken,
-      nickname,
     };
     res.send({ user: result });
   })(req, res, next);
