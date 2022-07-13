@@ -27,13 +27,14 @@ router.post('/create/:userId', authMiddleware, async (req, res, next) => {
   try {
     const host = Number(req.params.userId);
     const { tagName, title, content, password, date } = req.body;
-    const newStudyRoom = await Room.create({
+    const newStudyRoom = new Room({
       title,
       password,
       content,
       date,
       tagName,
     });
+    await newStudyRoom.save();
     const roomNum = Number(newStudyRoom.roomId);
     await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
     await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
