@@ -4,12 +4,10 @@ const cors = require('cors');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const express = require('express');
-const passport = require('passport');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const RedisStore = require('connect-redis')(session);
 const Router = require('./src/routes');
-const passportConfig = require('./src/passport');
 const connect = require('./src/database');
 const redisClient = require('./src/database/redis');
 const config = require('./src/config');
@@ -17,11 +15,10 @@ const logger = require('./src/config/winston');
 const app = express();
 
 redisClient.connect();
-passportConfig(); // 패스포트 설정
 connect();
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://egloo.link'],
   credentials: true,
 };
 
@@ -46,8 +43,6 @@ app.use(
     store: new RedisStore({ client: redisClient }),
   }),
 );
-app.use(passport.initialize());
-app.use(passport.session());
 
 // 라우터
 app.use('/api', Router);
