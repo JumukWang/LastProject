@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Room } = require('../models');
+const { Room, User } = require('../models');
 const router = require('express').Router();
 const { tokenVerify } = require('../util/jwt-util');
 const authMiddleware = require('../middlewares/authmiddleware');
@@ -24,15 +24,15 @@ router.get('/', async (req, res, next) => {
 // res.locals.user 못쓰니까 불러와서 써야함
 router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
-  let userInfo = req.headers.authorization.split('Bearer ')[1];
-  const decode = tokenVerify(userInfo);
+  const nickname = req.nickname;
+  const roomInfo = await Room.findOne({ roomId });
 
   if (roomId) {
     let flag = true;
     await Room.updateOne({ roomId }, { $set: { isLiked: flag } });
   }
   // 여기서 배열에 저장하면 될 듯 합니다
-  // const userRoomLike = await User.updateOne({ userId }, { $set: {userLike : roomId}})
+  await User.updateOne({ nickname }, { $push: { userLike: roomInfo } });
   return res.status(201).send({
     result: true,
     msg: '스터디룸 좋아요를 눌렀습니다.',
@@ -41,11 +41,17 @@ router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
 
 router.post('/dislike/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
+  const nickname = req.nickname;
+  const roomInfo = await Room.findOne({ roomId });
+  console.log(roomInfo);
+
   if (roomId) {
     let flag = false;
     await Room.updateOne({ roomId }, { $set: { isLiked: flag } });
   }
   // 여기서 배열에 저장하면 될 듯 합니다
+
+  await User.updateOne({ nickname }, { $pull: { userLike: roomInfo } });
   return res.status(201).send({
     result: true,
     msg: '스터디룸 좋아요를 취소했습다.',

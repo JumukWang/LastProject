@@ -2,6 +2,7 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const redisClient = require('../database/redis');
 const config = require('../config');
+const logger = require('../config/winston');
 
 module.exports = {
   // access 토큰 발급
@@ -20,13 +21,16 @@ module.exports = {
     // token 검증
     let decode = null;
     try {
+      logger.info('jwt 인증 시작');
       decode = jwt.verify(authToken, config.SECRET_KEY);
+      logger.info('jwt 인증 성공');
       return {
         result: true,
         email: decode.email,
         nickname: decode.nickname,
       };
     } catch (error) {
+      logger.error(error.message);
       return {
         result: false,
         msg: error.message,

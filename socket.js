@@ -8,7 +8,7 @@ const { Room, User } = require('./src/models');
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://egloo.link'],
     credentials: true,
   },
 });

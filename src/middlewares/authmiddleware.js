@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const { tokenVerify, refreshVerify, authSign } = require('../util/jwt-util');
+const logger = require('../config/winston');
 
 module.exports = async (req, res, next) => {
+  logger.error('req start');
   if (req.headers.authorization) {
     const authToken = req.headers.authorization.split('Bearer ')[1];
     const tokenRsult = tokenVerify(authToken); // 엑세스 토큰 넘어옴
