@@ -1,12 +1,14 @@
 const jwt = require('jsonwebtoken');
 const { tokenVerify, refreshVerify, authSign } = require('../util/jwt-util');
+const { User } = require('../models');
 const logger = require('../config/winston');
 
 module.exports = async (req, res, next) => {
-  logger.error('req start');
+  logger.info('req start');
   if (req.headers.authorization) {
     const authToken = req.headers.authorization.split('Bearer ')[1];
     const tokenRsult = tokenVerify(authToken); // 엑세스 토큰 넘어옴
+    // bearer 확인 코드 넣기 invailed code 넣어주기
     if (tokenRsult.result) {
       // 엑세스 토큰 만료시 false, msg 'jwt expired'
       req.email = tokenRsult.email;
@@ -39,7 +41,9 @@ module.exports = async (req, res, next) => {
       }
 
       //access token decoding 값에서 id를 가져와 refresh token 검증
-      const refreshResult = refreshVerify(refreshToken, decode.email);
+      let user = null;
+      user = await User.findOne({ email: decode.email });
+      const refreshResult = refreshVerify(refreshToken, user.email);
 
       if (accessResult.msg === 'jwt expired' && accessResult.result === false) {
         if (refreshResult.result === false) {

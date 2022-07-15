@@ -31,7 +31,7 @@ router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
     let flag = true;
     await Room.updateOne({ roomId }, { $set: { isLiked: flag } });
   }
-  // 여기서 배열에 저장하면 될 듯 합니다
+
   await User.updateOne({ nickname }, { $push: { userLike: roomInfo } });
   return res.status(201).send({
     result: true,
@@ -43,13 +43,11 @@ router.post('/dislike/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;
   const roomInfo = await Room.findOne({ roomId });
-  console.log(roomInfo);
 
   if (roomId) {
     let flag = false;
     await Room.updateOne({ roomId }, { $set: { isLiked: flag } });
   }
-  // 여기서 배열에 저장하면 될 듯 합니다
 
   await User.updateOne({ nickname }, { $pull: { userLike: roomInfo } });
   return res.status(201).send({
