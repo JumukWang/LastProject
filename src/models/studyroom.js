@@ -29,9 +29,6 @@ const studySchema = new Schema({
   word: {
     type: String,
   },
-  imgUrl: {
-    type: String,
-  },
   groupNum: {
     type: Number,
     default: 0,
@@ -47,6 +44,9 @@ const studySchema = new Schema({
   tagName: {
     type: Array,
     require: true,
+  },
+  imgUrl: {
+    type: String,
   },
 });
 
