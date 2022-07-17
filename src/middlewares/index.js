@@ -1,6 +1,6 @@
 const { logger } = require('../config');
-const jwt = require('jsonwebtoken');
-const config = require('../config');
+// const jwt = require('jsonwebtoken');
+// const config = require('../config');
 
 exports.logging = (req, res, next) => {
   var logStr = {};

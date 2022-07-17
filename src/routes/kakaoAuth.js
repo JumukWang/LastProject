@@ -3,7 +3,7 @@ const { User } = require('../models');
 const { authSign } = require('../util/jwt-util');
 const router = require('express').Router();
 
-router.post('/', async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     console.log(req.body);
     const api_url = 'https://kapi.kakao.com/v2/user/me';
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/newuser', async (req, res) => {
   try {
     // console.log("kakao_parsing의 req정보다",req)
     const user_info = req.body;
@@ -77,3 +77,5 @@ router.post('/', async (req, res) => {
     console.log('error =' + error);
   }
 });
+
+module.exports = router;

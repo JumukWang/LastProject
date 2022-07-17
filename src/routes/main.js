@@ -3,7 +3,7 @@ const { Room, User } = require('../models');
 const router = require('express').Router();
 const { tokenVerify } = require('../util/jwt-util');
 const authMiddleware = require('../middlewares/authmiddleware');
-const { logging } = require('../middlewares')
+const { logging } = require('../middlewares');
 
 // 메인 페이지
 router.get('/', async (req, res, next) => {

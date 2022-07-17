@@ -11,7 +11,7 @@ const { logging } = require('../middlewares');
 const { validateEmail, validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
 // 회원가입
-router.post('/signup', logging, validateAll, async (req, res, next) => {
+router.post('/signup', logging, validateAll, async (req, res) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck, profile_url } = req.body;
