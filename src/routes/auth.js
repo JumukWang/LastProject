@@ -6,7 +6,7 @@ const router = require('express').Router();
 const jwt = require('../util/jwt-util');
 const redisClient = require('../database/redis');
 const config = require('../config');
-const { logging } = require('../middlewares')
+const { logging } = require('../middlewares');
 
 const { validateEmail, validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
