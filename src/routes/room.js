@@ -1,11 +1,11 @@
 const { Room, User } = require('../models');
 const authMiddleware = require('../middlewares/authmiddleware');
 const router = require('express').Router();
-const { logging } = require('../middlewares')
+const { logging } = require('../middlewares');
 // 메인 페이지 만들기
 
 // 방조회
-router.get('/rooms', async (req, res, next) => {
+router.get('/rooms', async (req, res) => {
   try {
     const roomList = await Room.find({}).sort({ createAt: -1 });
     return res.status(201).send({
@@ -23,7 +23,7 @@ router.get('/rooms', async (req, res, next) => {
 // 호스트 / 참여중
 // 스키마
 // 방생성
-router.post('/create/:userId', logging, authMiddleware, async (req, res, next) => {
+router.post('/create/:userId', logging, authMiddleware, async (req, res) => {
   try {
     const host = Number(req.params.userId);
     const { tagName, title, content, password, date } = req.body;
@@ -77,7 +77,7 @@ router.post('/public-room/:roomId', logging, authMiddleware, async (req, res) =>
 });
 
 // 비밀방 입장
-router.post('/private-room/:roomId', logging, authMiddleware, async (req, res, next) => {
+router.post('/private-room/:roomId', logging, authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const { password } = req.body;
@@ -111,7 +111,7 @@ router.post('/private-room/:roomId', logging, authMiddleware, async (req, res, n
 });
 
 // 방나가기
-router.post('/exit/:roomId', async (req, res, next) => {
+router.post('/exit/:roomId', async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const [targetRoom] = await Room.find({ roomId });
@@ -140,7 +140,7 @@ router.post('/exit/:roomId', async (req, res, next) => {
 });
 
 // 방삭제
-router.delete('/:roomId/:userId', logging, authMiddleware, async (req, res, next) => {
+router.delete('/:roomId/:userId', logging, authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
@@ -173,7 +173,7 @@ router.delete('/:roomId/:userId', logging, authMiddleware, async (req, res, next
 });
 
 // 스터디룸 검색
-router.get('/search/:word', async (req, res, next) => {
+router.get('/search/:word', async (req, res) => {
   const { word } = req.params;
   let roomArr = [];
   let rooms = await Room.find({});

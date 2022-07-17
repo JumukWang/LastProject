@@ -18,9 +18,6 @@ const userSchema = new Schema(
       type: String,
       require: true,
     },
-    profileImg: {
-      type: String,
-    },
     hostRoom: {
       type: Array,
     },

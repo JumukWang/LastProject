@@ -1,13 +1,13 @@
 require('dotenv').config();
 const router = require('express').Router();
 const authMiddleware = require('../middlewares/authmiddleware');
-const { User, Room } = require('../models');
+const { User } = require('../models');
 const Bcrypt = require('bcrypt');
-const { logging } = require('../middlewares')
+const { logging } = require('../middlewares');
 const SALT_NUM = process.env.SALT_NUM;
 
 // 마이페이지
-router.get('/:userId', authMiddleware, async (req, res) => {
+router.get('/:userId', logging, authMiddleware, async (req, res) => {
   const userId = Number(req.params.userId);
   const user = await User.findOne({ userId: Number(userId) });
   try {
@@ -25,7 +25,7 @@ router.get('/:userId', authMiddleware, async (req, res) => {
 });
 
 // 마이페이지수정
-router.put('/:userId/update', authMiddleware, async (req, res) => {
+router.put('/:userId/update', logging, authMiddleware, async (req, res) => {
   const userId = Number(req.params.userId);
   const { nickname, password, passwordCheck, imgUrl } = req.body;
   try {
@@ -58,7 +58,7 @@ router.put('/:userId/update', authMiddleware, async (req, res) => {
 
 // 유저찾기
 
-router.get('/search', async (req, res, next) => {
+router.get('/search', async (req, res) => {
   try {
     const users = await User.find({}, { userId: 1, nickname: 1, email: 1 });
     console.log(users);
