@@ -7,7 +7,7 @@ const { logging } = require('../middlewares');
 const SALT_NUM = process.env.SALT_NUM;
 
 // 마이페이지
-router.get('/:userId', logging, authMiddleware, async (req, res) => {
+router.get('/:userId', authMiddleware, async (req, res) => {
   const userId = Number(req.params.userId);
   const user = await User.findOne({ userId: Number(userId) });
   try {
@@ -25,7 +25,7 @@ router.get('/:userId', logging, authMiddleware, async (req, res) => {
 });
 
 // 마이페이지수정
-router.put('/:userId/update', logging, authMiddleware, async (req, res) => {
+router.put('/:userId/update', authMiddleware, async (req, res) => {
   const userId = Number(req.params.userId);
   const { nickname, password, passwordCheck, imgUrl } = req.body;
   try {

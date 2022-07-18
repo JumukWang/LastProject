@@ -23,7 +23,7 @@ router.get('/rooms', async (req, res) => {
 // 호스트 / 참여중
 // 스키마
 // 방생성
-router.post('/create/:userId', logging, authMiddleware, async (req, res) => {
+router.post('/create/:userId', authMiddleware, async (req, res) => {
   try {
     const host = Number(req.params.userId);
     const { tagName, title, content, password, date } = req.body;
@@ -49,7 +49,7 @@ router.post('/create/:userId', logging, authMiddleware, async (req, res) => {
 });
 
 // 공개방 입장
-router.post('/public-room/:roomId', logging, authMiddleware, async (req, res) => {
+router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
   try {
     // 유저 닉네임 프로필 유알엘 투두
     const roomId = Number(req.params.roomId);
@@ -77,7 +77,7 @@ router.post('/public-room/:roomId', logging, authMiddleware, async (req, res) =>
 });
 
 // 비밀방 입장
-router.post('/private-room/:roomId', logging, authMiddleware, async (req, res) => {
+router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const { password } = req.body;
@@ -140,7 +140,7 @@ router.post('/exit/:roomId', async (req, res) => {
 });
 
 // 방삭제
-router.delete('/:roomId/:userId', logging, authMiddleware, async (req, res) => {
+router.delete('/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
@@ -190,7 +190,7 @@ router.get('/search/:word', async (req, res) => {
 });
 
 //참여중인 스터디 조회
-router.get('/entered-room', logging, authMiddleware, async (req, res) => {
+router.get('/entered-room', authMiddleware, async (req, res) => {
   try {
     const nickname = req.nickname;
 
@@ -213,7 +213,7 @@ router.get('/entered-room', logging, authMiddleware, async (req, res) => {
 });
 
 //호스트중인 스터디 조회
-router.get('/host-room/:userId', logging, authMiddleware, async (req, res) => {
+router.get('/host-room/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const hostRoom = await User.find({ hostRoom }).sort('-createAt');
@@ -235,7 +235,7 @@ router.get('/host-room/:userId', logging, authMiddleware, async (req, res) => {
 });
 
 //유저 초대하기
-router.put('/invite', logging, authMiddleware, async (req, res) => {
+router.put('/invite', authMiddleware, async (req, res) => {
   try {
     const nickname = req.nickname;
     const { roomId } = req.body;

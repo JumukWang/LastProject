@@ -11,7 +11,7 @@ const { logging } = require('../middlewares');
 const { validateEmail, validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
 // 회원가입
-router.post('/signup', logging, validateAll, async (req, res) => {
+router.post('/signup', validateAll, async (req, res) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck, profile_url } = req.body;
@@ -52,7 +52,7 @@ router.post('/signup', logging, validateAll, async (req, res) => {
 });
 
 // 로그인
-router.post('/login', logging, validatePwd, async (req, res, next) => {
+router.post('/login', validatePwd, async (req, res, next) => {
   try {
     // 여기도 중복검사, 해쉬화된 비밀번호 검증
     const { email, password } = req.body;

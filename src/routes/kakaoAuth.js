@@ -2,13 +2,14 @@ const config = require('../config');
 const { User } = require('../models');
 const { authSign } = require('../util/jwt-util');
 const router = require('express').Router();
-
-router.post('/login', async (req, res) => {
+// const logger = require('../config');
+router.post('/login', (req, res) => {
   try {
     console.log(req.body);
     const api_url = 'https://kapi.kakao.com/v2/user/me';
     const request = require('request');
     const access_token = req.body.access_token;
+    // const refresh_token = req.body.refresh_token;
     // var header = 'Bearer ' + token; // Bearer 다음에 공백 추가
     const options = {
       url: api_url,
@@ -48,10 +49,9 @@ router.post('/newuser', async (req, res) => {
     // 만약 디비에 user의 email이 없다면,
 
     if (!exUser) {
-      console.log('여기1111');
       const newUser = new User({
         email: userEmail,
-        nickname: nickname + Math.floor(Math.random() * 10000000),
+        nickname: nickname,
         password: config.KAKAO_BASIC_PASSWORD,
         profileUrl: '',
         snsId: snsId,
@@ -64,13 +64,15 @@ router.post('/newuser', async (req, res) => {
         accessToken,
         nickname,
         profileUrl: '',
+        snsId,
       });
     }
-    const profileUrl = exUser.profileUrl;
+    const profileUrl = exUser.profile_url;
     return res.send({
       accessToken,
       nickname,
       profileUrl,
+      snsId,
     });
   } catch (error) {
     res.status(400).send('에러가 발생했습니다.');

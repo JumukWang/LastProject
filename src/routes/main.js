@@ -22,7 +22,7 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.post('/like/:roomId', logging, authMiddleware, async (req, res, next) => {
+router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;
   const roomInfo = await Room.findOne({ roomId });
@@ -39,7 +39,7 @@ router.post('/like/:roomId', logging, authMiddleware, async (req, res, next) => 
   });
 });
 
-router.post('/dislike/:roomId', logging, authMiddleware, async (req, res, next) => {
+router.post('/dislike/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;
   const roomInfo = await Room.findOne({ roomId });

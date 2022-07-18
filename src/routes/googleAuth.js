@@ -11,27 +11,27 @@ router.post('/login', async (req, res) => {
     const { tokenId } = req.body.data;
 
     client.verifyIdToken({ idToken: tokenId, audience: config.GOOGLE_CLIENT_ID }).then((response) => {
-      const { email, nickname, profile_url } = response.getPayload();
+      const { email, nickname, iconUrl } = response.getPayload();
 
       if (email) {
         User.findOne({ eamil: email }, (err, user) => {
           if (err) return res.status(400).send({ result: false, err });
-          let token = '';
+          let accessToken = '';
           if (user) {
-            token = authSign({ email, nickname, profile_url });
+            accessToken = authSign({ email, nickname, iconUrl });
             res.status(200).send({
-              token,
+              accessToken,
             });
           } else {
             const newUser = new User({
               email,
               nickname,
-              profile_url,
+              iconUrl,
             });
             newUser.save();
-            token = authSign({ newUser });
+            accessToken = authSign({ newUser });
             res.status(200).send({
-              token,
+              accessToken,
             });
           }
         });
