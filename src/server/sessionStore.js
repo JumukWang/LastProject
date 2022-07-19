@@ -2,7 +2,6 @@ const redisClient = require('../database/redis');
 class SessionStore {
   findSession(id) {}
   saveSession(id, session) {}
-  findAllSessions() {}
 }
 
 // userId / nickname
@@ -28,18 +27,18 @@ class RedisSessionStore extends SessionStore {
       .exec();
   }
 }
-let sessionStorage;
-function initsessionStorage(redisClient) {
-  sessionStorage = new RedisSessionStore(redisClient);
-}
-function getsessionStorage() {
-  if (sessionStorage === null) {
-    initsessionStorage(redisClient);
-  }
-  return sessionStorage;
-}
+
+// let sessionStorage;
+// function initsessionStorage(redisClient) {
+//   sessionStorage = new RedisSessionStore(redisClient);
+// }
+// function getsessionStorage() {
+//   if (sessionStorage === null) {
+//     initsessionStorage(redisClient);
+//   }
+//   return sessionStorage;
+// }
 
 module.exports = {
-  initsessionStorage,
-  getsessionStorage,
+  RedisSessionStore,
 };

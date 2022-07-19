@@ -4,7 +4,10 @@ const Bcrypt = require('bcrypt');
 const router = require('express').Router();
 const jwt = require('../util/jwt-util');
 const config = require('../config');
-const { getsessionStorage } = require('../server/sessionStore');
+const redisClient = require('../database/redis');
+
+const { RedisSessionStore } = require('../server/sessionStore');
+const sessionStore = new RedisSessionStore(redisClient);
 
 const { validateEmail, validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
@@ -73,15 +76,21 @@ router.post('/login', validatePwd, async (req, res) => {
 
     const accessToken = jwt.authSign(user);
     const refreshToken = jwt.refreshToken();
-    const userSession = getsessionStorage();
-    userSession.saveSession(user.userId, {
-      userid: user.userId,
+    sessionStore.saveSession(user.userId, {
+      userID: user.userId,
       nickname: user.nickname,
       connected: true,
     });
+    // const userSession = getsessionStorage();
+    // userSession.saveSession(user.userId, {
+    //   userid: user.userId,
+    //   nickname: user.nickname,
+    //   connected: true,
+    // });
 
     return res.status(200).send({
-      eamil: user.nickname,
+      userId: user.userId,
+      email: user.email,
       nickname: user.nickname,
       userImg: user.profile_url,
       accessToken: accessToken,

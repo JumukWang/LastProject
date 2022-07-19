@@ -8,8 +8,13 @@ const redisClient = new Redis({
   password: config.REDIS_PASSWORD,
   legacyMode: true,
 });
-const { getsessionStorage } = require('./src/server/sessionStore');
-// db 들어갈 자리
+// const { getsessionStorage } = require('./src/server/sessionStore');
+const { RedisSessionStore } = require('./src/server/sessionStore');
+const sessionStore = new RedisSessionStore(redisClient);
+
+const { RedisMessageStore } = require('./src/server/messageStore');
+const { Socket } = require('socket.io');
+const messageStore = new RedisMessageStore(redisClient);
 
 const io = require('socket.io')(server, {
   cors: {
@@ -23,34 +28,30 @@ const io = require('socket.io')(server, {
 });
 
 io.use(async (socket, next) => {
-  const sessionID = socket.handshake.auth.sessionID;
-  if (sessionID) {
-    const session = await sessionStore.findSession(sessionID);
+  const userId = socket.handshake.auth.userId;
+  if (userId) {
+    const session = await sessionStore.findSession(userId);
     if (session) {
-      socket.sessionID = sessionID;
-      socket.userID = session.userID;
-      socket.username = session.username;
+      socket.id = session.nickname;
       return next();
     }
   }
-  const username = socket.handshake.auth.username;
-  if (!username) {
+  const nickname = socket.handshake.auth.nickname;
+  if (!nickname) {
     return next(new Error('invalid username'));
   }
-  socket.username = username;
+  socket.nickname = nickname;
   next();
 });
 
 const users = {};
-
 const socketToRoom = {};
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
-  socket.on('join room', (userId, roomId) => {
-    const getUser = getsessionStorage();
-    const userMap = getUser.findSession(userId); // object 형태로 들어온다.
+  socket.on('join room', (roomId) => {
+    // const getUser = sessionStore.findSession(userId);
     if (users[roomId]) {
       const length = users[roomId].length;
       if (length === 4) {
