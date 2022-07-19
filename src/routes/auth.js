@@ -1,12 +1,10 @@
 require('dotenv').config();
 const { User } = require('../models');
 const Bcrypt = require('bcrypt');
-const passport = require('passport');
 const router = require('express').Router();
 const jwt = require('../util/jwt-util');
 const redisClient = require('../database/redis');
 const config = require('../config');
-const { logging } = require('../middlewares');
 
 const { validateEmail, validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
@@ -80,7 +78,6 @@ router.post('/login', validatePwd, async (req, res, next) => {
     redisClient.set(user.id, refreshToken);
 
     return res.status(200).send({
-      userId: user.userId,
       eamil: user.nickname,
       nickname: user.nickname,
       userImg: user.profile_url,
@@ -99,13 +96,13 @@ router.post('/login', validatePwd, async (req, res, next) => {
 });
 
 // 이메일 중복검사
-router.get('/user/exemail', validateEmail, async (req, res, next) => {
+router.post('/exemail', validateEmail, async (req, res, next) => {
   try {
     const { email } = req.body;
-    const exisEmail = await User.findOne({
+    const exEmail = await User.findOne({
       email,
     });
-    if (exisEmail) {
+    if (email === exEmail.email) {
       return res.status(400).send({
         result: false,
         msg: '이미 사용중인 이메일 입니다.',
@@ -121,13 +118,12 @@ router.get('/user/exemail', validateEmail, async (req, res, next) => {
 });
 
 // 닉네임 중복검사
-router.get('/user/exnickname', validateNick, async (req, res, next) => {
+router.post('/exnickname', validateNick, async (req, res) => {
   try {
     const { nickname } = req.body;
-    const exitNick = await User.findOne({
-      nickname,
-    });
-    if (exitNick) {
+    const exNick = await User.findOne({ nickname });
+
+    if (exNick) {
       return res.status(400).send({
         result: false,
         msg: '이미 사용중인 닉네임 입니다.',
@@ -141,46 +137,5 @@ router.get('/user/exnickname', validateNick, async (req, res, next) => {
     error.message;
   }
 });
-
-router.get('/kakao', passport.authenticate('kakao'));
-
-router.get('/kakao/callback', (req, res, next) => {
-  passport.authenticate('kakao', { failureRedirect: '/' }, (err, user, info) => {
-    if (err) return next(err);
-    const { userId, nickname } = user;
-    const accessToken = jwt.authSign({ userId, nickname });
-    const result = {
-      accessToken,
-      nickname,
-    };
-    console.log(user);
-    res.send({ user: result });
-  })(req, res, next);
-});
-
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-router.get('/google/callback', (req, res, next) => {
-  passport.authenticate('google', { failureRedirect: '/' }, (err, user, info) => {
-    // user 객체 뜯어보기
-    if (err) return next(err);
-    const { userId, nickname } = user;
-    const accessToken = jwt.authSign({ userId, nickname });
-    const result = {
-      accessToken,
-    };
-    res.send({ user: result });
-  })(req, res, next);
-});
-
-// router.get(
-//   "/google/callback",
-//   passport.authenticate("google", {
-//     failureRedirect: "/",
-//   }),
-//   (req, res) => {
-//     res.redirect("/")
-//   }
-// )
 
 module.exports = router;
