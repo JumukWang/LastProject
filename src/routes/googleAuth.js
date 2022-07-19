@@ -2,7 +2,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { User } = require('../models');
 const router = require('express').Router();
 const config = require('../config');
-const { authSign, refreshToken } = require('../util/jwt-util');
+const { authSign } = require('../util/jwt-util');
 
 const client = new OAuth2Client(config.GOOGLE_CLIENT_ID);
 

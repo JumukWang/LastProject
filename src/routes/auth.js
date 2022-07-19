@@ -3,8 +3,8 @@ const { User } = require('../models');
 const Bcrypt = require('bcrypt');
 const router = require('express').Router();
 const jwt = require('../util/jwt-util');
-const redisClient = require('../database/redis');
 const config = require('../config');
+const { getsessionStorage } = require('../server/sessionStore');
 
 const { validateEmail, validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
@@ -50,12 +50,11 @@ router.post('/signup', validateAll, async (req, res) => {
 });
 
 // 로그인
-router.post('/login', validatePwd, async (req, res, next) => {
+router.post('/login', validatePwd, async (req, res) => {
   try {
     // 여기도 중복검사, 해쉬화된 비밀번호 검증
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    console.log(user);
     if (!user) {
       return res.status(400).send({
         msg: '아이디 혹은 비밀번호를 확인해주세요.',
@@ -74,8 +73,12 @@ router.post('/login', validatePwd, async (req, res, next) => {
 
     const accessToken = jwt.authSign(user);
     const refreshToken = jwt.refreshToken();
-
-    redisClient.set(user.id, refreshToken);
+    const userSession = getsessionStorage();
+    userSession.saveSession(user.userId, {
+      userid: user.userId,
+      nickname: user.nickname,
+      connected: true,
+    });
 
     return res.status(200).send({
       eamil: user.nickname,
@@ -96,7 +99,7 @@ router.post('/login', validatePwd, async (req, res, next) => {
 });
 
 // 이메일 중복검사
-router.post('/exemail', validateEmail, async (req, res, next) => {
+router.post('/exemail', validateEmail, async (req, res) => {
   try {
     const { email } = req.body;
     const exEmail = await User.findOne({

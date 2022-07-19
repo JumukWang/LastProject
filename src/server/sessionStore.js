@@ -1,28 +1,11 @@
-/* abstract */ class SessionStore {
+const redisClient = require('../database/redis');
+class SessionStore {
   findSession(id) {}
   saveSession(id, session) {}
   findAllSessions() {}
 }
 
-class InMemorySessionStore extends SessionStore {
-  constructor() {
-    super();
-    this.sessions = new Map();
-  }
-
-  findSession(id) {
-    return this.sessions.get(id);
-  }
-
-  saveSession(id, session) {
-    this.sessions.set(id, session);
-  }
-
-  findAllSessions() {
-    return [...this.sessions.values()];
-  }
-}
-
+// userId / nickname
 const SESSION_TTL = 24 * 60 * 60;
 const mapSession = ([userID, username, connected]) =>
   userID ? { userID, username, connected: connected === 'true' } : undefined;
@@ -39,33 +22,24 @@ class RedisSessionStore extends SessionStore {
 
   saveSession(id, { userID, username, connected }) {
     this.redisClient
-      .multi()
+      .multi() // exec에서 하나라도 실패하면 다 실패 레디스 트랜젝션 관리
       .hset(`session:${id}`, 'userID', userID, 'username', username, 'connected', connected)
       .expire(`session:${id}`, SESSION_TTL)
       .exec();
   }
-
-  async findAllSessions() {
-    const keys = new Set();
-    let nextIndex = 0;
-    do {
-      const [nextIndexAsStr, results] = await this.redisClient.scan(nextIndex, 'MATCH', 'session:*', 'COUNT', '100');
-      nextIndex = parseInt(nextIndexAsStr, 10);
-      results.forEach((s) => keys.add(s));
-    } while (nextIndex !== 0);
-    const commands = [];
-    keys.forEach((key) => {
-      commands.push(['hmget', key, 'userID', 'username', 'connected']);
-    });
-    return this.redisClient
-      .multi(commands)
-      .exec()
-      .then((results) => {
-        return results.map(([err, session]) => (err ? undefined : mapSession(session))).filter((v) => !!v);
-      });
-  }
 }
+let sessionStorage;
+function initsessionStorage(redisClient) {
+  sessionStorage = new RedisSessionStore(redisClient);
+}
+function getsessionStorage() {
+  if (sessionStorage === null) {
+    initsessionStorage(redisClient);
+  }
+  return sessionStorage;
+}
+
 module.exports = {
-  InMemorySessionStore,
-  RedisSessionStore,
+  initsessionStorage,
+  getsessionStorage,
 };

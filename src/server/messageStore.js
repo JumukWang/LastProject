@@ -1,21 +1,8 @@
-/* abstract */ class MessageStore {
+const redisClient = require('../database/redis');
+
+class MessageStore {
   saveMessage(message) {}
   findMessagesForUser(userID) {}
-}
-
-class InMemoryMessageStore extends MessageStore {
-  constructor() {
-    super();
-    this.messages = [];
-  }
-
-  saveMessage(message) {
-    this.messages.push(message);
-  }
-
-  findMessagesForUser(userID) {
-    return this.messages.filter(({ from, to }) => from === userID || to === userID);
-  }
 }
 
 const CONVERSATION_TTL = 24 * 60 * 60;
@@ -43,8 +30,18 @@ class RedisMessageStore extends MessageStore {
     });
   }
 }
+let messageStorage;
+function initMessageStorage() {
+  messageStorage = new RedisMessageStore(redisClient);
+}
+function getMessageStorage() {
+  if (messageStorage === null) {
+    initMessageStorage(redisClient);
+  }
+  return messageStorage;
+}
 
 module.exports = {
-  InMemoryMessageStore,
-  RedisMessageStore,
+  initMessageStorage,
+  getMessageStorage,
 };

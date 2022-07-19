@@ -17,8 +17,6 @@ const io = require('socket.io')(httpServer, {
 });
 
 const { setupWorker } = require('@socket.io/sticky');
-const crypto = require('crypto');
-const randomId = () => crypto.randomBytes(8).toString('hex');
 
 const { RedisSessionStore } = require('./sessionStore');
 const sessionStore = new RedisSessionStore(redisClient);
@@ -27,7 +25,7 @@ const { RedisMessageStore } = require('./messageStore');
 const messageStore = new RedisMessageStore(redisClient);
 
 io.use(async (socket, next) => {
-  const sessionID = socket.handshake.auth.sessionID;
+  const sessionID = socket.handshake.auth.id;
   if (sessionID) {
     const session = await sessionStore.findSession(sessionID);
     if (session) {
@@ -41,8 +39,6 @@ io.use(async (socket, next) => {
   if (!username) {
     return next(new Error('invalid username'));
   }
-  socket.sessionID = randomId();
-  socket.userID = randomId();
   socket.username = username;
   next();
 });
