@@ -13,7 +13,6 @@ const { RedisSessionStore } = require('./src/server/sessionStore');
 const sessionStore = new RedisSessionStore(redisClient);
 
 const { RedisMessageStore } = require('./src/server/messageStore');
-const { Socket } = require('socket.io');
 const messageStore = new RedisMessageStore(redisClient);
 
 const io = require('socket.io')(server, {
@@ -36,12 +35,12 @@ io.use(async (socket, next) => {
       return next();
     }
   }
-  const nickname = socket.handshake.auth.nickname;
-  if (!nickname) {
-    return next(new Error('invalid username'));
-  }
-  socket.nickname = nickname;
-  next();
+  // const nickname = socket.handshake.auth.nickname;
+  // if (!nickname) {
+  //   return next(new Error('invalid username'));
+  // }
+  // socket.nickname = nickname;
+  // next();
 });
 
 const users = {};

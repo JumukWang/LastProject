@@ -1,5 +1,3 @@
-const redisClient = require('../database/redis');
-
 class MessageStore {
   saveMessage(message) {}
   findMessagesForUser(userID) {}

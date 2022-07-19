@@ -1,4 +1,3 @@
-const redisClient = require('../database/redis');
 class SessionStore {
   findSession(id) {}
   saveSession(id, session) {}
