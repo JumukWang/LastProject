@@ -9,14 +9,23 @@ const redisClient = require('../database/redis');
 const { RedisSessionStore } = require('../server/sessionStore');
 const sessionStore = new RedisSessionStore(redisClient);
 
-const { validateEmail, validateNick, validatePwd, validateAll } = require('../middlewares/validation');
+const { validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
 // 회원가입
 router.post('/signup', validateAll, async (req, res) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck, profile_url } = req.body;
-
+    const exEmail = await User.findOne({
+      email,
+    });
+    console.log(exEmail);
+    if (exEmail) {
+      return res.status(400).send({
+        result: false,
+        msg: '이미 사용중인 이메일 입니다.',
+      });
+    }
     if (password !== passwordCheck) {
       res.status(400).send({
         message: '비밀번호 확인란이 일치하지 않습니다.',
@@ -24,6 +33,7 @@ router.post('/signup', validateAll, async (req, res) => {
       });
       return;
     }
+
     const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
     const hashPassword = await Bcrypt.hash(password, salt);
 
@@ -76,17 +86,12 @@ router.post('/login', validatePwd, async (req, res) => {
 
     const accessToken = jwt.authSign(user);
     const refreshToken = jwt.refreshToken();
+    console.log(user);
     sessionStore.saveSession(user.userId, {
       userID: user.userId,
       nickname: user.nickname,
       connected: true,
     });
-    // const userSession = getsessionStorage();
-    // userSession.saveSession(user.userId, {
-    //   userid: user.userId,
-    //   nickname: user.nickname,
-    //   connected: true,
-    // });
 
     return res.status(200).send({
       userId: user.userId,
@@ -104,28 +109,6 @@ router.post('/login', validatePwd, async (req, res) => {
       msg: '다시 로그인 신청해 주세요',
       message: error.message,
     });
-  }
-});
-
-// 이메일 중복검사
-router.post('/exemail', validateEmail, async (req, res) => {
-  try {
-    const { email } = req.body;
-    const exEmail = await User.findOne({
-      email,
-    });
-    if (email === exEmail.email) {
-      return res.status(400).send({
-        result: false,
-        msg: '이미 사용중인 이메일 입니다.',
-      });
-    }
-    return res.status(200).send({
-      result: 'true',
-      msg: '사용 가능한 이메일 입니다.',
-    });
-  } catch (error) {
-    error.message;
   }
 });
 

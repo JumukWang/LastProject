@@ -9,11 +9,6 @@ const validate = (req, res, next) => {
   return res.status(400).json({ message: errors.array()[0].msg });
 };
 
-const validateEmail = [
-  body('email').trim().isEmail().withMessage('이메일 형식을 입력해 주세요').normalizeEmail(),
-  validate,
-];
-
 const validateNick = [
   body('nickname').trim().isLength({ min: 2 }).withMessage('닉네임은 두 글자 이상 입력해 주세요'),
   validate,
@@ -37,4 +32,4 @@ const validateAll = [
   validate,
 ];
 
-module.exports = { validateAll, validateEmail, validateNick, validatePwd };
+module.exports = { validateAll, validateNick, validatePwd };

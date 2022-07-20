@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
       console.log(error);
     }
     console.log('Finish sending email : ' + info.response);
-    res.json({ authNum, success: true });
+    res.send({ authNum, success: true });
     transporter.close();
   });
 });

@@ -47,10 +47,12 @@ router.post('/create/:userId', authMiddleware, async (req, res) => {
 });
 
 // 공개방 입장
+// nickname profileimg
 router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
   try {
     // 유저 닉네임 프로필 유알엘 투두
     const roomId = Number(req.params.roomId);
+    const nickname = req.nickname;
     const { groupNum, title } = await Room.findOne({ roomId: roomId });
     await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
 
@@ -64,6 +66,7 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
       roomId,
       title,
       groupNum,
+      nickname,
     });
   } catch (error) {
     return res.status(400).send({

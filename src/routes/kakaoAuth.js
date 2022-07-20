@@ -5,7 +5,6 @@ const router = require('express').Router();
 // const logger = require('../config');
 router.post('/login', (req, res) => {
   try {
-    console.log(req.body);
     const api_url = 'https://kapi.kakao.com/v2/user/me';
     const request = require('request');
     const access_token = req.body.access_token;
@@ -36,15 +35,13 @@ router.post('/login', (req, res) => {
 router.post('/newuser', async (req, res) => {
   try {
     // console.log("kakao_parsing의 req정보다",req)
+    const userId = await User.findOne({ userId });
     const user_info = req.body;
-    console.log('user_info정보다', user_info);
     const snsId = user_info.user_id;
     const userEmail = user_info.user_email;
     const nickname = user_info.user_name;
     const exUser = await User.findOne({ $and: [{ snsId }, { provider: 'kakao' }] });
-    console.log('exUser: ', exUser);
     const accessToken = authSign({ nickname });
-    console.log('accessToken 정보임', accessToken);
 
     // 만약 디비에 user의 email이 없다면,
 
@@ -57,7 +54,6 @@ router.post('/newuser', async (req, res) => {
         snsId: snsId,
         provider: 'kakao',
       });
-      console.log('newUser정보임', newUser);
       // 저장하기
       newUser.save();
       return res.send({
