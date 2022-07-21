@@ -1,10 +1,14 @@
-const { logger } = require('../config');
+const logger = require('../config/winston');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
 exports.logging = (req, res, next) => {
-  var logStr = {};
+  let logStr = {};
+
   try {
+    logStr.url = req.url;
+
+    logStr.method = req.method;
     switch (req.method) {
       case 'GET':
         logStr.query = req.query;
@@ -21,7 +25,7 @@ exports.logging = (req, res, next) => {
 
     next();
   } catch (error) {
-    logger.error(error);
+    logger.error();
     res.send({ result: false });
   }
 };

@@ -8,9 +8,6 @@ const redisClient = new Redis({
   password: config.REDIS_PASSWORD,
   legacyMode: true,
 });
-// const { getsessionStorage } = require('./src/server/sessionStore');
-const { RedisSessionStore } = require('./src/server/sessionStore');
-const sessionStore = new RedisSessionStore(redisClient);
 
 const { RedisMessageStore } = require('./src/server/messageStore');
 const messageStore = new RedisMessageStore(redisClient);
@@ -26,23 +23,6 @@ const io = require('socket.io')(server, {
   }),
 });
 
-io.use(async (socket, next) => {
-  const userId = socket.handshake.auth.userId;
-  if (userId) {
-    const session = await sessionStore.findSession(userId);
-    if (session) {
-      socket.id = session.nickname;
-      return next();
-    }
-  }
-  // const nickname = socket.handshake.auth.nickname;
-  // if (!nickname) {
-  //   return next(new Error('invalid username'));
-  // }
-  // socket.nickname = nickname;
-  // next();
-});
-
 const users = {};
 const socketToRoom = {};
 
@@ -50,18 +30,6 @@ io.on('connection', async (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
   socket.on('join room', (roomId) => {
-    // const getUser = sessionStore.findSession(userId);
-    if (users[roomId]) {
-      const length = users[roomId].length;
-      if (length === 4) {
-        socket.emit('room full');
-        return;
-      }
-      users[roomId].push(socket.id);
-    } else {
-      users[roomId] = [socket.id];
-      console.log(`User with ID: ${socket.id} joined room: ${roomId}`);
-    }
     socketToRoom[socket.id] = roomId;
     const usersInThisRoom = users[roomId].filter((id) => id !== socket.id);
     socket.broadcast.to(usersInThisRoom).emit(); // 이벤트명으로 emit 이벤트 명과 메세지를 출력

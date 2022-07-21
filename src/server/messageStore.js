@@ -28,16 +28,6 @@ class RedisMessageStore extends MessageStore {
     });
   }
 }
-// let messageStorage;
-// function initMessageStorage() {
-//   messageStorage = new RedisMessageStore(redisClient);
-// }
-// function getMessageStorage() {
-//   if (messageStorage === null) {
-//     initMessageStorage(redisClient);
-//   }
-//   return messageStorage;
-// }
 
 module.exports = {
   RedisMessageStore,

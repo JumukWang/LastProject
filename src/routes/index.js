@@ -8,15 +8,16 @@ const mainRouter = require('./main');
 const kakaoRouter = require('./kakaoAuth');
 const googleRouter = require('./googleAuth');
 const authMail = require('./authMail');
+const { logging } = require('../middlewares');
 
-router.use('/auth', authRouter);
-router.use('/mypage', userRouter);
-router.use('/room', roomRouter);
-router.use('/todo', todoRouter);
-router.use('/studytime', studytimeRouter);
-router.use('/main', mainRouter);
-router.use('/kakao', kakaoRouter);
-router.use('/google', googleRouter);
-router.use('/authMail', authMail);
+router.use('/auth', logging, authRouter);
+router.use('/mypage', logging, userRouter);
+router.use('/room', logging, roomRouter);
+router.use('/todo', logging, todoRouter);
+router.use('/studytime', logging, studytimeRouter);
+router.use('/main', logging, mainRouter);
+router.use('/kakao', logging, kakaoRouter);
+router.use('/google', logging, googleRouter);
+router.use('/authMail', logging, authMail);
 
 module.exports = router;

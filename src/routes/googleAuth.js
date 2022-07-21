@@ -10,39 +10,12 @@ router.post('/login', async (req, res) => {
   try {
     const { tokenId } = req.body.data;
 
-    client.verifyIdToken({ idToken: tokenId, audience: config.GOOGLE_CLIENT_ID }).then((response) => {
-      const { email, nickname, iconUrl } = response.getPayload();
-
-      if (email) {
-        User.findOne({ eamil: email }, (err, user) => {
-          if (err) return res.status(400).send({ result: false, err });
-          let accessToken = '';
-          if (user) {
-            accessToken = authSign({ email, nickname, iconUrl });
-            res.status(200).send({
-              accessToken,
-            });
-          } else {
-            const newUser = new User({
-              email,
-              nickname,
-              iconUrl,
-            });
-            newUser.save();
-            accessToken = authSign({ newUser });
-            res.status(200).send({
-              accessToken,
-            });
-          }
-        });
-      }
-    });
-  } catch (error) {
-    res.status(400).send({
-      result: false,
-      msg: error.message,
-    });
-  }
+    const ticket = await client
+      .verifyIdToken({ idToken: tokenId, audience: config.GOOGLE_CLIENT_ID })
+      .then((response) => {
+        const payload = ticket.getPayload();
+      });
+  } catch (error) {}
 });
 
 module.exports = router;
