@@ -2,6 +2,7 @@ const config = require('../config');
 const { User } = require('../models');
 const { authSign } = require('../util/jwt-util');
 const router = require('express').Router();
+
 // const logger = require('../config');
 router.post('/login', (req, res) => {
   try {

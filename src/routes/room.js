@@ -173,6 +173,7 @@ router.delete('/:roomId/:userId', authMiddleware, async (req, res) => {
 });
 
 // 스터디룸 검색
+//! body로 받아서 수정하기
 router.get('/search/:word', async (req, res) => {
   const { word } = req.params;
   let roomArr = [];

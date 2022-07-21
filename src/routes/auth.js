@@ -16,7 +16,7 @@ router.post('/signup', validateAll, async (req, res) => {
     const exEmail = await User.findOne({
       email,
     });
-    console.log(exEmail);
+
     if (exEmail) {
       return res.status(400).send({
         result: false,
@@ -83,8 +83,10 @@ router.post('/login', validatePwd, async (req, res) => {
 
     const accessToken = jwt.authSign(user);
     const refreshToken = jwt.refreshToken();
-
-    redisClient.set(email, refreshToken);
+    redisClient.set(email, {
+      refreshToken,
+      nickname: user.nickname,
+    });
 
     return res.status(200).send({
       userId: user.userId,

@@ -24,6 +24,7 @@ module.exports = async (req, res, next) => {
 
   try {
     // 헤더에서 인증, 토큰 비교 검증
+    logger.info('jwt 인증 시작');
     if (req.headers.authorization && req.headers.refreshToken) {
       const authToken = req.headers.authorization.split('Bearer ')[1];
       const refreshToken = req.headers.refreshToken;
