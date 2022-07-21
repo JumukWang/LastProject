@@ -5,13 +5,8 @@ const studyTimeSchema = new Schema({
   studytime: {
     type: String,
   },
-  timeId: {
-    type: Number,
-    default: 0,
-  },
-  userId: {
-    type: Number,
-    unique: true,
+  email: {
+    type: String,
   },
   startTime: {
     type: String,
@@ -31,6 +26,13 @@ const studyTimeSchema = new Schema({
   timedif: {
     type: Number,
   },
+  weeksum: {
+    type: String,
+  },
+  todaysum: {
+    type: String,
+  }
 });
 
-module.exports = mongoose.model('studyTime', studyTimeSchema);
+const Studytime = mongoose.model('Studytime', studyTimeSchema);
+module.exports = { Studytime };

@@ -55,158 +55,156 @@ function changeTime(time) {
 
   return hours + ":" + minutes + ":" + seconds;
 }
+module.exports = {timeSet, changeTime}
+// // 타이머Start
+// router.post('/timestart', authmiddleware, async (req,res, next) => {
+//   const email = req.email
+//   const { timeset }= req.body;
 
-// 타이머Start
-router.post('/timestart', authmiddleware, async (req,res, next) => {
-  const email = req.email
-  const { timeset }= req.body;
+//   try {
+//     if(timeset === 1) {
+//     const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
+//     const now = new Date();
+//     const day = now.getDay();
+//     const inTimestamp = now.getTime();
+//     const start = await Studytime.create({email,startTime,day,inTimestamp})
+//     res.status(200).send({
+//       result: true,
+//       message: "스터디시작!",
+//       start,
+//   })
+//     return;
+//   } 
+//   } catch (error) {
+//     res.status(400).send({
+//       result: false,
+//       message: error.message,
+//   });
+//   }
+// });
 
-  try {
-    if(timeset === 1) {
-    const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
-    const now = new Date();
-    const day = now.getDay();
-    const inTimestamp = now.getTime();
-    const start = await Studytime.create({email,startTime,day,inTimestamp})
-    res.status(200).send({
-      result: true,
-      message: "스터디시작!",
-      start,
-  })
-    return;
-  } 
-  } catch (error) {
-    res.status(400).send({
-      result: false,
-      message: error.message,
-  });
-  }
-});
+// // 타이머Out
+// router.post('/timeout', authmiddleware, async (req,res, next) => {
+//   const email = req.email
+//   const { timeset }= req.body;
 
-// 타이머Out
-router.post('/timeout', authmiddleware, async (req,res, next) => {
-  const email = req.email
-  const { timeset }= req.body;
+//   try {
+//     if(timeset === 0) {
+//     const outTime = moment().format('YYYY-MM-DD HH:mm:ss');
+//     const now = new Date();
+//     const day = now.getDay();
+//     const outTimestamp = now.getTime();
+//     const out = await Studytime.create({email,outTime,day,outTimestamp})
+//     res.status(200).send({
+//       result: true,
+//       message: "스터디끝!",
+//       out,
+//   })
+//     return;
+//   } 
+//   } catch (error) {
+//     console.log(error)
+//     res.status(400).send({
+//       result: false,
+//       message: error.message,
+//   });
+//   }
+// });
 
-  try {
-    if(timeset === 0) {
-    const outTime = moment().format('YYYY-MM-DD HH:mm:ss');
-    const now = new Date();
-    const day = now.getDay();
-    const outTimestamp = now.getTime();
-    const out = await Studytime.create({email,outTime,day,outTimestamp})
-    res.status(200).send({
-      result: true,
-      message: "스터디끝!",
-      out,
-  })
-    return;
-  } 
-  } catch (error) {
-    console.log(error)
-    res.status(400).send({
-      result: false,
-      message: error.message,
-  });
-  }
-});
+// // 화상스터디방 저장( room에서 나갈때 저장해주자)
 
-// 화상스터디방 저장( room에서 나갈때 저장해주자)
+// router.put('/save', authmiddleware, async (req,res,next) => {
+//   const email = req.email;
+//   const { todayStart, weekStart, weekEnd } = timeSet();
+//   console.log(todayStart, weekStart, weekEnd)
+//   try{
+//     const inTime = await Studytime.find({email}, {inTimestamp:1, email:1})
+//     const outTime = await Studytime.find({email}, {outTimestamp:1, email:1})
+//     const allinTime = inTime.map( intime => intime.inTimestamp ).filter(intime => intime !== undefined);
+//     const arr_allinTime = allinTime[allinTime.length -1]; //맨마지막타임스타드
+//     const alloutTime = outTime.map( outtime => outtime.outTimestamp ).filter(outtime => outtime !== undefined);
+//     const arr_alloutTime = alloutTime[alloutTime.length -1]; //맨마지막타임아웃
+//     const timedif =  arr_alloutTime - arr_allinTime
+//     if(arr_alloutTime<arr_allinTime) {
+//       res.status(200).send({
+//         result: false,
+//         message: "타임아웃시간을 눌러주세요"
+//       })
+//       return;
+//     } 
+//     const finaltime = changeTime(timedif)
 
-router.put('/save', authmiddleware, async (req,res,next) => {
-  const email = req.email;
-  const { todayStart, weekStart, weekEnd } = timeSet();
-  console.log(todayStart, weekStart, weekEnd)
-  try{
-    const inTime = await Studytime.find({email}, {inTimestamp:1, email:1})
-    const outTime = await Studytime.find({email}, {outTimestamp:1, email:1})
-    const allinTime = inTime.map( intime => intime.inTimestamp ).filter(intime => intime !== undefined);
-    const arr_allinTime = allinTime[allinTime.length -1]; //맨마지막타임스타드
-    const alloutTime = outTime.map( outtime => outtime.outTimestamp ).filter(outtime => outtime !== undefined);
-    const arr_alloutTime = alloutTime[alloutTime.length -1]; //맨마지막타임아웃
-    const timedif =  arr_alloutTime - arr_allinTime
-    if(arr_alloutTime<arr_allinTime) {
-      res.status(200).send({
-        result: false,
-        message: "타임아웃시간을 눌러주세요"
-      })
-      return;
-    } 
-    const finaltime = changeTime(timedif)
+//     await Studytime.updateOne({outTimestamp: arr_alloutTime }, {$set:{studytime: finaltime, timedif: timedif}});
+//     await Studytime.updateOne({inTimestamp: arr_allinTime }, {$set:{studytime: finaltime, timedif: timedif}});
+//     // todayRecord
+//     // TotalstudyTime, +1은 다음날을 기준으로 하기위해서 한것이고 -9시간은 UTC와 KRA 시간이 달라서 조정하기 위해 뺀것!!
+//     const today = new Date(todayStart);
+//     const tommorownum = today.getTime() + 24*60*60*1000 - 9*60*60*1000; 
+//     const todayKST = today.getTime() - 9*60*60*1000;
 
-    await Studytime.updateOne({outTimestamp: arr_alloutTime }, {$set:{studytime: finaltime, timedif: timedif}});
-    await Studytime.updateOne({inTimestamp: arr_allinTime }, {$set:{studytime: finaltime, timedif: timedif}});
-
-    // TotalstudyTime, +1은 다음날을 기준으로 하기위해서 한것이고 -9시간은 UTC와 KRA 시간이 달라서 조정하기 위해 뺀것!!
-    const today = new Date(todayStart);
-    const tommorownum = today.getTime() + 24*60*60*1000 - 9*60*60*1000; 
-    const todayKST = today.getTime() - 9*60*60*1000;
+//     const todaytime_1 = await Studytime.find({ email, inTimestamp:{$gt:todayKST,$lt:tommorownum}})
+//     const todaytime_2 = todaytime_1.map(x=> x.timedif).filter(x => x !== undefined);
+//     let todaysum = 0;
+//     for(let i = 0; i< todaytime_2.length; i++) {
+//       todaysum += todaytime_2[i]
+//     } console.log(changeTime(todaysum))
     
-    // todayRecord
+//     // weakRecord 
 
-    const todaytime_1 = await Studytime.find({ email, inTimestamp:{$gt:todayKST,$lt:tommorownum}})
-    const todaytime_2 = todaytime_1.map(x=> x.timedif).filter(x => x !== undefined);
-    let todaysum = 0;
-    for(let i = 0; i< todaytime_2.length; i++) {
-      todaysum += todaytime_2[i]
-    } console.log(changeTime(todaysum))
+//     const weekstart = new Date(weekStart).getTime();
+//     const weekend = new Date(weekEnd).getTime();
+//     const weekstartKST = weekstart - 9*60*60*1000;
+//     const weekendKST = weekend - 9*60*60*1000;
     
-    // weakRecord 
-
-    const weekstart = new Date(weekStart).getTime();
-    const weekend = new Date(weekEnd).getTime();
-    const weekstartKST = weekstart - 9*60*60*1000;
-    const weekendKST = weekend - 9*60*60*1000;
+//     const weektime_1 = await Studytime.find({ email, inTimestamp:{$gt:weekstartKST,$lt:weekendKST}})
+//     const weektime_2 = weektime_1.map(x=> x.timedif).filter(x => x !== undefined);
+//     let weeksum = 0;
+//     for(let i = 0; i< weektime_2.length; i++) {
+//       weeksum += weektime_2[i]
+//     } console.log(changeTime(weeksum))
     
-    const weektime_1 = await Studytime.find({ email, inTimestamp:{$gt:weekstartKST,$lt:weekendKST}})
-    const weektime_2 = weektime_1.map(x=> x.timedif).filter(x => x !== undefined);
-    let weeksum = 0;
-    for(let i = 0; i< weektime_2.length; i++) {
-      weeksum += weektime_2[i]
-    } console.log(changeTime(weeksum))
-    
-    await Studytime.updateOne({outTimestamp: arr_alloutTime }, {$set:{studytime:changeTime(todaysum), weektime: changeTime(weeksum)}});
-    await Studytime.updateOne({inTimestamp: arr_allinTime }, {$set:{studytime:changeTime(todaysum), weektime: changeTime(weeksum)}});
+//     await Studytime.updateOne({outTimestamp: arr_alloutTime }, {$set:{studytime:changeTime(todaysum), weektime: changeTime(weeksum)}});
+//     await Studytime.updateOne({inTimestamp: arr_allinTime }, {$set:{studytime:changeTime(todaysum), weektime: changeTime(weeksum)}});
 
-    res.status(200).send({
-      result: true,
-      message: "공부시간이 저장되었습니다.",
-      studytime: finaltime,
-      todayrecord : changeTime(todaysum),
-      weekrecord : changeTime(weeksum),
-      email
-  });
+//     res.status(200).send({
+//       result: true,
+//       message: "공부시간이 저장되었습니다.",
+//       studytime: finaltime,
+//       todayrecord : changeTime(todaysum),
+//       weekrecord : changeTime(weeksum),
+//       email
+//   });
 
-  } catch (error) {
-    console.log(error)
-    res.status(400).send({
-      result: false,
-      message: error.message,
-  });
-  }
-});
+//   } catch (error) {
+//     console.log(error)
+//     res.status(400).send({
+//       result: false,
+//       message: error.message,
+//   });
+//   }
+// });
 
-// Study Time,day 조회
-router.get('/', authmiddleware, async (req,res, next) => {
-  const email = req.email;
-  try{
-    const total = await Studytime.find({email})
-    const lasttotal = total[total.length-1];
-    console.log(lasttotal)
-    res.status(200).send({
-      result: true,
-      email : lasttotal.email,
-      day : lasttotal.day,
-      todayrecord : lasttotal.studytime,
-      weekrecord : lasttotal.weektime
-    });
-  } catch (error) {
-    res.status(400).send({
-      result: false,
-      message: error.message,
-  });
-  }
-});
+// // Study Time,day 조회
+// router.get('/', authmiddleware, async (req,res, next) => {
+//   const email = req.email;
+//   try{
+//     const total = await Studytime.find({email})
+//     const lasttotal = total[total.length-1];
+//     console.log(lasttotal)
+//     res.status(200).send({
+//       result: true,
+//       email : lasttotal.email,
+//       day : lasttotal.day,
+//       todayrecord : lasttotal.studytime,
+//       weekrecord : lasttotal.weektime
+//     });
+//   } catch (error) {
+//     res.status(400).send({
+//       result: false,
+//       message: error.message,
+//   });
+//   }
+// });
 
 
-module.exports = router
+// module.exports = router
