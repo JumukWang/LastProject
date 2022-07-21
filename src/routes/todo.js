@@ -1,8 +1,6 @@
 require('dotenv').config();
 const router = require('express').Router();
 const Todo = require('../models/todo');
-const Room = require('../models/studyroom');
-const Users = require('../models/user');
 const authMiddleware = require('../middlewares/authmiddleware');
 
 const moment = require('moment');

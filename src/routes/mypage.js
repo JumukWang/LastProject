@@ -3,7 +3,6 @@ const router = require('express').Router();
 const authMiddleware = require('../middlewares/authmiddleware');
 const { User } = require('../models');
 const Bcrypt = require('bcrypt');
-const { logging } = require('../middlewares');
 const SALT_NUM = process.env.SALT_NUM;
 
 // 마이페이지

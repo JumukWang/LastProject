@@ -1,7 +1,6 @@
 const { Room, User } = require('../models');
 const authMiddleware = require('../middlewares/authmiddleware');
 const router = require('express').Router();
-const { logging } = require('../middlewares');
 // 메인 페이지 만들기
 
 // 방조회

@@ -1,6 +1,4 @@
 const logger = require('../config/winston');
-const jwt = require('jsonwebtoken');
-const config = require('../config');
 
 exports.logging = (req, res, next) => {
   let logStr = {};
