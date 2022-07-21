@@ -19,8 +19,7 @@ router.get('/rooms', async (req, res) => {
     });
   }
 });
-// 호스트 / 참여중
-// 스키마
+// 참여중
 // 방생성
 router.post('/create/:userId', authMiddleware, async (req, res) => {
   try {
@@ -198,13 +197,13 @@ router.get('/entered-room', authMiddleware, async (req, res) => {
     const attendRoom = await User.find({ attendRoom }).sort('-createAt');
 
     if (!nickname === attendRoom.nickname) {
-      return res.status(400).json({ success: false, msg: '참여중인 스터디를 찾을 수 없습니다.' });
+      return res.status(400).json({ result: false, msg: '참여중인 스터디를 찾을 수 없습니다.' });
     }
     if (!attendRoom) {
-      return res.status(400).json({ success: false, msg: '해당 카테고리 방이 존재하지 않습니다.' });
+      return res.status(400).json({ result: false, msg: '해당 카테고리 방이 존재하지 않습니다.' });
     }
     res.status(200).json({
-      success: true,
+      result: true,
       attendRoom,
     });
   } catch (error) {
@@ -220,13 +219,13 @@ router.get('/host-room/:userId', authMiddleware, async (req, res) => {
     const hostRoom = await User.find({ hostRoom }).sort('-createAt');
 
     if (!userId === hostRoom.userId) {
-      return res.status(400).json({ success: false, msg: '호스트중인 스터디가 없습니다.' });
+      return res.status(400).json({ result: false, msg: '호스트중인 스터디가 없습니다.' });
     }
     if (!hostRoom) {
-      return res.status(400).json({ success: false, msg: '스터디를 불러올수없습니다.' });
+      return res.status(400).json({ result: false, msg: '스터디를 불러올수없습니다.' });
     }
     res.status(200).json({
-      success: true,
+      result: true,
       hostRoom,
     });
   } catch (error) {
@@ -243,15 +242,15 @@ router.put('/invite', authMiddleware, async (req, res) => {
     const userList = await User.find({ nickname: { $ne: nickname } }).sort('nickname');
     //로그인한 나를 제외한 유저목록조회 (이름 순으로 정렬)
     if (!userList) {
-      return res.status(400).json({ success: false, msg: '유저 리스트를 불러올 수 없습니다.' });
+      return res.status(400).json({ result: false, msg: '유저 리스트를 불러올 수 없습니다.' });
     }
     if (userList === nickname) {
-      return res.status(400).json({ success: false, msg: '본인 포함 오류' });
+      return res.status(400).json({ result: false, msg: '본인 포함 오류' });
     }
 
     const inviteUser = await Room.findOneAndUpdate({ roomId }, { $push: { userNickname: userList.nickname } });
     res.status(200).json({
-      success: true,
+      result: true,
       inviteUser,
       msg: '초대 완료',
     });

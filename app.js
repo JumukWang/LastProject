@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 const RedisStore = require('connect-redis')(session);
 const Router = require('./src/routes');
 const connect = require('./src/database');
-const redisClient = require('./src/database/redis');
+const { redisClient } = require('./src/database/redis');
 const config = require('./src/config');
 const logger = require('./src/config/winston');
 const app = express();
@@ -29,7 +29,6 @@ app.use(helmet());
 app.use(morgan('tiny'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(cookieParser(config.COOKIE_SECRET));
 app.use(
   session({

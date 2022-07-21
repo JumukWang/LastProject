@@ -18,7 +18,7 @@ router.get('/:userId', authMiddleware, async (req, res) => {
   } catch (error) {
     res.status(400).send({
       result: false,
-      message: error.message,
+      msg: error.message,
     });
   }
 });
@@ -33,7 +33,7 @@ router.put('/:userId/update', authMiddleware, async (req, res) => {
     if (passwordCheck !== password) {
       return res.send({
         result: false,
-        message: '비밀번호, 비밀번호 확인이 동일해야 합니다.',
+        msg: '비밀번호, 비밀번호 확인이 동일해야 합니다.',
       });
     }
 
@@ -44,13 +44,13 @@ router.put('/:userId/update', authMiddleware, async (req, res) => {
     const updateUser = await User.findOne({ userId: Number(userId) });
     res.send({
       result: true,
-      message: '유저정보가 수정되었습니다.',
+      msg: '유저정보가 수정되었습니다.',
       updateUser,
     });
   } catch (error) {
     res.status(400).send({
       result: false,
-      message: error.message,
+      msg: error.message,
     });
   }
 });

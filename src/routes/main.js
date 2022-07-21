@@ -20,6 +20,26 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/enter/:roomId', async (req, res) => {
+  try {
+    const roomId = req.params;
+    const enterInfo = await Room.find({ roomId });
+    if (!enterInfo) {
+      return res.status(400).json({
+        success: false,
+        msg: '정보를 불러올수없습니다.',
+      });
+    }
+    res.status(200).json({
+      success: true,
+      enterInfo: { title: enterInfo.title, content: enterInfo.content, groupNum: enterInfo.groupNum },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ errorMessage: error.message });
+  }
+});
+
 router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;

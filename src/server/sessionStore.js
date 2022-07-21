@@ -27,17 +27,6 @@ class RedisSessionStore extends SessionStore {
   }
 }
 
-// let sessionStorage;
-// function initsessionStorage(redisClient) {
-//   sessionStorage = new RedisSessionStore(redisClient);
-// }
-// function getsessionStorage() {
-//   if (sessionStorage === null) {
-//     initsessionStorage(redisClient);
-//   }
-//   return sessionStorage;
-// }
-
 module.exports = {
   RedisSessionStore,
 };
