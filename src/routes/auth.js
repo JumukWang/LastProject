@@ -4,6 +4,7 @@ const Bcrypt = require('bcrypt');
 const router = require('express').Router();
 const jwt = require('../util/jwt-util');
 const config = require('../config');
+const redisClient = require('../database/redis');
 
 const { validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
@@ -82,6 +83,8 @@ router.post('/login', validatePwd, async (req, res) => {
 
     const accessToken = jwt.authSign(user);
     const refreshToken = jwt.refreshToken();
+
+    redisClient.set(email, refreshToken);
 
     return res.status(200).send({
       userId: user.userId,
