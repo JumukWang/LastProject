@@ -34,7 +34,7 @@ router.post('/create/:userId', authMiddleware, async (req, res) => {
     });
     const roomNum = Number(newStudyRoom.roomId);
     await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-    await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+    await User.updateOne({ userId: host }, { $push: { hostRoom: newStudyRoom } });
     return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newStudyRoom });
   } catch (error) {
     return res.status(400).send({
@@ -184,9 +184,12 @@ router.get('/search/:word', async (req, res) => {
         roomArr.push(rooms[i]);
       }
     }
-    return res.status(201).send(roomArr);
+    return res.status(201).send({
+      roomArr,
+      result: true,
+    });
   } catch (error) {
-    return res.status(401).json({ result: false, Message: '찾으시는 스터디가 없습니다.' });
+    return res.status(401).json({ result: false, msg: '찾으시는 스터디가 없습니다.' });
   }
 });
 
