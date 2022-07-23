@@ -30,9 +30,10 @@ io.on('connection', async (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
   socket.on('join room', async (roomId, nick) => {
+    await redisClient.sadd('room_' + roomId, nick);
     const [messages] = await Promise.all([messageStore.findMessagesForUser(nick)]);
     const messagePerUser = new Map();
-    messages.forEeach((data) => {
+    messages.forEach((data) => {
       const { from, to } = data;
       const otherUser = nick === from ? to : from;
       if (messagePerUser.has(otherUser)) {
@@ -42,9 +43,11 @@ io.on('connection', async (socket) => {
       }
     });
     socketToRoom[socket.id] = roomId;
-    const usersInThisRoom = users[roomId].filter((id) => id !== socket.id);
-    socket.broadcast.to(usersInThisRoom).emit(); // 이벤트명으로 emit 이벤트 명과 메세지를 출력
-    socket.emit('all users', usersInThisRoom);
+    socket.broadcast.to(roomId).emit(); // 이벤트명으로 emit 이벤트 명과 메세지를 출력
+    const smembers = await redisClient.smembers('room_' + roomId);
+    const filteredlist = smembers.filter((userId) => userId !== nick);
+
+    socket.emit('all users', filteredlist);
   });
 
   socket.on('sending signal', (payload) => {
@@ -55,15 +58,10 @@ io.on('connection', async (socket) => {
     io.to(payload.callerId).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
   });
 
-  socket.on('send_message', (nick, data, to) => {
-    const message = {
-      data,
-      from: nick,
-      to,
-    };
-    socket.to(data.room).emit('receive_message', message);
-    messageStore.saveMessage(message);
-    console.log(data);
+  socket.on('send_message', (data) => {
+    socket.to(data.roomId).emit('receive_message', data);
+    messageStore.saveMessage(data);
+    console.log(data.roomId);
   });
 
   socket.on('disconnect', () => {
