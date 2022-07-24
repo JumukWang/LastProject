@@ -12,10 +12,13 @@ const CONFIG = {
   REDIS_HOST: process.env.REDIS_HOST,
   REDIS_PORT: process.env.REDIS_PORT,
   REDIS_PASSWORD: process.env.REDIS_PASSWORD,
-  MONGO_URL: process.env.MONGO_URL,
   NODE_ENV: process.env.NODE_ENV || 'production',
   NODEMAILER_USER: process.env.NODEMAILER_USER,
   NODEMAILER_PASS: process.env.NODEMAILER_PASS,
+  MONGO_USERNAME: process.env.MONGO_USERNAME,
+  MONGO_PASSWORD: process.env.MONGO_PASSWORD,
+  MONGO_NAME: process.env.MONGO_NAME,
+  MONGO_URL: process.env.MONGO_URL,
 };
 
 module.exports = CONFIG;
