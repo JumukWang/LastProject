@@ -3,3 +3,4 @@ Dockerfile
 .env
 README.md
 .gitignore
+logs
