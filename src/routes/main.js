@@ -54,32 +54,13 @@ router.post('/dislike/:roomId', authMiddleware, async (req, res, next) => {
   });
 });
 
-// 카테고리 전체조회
-
-router.get('/tag', async (req, res) => {
-  try {
-    const roomList = await Room.find({}).sort('tagName');
-    if (!roomList) {
-      return res.status(400).json({
-        success: false,
-        msg: '해당 카테고리 방이 존재하지 않습니다.',
-      });
-    }
-    res.status(200).json({
-      success: true,
-      roomList,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send({ errorMessage: error.message });
-  }
-});
-
-// 카테고리 조회 (미완성)
 router.get('/tag/:tagName', async (req, res) => {
   try {
     const { tagName } = req.params;
-    const roomList = await Room.find({ tagName }).sort('-createAt');
+    const roomList = await Room.find({ tagName })
+      .sort('-createAt')
+      .skip((tagName - 1) * 2)
+      .limit(6);
     if (!roomList) {
       return res.status(400).json({
         success: false,
