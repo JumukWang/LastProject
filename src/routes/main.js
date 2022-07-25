@@ -20,8 +20,8 @@ router.get('/', async (req, res, next) => {
     });
   }
 });
-// 유저에 배열 만들어서 저장해야함
-// res.locals.user 못쓰니까 불러와서 써야함
+
+// 좋아요
 router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;
@@ -39,6 +39,7 @@ router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
   });
 });
 
+// 싫어요
 router.post('/dislike/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;

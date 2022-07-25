@@ -28,11 +28,21 @@ const studyTimeSchema = new Schema({
   },
   weeksum: {
     type: String,
+    default: 0,
   },
   todaysum: {
     type: String,
+    default: 0,
+  },
+  todaysum_h : {
+    type: Number,
+    default: 0,
   }
-});
+},
+// {timestamps: true}
+);
+// studyTimeSchema.index({createdAt: 1},{expireAfterSeconds: 60});
 
 const Studytime = mongoose.model('Studytime', studyTimeSchema);
+
 module.exports = { Studytime };
