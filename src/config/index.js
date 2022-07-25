@@ -17,7 +17,6 @@ const CONFIG = {
   NODEMAILER_PASS: process.env.NODEMAILER_PASS,
   MONGO_USERNAME: process.env.MONGO_USERNAME,
   MONGO_PASSWORD: process.env.MONGO_PASSWORD,
-  MONGO_NAME: process.env.MONGO_NAME,
   MONGO_URL: process.env.MONGO_URL,
 };
 
