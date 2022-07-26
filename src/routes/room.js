@@ -3,22 +3,6 @@ const authMiddleware = require('../middlewares/authmiddleware');
 const router = require('express').Router();
 // 메인 페이지 만들기
 
-// 방조회
-router.get('/rooms', async (req, res) => {
-  try {
-    const roomList = await Room.find({}).sort({ createAt: -1 });
-    return res.status(201).send({
-      result: true,
-      roomList,
-    });
-  } catch (error) {
-    return res.status(400).send({
-      result: false,
-      msg: '스터디를 불러올 수 없습니다.',
-      errmsg: error.message,
-    });
-  }
-});
 // 참여중
 // 방생성
 router.post('/create/:userId', authMiddleware, async (req, res) => {
@@ -46,7 +30,7 @@ router.post('/create/:userId', authMiddleware, async (req, res) => {
 });
 
 // 공개방 입장
-// nickname profileimg
+//! 유저 직접 넣어서 length로 수정해야함
 router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
   try {
     // 유저 닉네임 프로필 유알엘 투두
@@ -77,13 +61,14 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
 });
 
 // 비밀방 입장
+//! 유저 직접 넣어서 length로 수정해야함
 router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const { password } = req.body;
     const nickname = req.nickname;
-    const passCheck = await Room.findOne({ roomId: roomId });
-    const { groupNum, title } = await Room.findOne({ roomId: roomId });
+    const passCheck = await Room.findOne({ roomId });
+    const { groupNum, title } = await Room.findOne({ roomId });
 
     if (passCheck.password !== password) {
       return res.status(401).send({ msg: '비밀번호가 틀렸습니다 ' });
@@ -144,25 +129,14 @@ router.delete('/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
-    const { password } = req.body;
-    const roomCheck = await Room.findOne({ roomId: roomId });
-    const user = await User.findOne({ userId });
-
-    if (roomCheck.password !== password) {
-      return res.status(401).send({
-        result: false,
-        msg: '비밀번호가 틀렸습니다',
-      });
-    }
-    if (user !== roomCheck.hostId) {
+    if (!userId) {
       return res.status(401).send({
         result: false,
         msg: '방의 호스트만 삭제할 수 있습니다.',
       });
     }
-    await Room.deleteOne({ roomId: roomId });
-
-    return res.status(201).sned({ result: true, msg: '스터디 룸이 삭제되었습니다.' });
+    await Room.deleteOne({ roomId });
+    return res.status(201).send({ result: true, msg: '스터디 룸이 삭제되었습니다.' });
   } catch (error) {
     return res.status(401).send({
       result: false,

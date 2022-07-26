@@ -6,7 +6,7 @@ const authMiddleware = require('../middlewares/authmiddleware');
 // 메인 페이지
 router.get('/', async (req, res, next) => {
   try {
-    const roomList = await Room.find({});
+    const roomList = await Room.find({}).sort({ create: -1 });
     return res.status(201).send({
       result: true,
       roomList,
