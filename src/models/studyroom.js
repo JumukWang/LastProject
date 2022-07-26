@@ -23,7 +23,7 @@ const studySchema = new Schema({
     require: true,
   },
   date: {
-    type: String,
+    type: Array,
     require: true,
   },
   word: {

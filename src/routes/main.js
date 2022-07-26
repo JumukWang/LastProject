@@ -20,6 +20,10 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+// 좋아요
+>>>>>>> origin/yechan3
 router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;
@@ -37,6 +41,7 @@ router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
   });
 });
 
+// 싫어요
 router.post('/dislike/:roomId', authMiddleware, async (req, res, next) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;

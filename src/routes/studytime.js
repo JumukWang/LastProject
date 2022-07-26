@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 require('dotenv').config();
 const { Studytime, User } = require('../models');
 const router = require('express').Router();
 const authmiddleware = require('../middlewares/authmiddleware');
 const moment = require('moment');
+=======
+require("dotenv").config()
+>>>>>>> origin/yechan3
 
 // today,week Start Point
 function timeSet() {
@@ -14,8 +18,16 @@ function timeSet() {
   const calcDate = now.getDate() - nowDay + ((nowDay == 0 ? 1 : 8) + 0);
 
   // 2. 금주 월요일과 어제의 timestamp 출력.
+<<<<<<< HEAD
   const [mondayStamp, yesterdayStamp] = [nowTimestamp - (nowDay - 1) * dayToMs, nowTimestamp - dayToMs];
 
+=======
+  const [mondayStamp, yesterdayStamp] = [
+    nowTimestamp - (nowDay - 1) * dayToMs,
+    nowTimestamp - dayToMs,
+  ];
+  
+>>>>>>> origin/yechan3
   // 3. 현재시각, 년, 월, 오늘날짜, 어제날짜, 금주 월요일 날짜를 출력.
   const [currentTime, year, month, today, yesterday, monday] = [
     now.getHours(),
@@ -29,14 +41,17 @@ function timeSet() {
   let weekStart = `${year}-${month}-${monday}T00:00:00.000Z`;
   let weekEnd = `${year}-${month}-${calcDate}T00:00:00.000Z`;
   let todayStart;
-  currentTime < 24 //한국시간 기준으로 한것!! 삼항쓸필요는 없는데 안바꿔놓음
+  currentTime < 24
     ? (todayStart = `${year}-${month}-${today}T00:00:00.000Z`)
     : (todayStart = `${year}-${month}-${yesterday}T00:00:00.000Z`);
 
+<<<<<<< HEAD
   // currentTime < 9 //UTC시간이라서 변경한거임!! (삼항연산자사용!!).....
   // ? (todayStart = `${year}-${month}-${yesterday}T00:00:00.000Z`)
   // : (todayStart = `${year}-${month}-${today}T00:00:00.000Z`);
 
+=======
+>>>>>>> origin/yechan3
   return { todayStart, weekStart, weekEnd };
 }
 
@@ -52,7 +67,9 @@ function changeTime(time) {
 
   return hours + ':' + minutes + ':' + seconds;
 }
+// h(시)변환
 
+<<<<<<< HEAD
 // 타이머Start
 router.post('/timestart', authmiddleware, async (req, res, next) => {
   const email = req.email;
@@ -77,9 +94,16 @@ router.post('/timestart', authmiddleware, async (req, res, next) => {
       result: false,
       message: error.message,
     });
+=======
+function timeConversion(millisec) {
+  var hours = (millisec / (1000 * 60 * 60)).toFixed(1);
+  if (hours < 24) {
+    return hours 
+>>>>>>> origin/yechan3
   }
-});
+}
 
+<<<<<<< HEAD
 // 타이머Out
 router.post('/timeout', authmiddleware, async (req, res, next) => {
   const email = req.email;
@@ -213,3 +237,32 @@ router.get('/', authmiddleware, async (req, res, next) => {
 });
 
 module.exports = router;
+=======
+// 숫자 요일로 바꾸기 
+
+function daySet(day) {
+  if(day === 0) {
+    return '일'
+  } 
+  if(day === 1) {
+    return '월'
+  }
+  if(day === 2) {
+    return '화'
+  }
+  if(day === 3) {
+    return '수'
+  }
+  if(day === 4) {
+    return '목'
+  }
+  if(day === 5) {
+    return '금'
+  }
+  if(day === 6) {
+    return '토'
+  }
+}
+
+module.exports = {timeSet, changeTime, timeConversion, daySet}
+>>>>>>> origin/yechan3

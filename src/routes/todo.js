@@ -5,26 +5,30 @@ const authMiddleware = require('../middlewares/authmiddleware');
 
 const moment = require('moment');
 
-//할 일 목록
-router.get('/', authMiddleware, async (req, res) => {
-  try {
-    const { roomId } = req.body;
-    const todos = await Todo.find({ roomId }).sort('-createAt').exec();
-    if (!todos) {
-      return res.status(400).json({
-        success: false,
-        errorMessage: '할 일 목록이 없습니다.',
-      });
+//할 일 목록  
+router.get('/', authMiddleware, async (req, res)=> {
+    try {
+        const { roomId } = req.body
+        const todos = await Todo.find({ roomId }).sort("-createAt").exec()
+        if (!todos) {
+            return res.status(400).json({
+                success: false,
+                errorMessage: "할 일 목록이 없습니다."
+            })
+        }
+        res.status(200).json({
+            success: true,
+            todos,
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(400).send({errorMessage: error.message})
     }
     res.status(200).json({
       success: true,
       todos,
     });
-  } catch (error) {
-    console.log(error);
-    return res.status(400).send({ errorMessage: error.message });
-  }
-});
+  })
 
 //할 일 생성
 router.post('/input', authMiddleware, async (req, res) => {

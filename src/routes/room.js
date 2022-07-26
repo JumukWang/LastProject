@@ -1,6 +1,8 @@
-const { Room, User } = require('../models');
+const { Room, User, Studytime } = require('../models');
 const authMiddleware = require('../middlewares/authmiddleware');
 const router = require('express').Router();
+const moment = require("moment");
+const { timeSet, changeTime, timeConversion } = require('../routes/studytime')
 // 메인 페이지 만들기
 
 // 참여중
@@ -33,7 +35,7 @@ router.post('/create/:userId', authMiddleware, async (req, res) => {
 //! 유저 직접 넣어서 length로 수정해야함
 router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
   try {
-    // 유저 닉네임 프로필 유알엘 투두
+    
     const roomId = Number(req.params.roomId);
     const nickname = req.nickname;
     const { groupNum, title } = await Room.findOne({ roomId: roomId });
@@ -45,12 +47,49 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
         msg: '정원이 초과되었습니다.',
       });
     }
+    const email = req.email;
+    const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
+    const now = new Date();
+    const day = now.getDay();
+    const inTimestamp = now.getTime();
+    const start = await Studytime.create({email,startTime,day,inTimestamp})
+    const total = await Studytime.find({email, day:day})
+    
+    if(total.length === 1){
+      return res.status(200).send({
+        roomId,
+        title,
+        groupNum,
+        start,
+        email : total.email,
+        day : total.day,
+        hour : 0,
+        minute : 0,
+        second : 0,
+        todayrecord : 0,
+        weekrecord : 0,
+      });
+    } else {
+    const lasttotal = total.slice(-2)[0];
+    console.log(lasttotal)
+    let hour = lasttotal.todaysum.substr(0,2)
+    let minute = lasttotal.todaysum.substr(3,2)
+    let second = lasttotal.todaysum.substr(6,2)
+    console.log( hour, minute, second )
+
     return res.status(200).send({
       roomId,
       title,
       groupNum,
-      nickname,
-    });
+      email : lasttotal.email,
+      day : lasttotal.day,
+      hour : Number(hour),
+      minute : Number(minute),
+      second : Number(second),
+      todayrecord : lasttotal.todaysum,
+      weekrecord : lasttotal.weeksum
+    })
+    }
   } catch (error) {
     return res.status(400).send({
       result: false,
@@ -66,10 +105,9 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const { password } = req.body;
-    const nickname = req.nickname;
-    const passCheck = await Room.findOne({ roomId });
-    const { groupNum, title } = await Room.findOne({ roomId });
-
+    const passCheck = await Room.findOne({ roomId: roomId });
+    const { groupNum, title } = await Room.findOne({ roomId: roomId });
+    
     if (passCheck.password !== password) {
       return res.status(401).send({ msg: '비밀번호가 틀렸습니다 ' });
     }
@@ -79,13 +117,50 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
         msg: '정원이 초과되었습니다.',
       });
     }
+    const email = req.email
+    const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
+    const now = new Date();
+    const day = now.getDay();
+    const inTimestamp = now.getTime();
+    const start = await Studytime.create({email,startTime,day,inTimestamp})
 
     await Room.updateOne({ groupNum }, { $inc: { groupNum: 1 } });
+
+    if(total.length === 1){
+      return res.status(200).send({
+        roomId,
+        title,
+        groupNum,
+        start,
+        email : total.email,
+        day : total.day,
+        hour : 0,
+        minute : 0,
+        second : 0,
+        todayrecord : 0,
+        weekrecord : 0,
+      });
+    } else {
+    const lasttotal = total.slice(-2)[0];
+    console.log(lasttotal)
+    let hour = lasttotal.todaysum.substr(0,2)
+    let minute = lasttotal.todaysum.substr(3,2)
+    let second = lasttotal.todaysum.substr(6,2)
+    console.log( hour, minute, second )
+
     return res.status(200).send({
       roomId,
       title,
-      nickname,
-    });
+      groupNum,
+      email : lasttotal.email,
+      day : lasttotal.day,
+      hour : Number(hour),
+      minute : Number(minute),
+      second : Number(second),
+      todayrecord : lasttotal.todaysum,
+      weekrecord : lasttotal.weeksum
+    })
+    }
   } catch (error) {
     return res.status(400).send({
       result: false,
@@ -96,7 +171,7 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
 });
 
 // 방나가기
-router.post('/exit/:roomId', async (req, res) => {
+router.post('/exit/:roomId', authMiddleware, async (req, res, next) => {
   try {
     const roomId = Number(req.params.roomId);
     const [targetRoom] = await Room.find({ roomId });
@@ -110,10 +185,52 @@ router.post('/exit/:roomId', async (req, res) => {
         msg: '참여 인원이 없습니다.',
       });
     }
+
+    //시간저장 
+    const email = req.email;
+    
+    const { todayStart, weekStart, weekEnd } = timeSet();
+    console.log(todayStart, weekStart, weekEnd)
+    const outTime = moment().format('YYYY-MM-DD HH:mm:ss');
+    const now = new Date();
+    const day = now.getDay();
+    const outTimestamp = now.getTime();
+    const out = await Studytime.create({email,outTime,day,outTimestamp})
+
+    const inTime = await Studytime.find({email}, {inTimestamp:1, email:1})
+    const outTime_1 = await Studytime.find({email}, {outTimestamp:1, email:1})
+    const allinTime = inTime.map( intime => intime.inTimestamp ).filter(intime => intime !== undefined);
+    const arr_allinTime = allinTime[allinTime.length -1]; //맨마지막타임스타드
+    const alloutTime = outTime_1.map( outtime => outtime.outTimestamp ).filter(outtime => outtime !== undefined);
+    const arr_alloutTime = alloutTime[alloutTime.length -1]; //맨마지막타임아웃
+    const timedif =  arr_alloutTime - arr_allinTime
+    const finaltime = changeTime(timedif)
+    console.log('hi')
+    await Studytime.updateOne({outTimestamp: arr_alloutTime }, {$set:{studytime: finaltime, timedif: timedif}});
+    await Studytime.updateOne({inTimestamp: arr_allinTime }, {$set:{studytime: finaltime, timedif: timedif}});
+
+    // todayRecord
+    // TotalstudyTime, +1은 다음날을 기준으로 하기위해서 한것이고 -9시간은 UTC와 KRA 시간이 달라서 조정하기 위해 뺀것!!
+    const today = new Date(todayStart);
+    const tommorownum = today.getTime() + 24*60*60*1000 - 9*60*60*1000; 
+    const todayKST = today.getTime() - 9*60*60*1000; 
+    const todaytime_1 = await Studytime.find({ email, inTimestamp:{$gt:todayKST,$lt:tommorownum}})
+    const todaytime_2 = todaytime_1.map(x=> x.timedif).filter(x => x !== undefined);
+    let todaysum = 0;
+    for(let i = 0; i< todaytime_2.length; i++) {
+      todaysum += todaytime_2[i]
+    } console.log(changeTime(todaysum))
+    
+    await Studytime.updateOne({outTimestamp: arr_alloutTime }, {$set:{todaysum:changeTime(todaysum), todaysum_h:timeConversion(todaysum)}});
+    await Studytime.updateOne({inTimestamp: arr_allinTime }, {$set:{todaysum:changeTime(todaysum), todaysum_h:timeConversion(todaysum)}});
+    
     return res.status(201).send({
       groupNum,
       result: true,
       msg: '스터디 룸에서 나왔습니다.',
+      out,
+      todayrecord : changeTime(todaysum),
+      todaysum_h: timeConversion(todaysum),
     });
   } catch (error) {
     return res.status(400).send({
@@ -236,5 +353,7 @@ router.put('/invite', authMiddleware, async (req, res) => {
     console.log(error);
     res.status(400).send({ errorMessage: error.message });
   }
-});
+  
+})
+
 module.exports = router;

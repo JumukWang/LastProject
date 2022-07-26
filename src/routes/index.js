@@ -3,12 +3,13 @@ const authRouter = require('./auth');
 const userRouter = require('./mypage');
 const roomRouter = require('./room');
 const todoRouter = require('./todo');
-const studytimeRouter = require('./studytime');
 const mainRouter = require('./main');
 const kakaoRouter = require('./kakaoAuth');
 const googleRouter = require('./googleAuth');
 const authMail = require('./authMail');
 const { logging } = require('../middlewares');
+const mailAuthRouter = require('./mailauth');
+
 
 router.use('/auth', logging, authRouter);
 router.use('/mypage', logging, userRouter);
@@ -19,5 +20,6 @@ router.use('/main', logging, mainRouter);
 router.use('/kakao', logging, kakaoRouter);
 router.use('/google', logging, googleRouter);
 router.use('/authMail', logging, authMail);
+router.use('/mailauth', mailAuthRouter);
 
 module.exports = router;
