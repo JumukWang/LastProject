@@ -39,7 +39,7 @@ router.post('/create/:userId', authMiddleware, async (req, res, next) => {
     console.log(newStudyRoom)
     const roomNum = Number(newStudyRoom.roomId);
     await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-    await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+    await User.updateOne({ userId: host }, { $push: { hostRoom: newStudyRoom } });
     return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newStudyRoom });
   } catch (error) {
     return res.status(400).send({

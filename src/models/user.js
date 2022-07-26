@@ -31,49 +31,6 @@ const userSchema = new Schema(
     userLike: {
       type: Array,
     },
-    day : [{type: mongoose.Schema.Types.ObjectId, ref: "Day"}] ,
-    day0: {
-      type: Array,
-      default:0,
-      createdAt: 1,
-      expireAfterSeconds: 60,
-    },
-    day1: {
-      type: Array,
-      default:0,
-      createdAt: 1,
-      expireAfterSeconds: 60,
-    },
-    day2: {
-      type: Array,
-      default:0,
-      createdAt: 1,
-      expireAfterSeconds: 60,
-    },
-    day3: {
-      type: Array,
-      default:0,
-      createdAt: 1,
-      expireAfterSeconds: 60,
-    },
-    day4: {
-      type: Array,
-      default:0,
-      createdAt: 1,
-      expireAfterSeconds: 60,
-    },
-    day5: {
-      type: Array,
-      default:0,
-      createdAt: 1,
-      expireAfterSeconds: 60,
-    },
-    day6: {
-      type: Array,
-      default:0,
-      createdAt: 1,
-      expireAfterSeconds: 60,
-    },
   },
   {
     timestamps: true,
