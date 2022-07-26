@@ -33,10 +33,6 @@ const studySchema = new Schema({
     type: Number,
     default: 0,
   },
-  isLiked: {
-    type: Boolean,
-    default: false,
-  },
   createAt: {
     type: Date,
     default: Date.now(),

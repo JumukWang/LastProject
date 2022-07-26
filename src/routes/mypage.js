@@ -7,10 +7,9 @@ const SALT_NUM = process.env.SALT_NUM;
 
 // 마이페이지
 router.get('/:userId', authMiddleware, async (req, res) => {
-  const userId = Number(req.params.userId);
-  const user = await User.findOne({ userId: Number(userId) });
   try {
-    const myPage = await User.findOne({ user });
+    const { userId } = req.params;
+    const myPage = await User.findOne({ userId });
     res.status(200).send({
       result: true,
       myPage,

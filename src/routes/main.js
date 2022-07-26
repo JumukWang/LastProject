@@ -54,22 +54,20 @@ router.post('/dislike/:roomId', authMiddleware, async (req, res, next) => {
   });
 });
 
-router.get('/tag/:tagName', async (req, res) => {
+router.post('/tag/:tagName', async (req, res) => {
   try {
     const { tagName } = req.params;
     const roomLength = await Room.find({ tagName });
-    const roomList = await Room.find({ tagName })
-      .sort('-createAt')
-      .skip((tagName - 1) * 2)
-      .limit(6);
+    const roomList = await Room.find({ tagName }).sort({ createAt: -1 }).limit(6);
     const tagLength = roomLength.length;
+    console.log(tagLength);
+
     if (!roomList) {
       return res.status(400).json({
         success: false,
         msg: '해당 카테고리 방이 존재하지 않습니다.',
       });
     }
-
     res.status(200).json({
       success: true,
       roomList,
