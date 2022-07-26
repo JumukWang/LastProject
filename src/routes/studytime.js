@@ -28,13 +28,9 @@ function timeSet() {
   let weekStart = `${year}-${month}-${monday}T00:00:00.000Z`;
   let weekEnd = `${year}-${month}-${calcDate}T00:00:00.000Z`;
   let todayStart;
-  currentTime < 24//한국시간 기준으로 한것!! 삼항쓸필요는 없는데 안바꿔놓음
+  currentTime < 24
     ? (todayStart = `${year}-${month}-${today}T00:00:00.000Z`)
     : (todayStart = `${year}-${month}-${yesterday}T00:00:00.000Z`);
-
-    // currentTime < 9 //UTC시간이라서 변경한거임!! (삼항연산자사용!!)..... 
-    // ? (todayStart = `${year}-${month}-${yesterday}T00:00:00.000Z`)
-    // : (todayStart = `${year}-${month}-${today}T00:00:00.000Z`); 
 
   return { todayStart, weekStart, weekEnd };
 }

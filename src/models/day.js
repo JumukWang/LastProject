@@ -33,7 +33,10 @@ const daySchema = new Schema({
     type: Array,
     default:0,
   },
-});
+},
+{timestamps: true}
+);
+daySchema.index({createdAt: 1},{expireAfterSeconds: 60*60*24*7 });
 
 const Day = mongoose.model('Day', daySchema);
 module.exports = { Day };

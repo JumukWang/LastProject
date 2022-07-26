@@ -39,9 +39,9 @@ const studyTimeSchema = new Schema({
     default: 0,
   }
 },
-// {timestamps: true}
+{timestamps: true}
 );
-// studyTimeSchema.index({createdAt: 1},{expireAfterSeconds: 60});
+studyTimeSchema.index({createdAt: 1},{expireAfterSeconds: 60*60*24*7});
 
 const Studytime = mongoose.model('Studytime', studyTimeSchema);
 

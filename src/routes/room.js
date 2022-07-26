@@ -71,7 +71,7 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
     const inTimestamp = now.getTime();
     const start = await Studytime.create({email,startTime,day,inTimestamp})
     const total = await Studytime.find({email, day:day})
-    console.log(total)
+    
     if(total.length === 1){
       return res.status(200).send({
         roomId,
@@ -141,12 +141,42 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res, next) => {
     const start = await Studytime.create({email,startTime,day,inTimestamp})
 
     await Room.updateOne({ groupNum }, { $inc: { groupNum: 1 } });
+
+    if(total.length === 1){
+      return res.status(200).send({
+        roomId,
+        title,
+        groupNum,
+        start,
+        email : total.email,
+        day : total.day,
+        hour : 0,
+        minute : 0,
+        second : 0,
+        todayrecord : 0,
+        weekrecord : 0,
+      });
+    } else {
+    const lasttotal = total.slice(-2)[0];
+    console.log(lasttotal)
+    let hour = lasttotal.todaysum.substr(0,2)
+    let minute = lasttotal.todaysum.substr(3,2)
+    let second = lasttotal.todaysum.substr(6,2)
+    console.log( hour, minute, second )
+
     return res.status(200).send({
       roomId,
       title,
-      email,
-      start,
-    });
+      groupNum,
+      email : lasttotal.email,
+      day : lasttotal.day,
+      hour : Number(hour),
+      minute : Number(minute),
+      second : Number(second),
+      todayrecord : lasttotal.todaysum,
+      weekrecord : lasttotal.weeksum
+    })
+    }
   } catch (error) {
     return res.status(400).send({
       result: false,
@@ -207,20 +237,6 @@ router.post('/exit/:roomId', authMiddleware, async (req, res, next) => {
       todaysum += todaytime_2[i]
     } console.log(changeTime(todaysum))
     
-    // weakRecord 
-
-    // const weekstart = new Date(weekStart).getTime();
-    // const weekend = new Date(weekEnd).getTime();
-    // const weekstartKST = weekstart - 9*60*60*1000;
-    // const weekendKST = weekend - 9*60*60*1000;
-    
-    // const weektime_1 = await Studytime.find({ email, inTimestamp:{$gt:weekstartKST,$lt:weekendKST}})
-    // const weektime_2 = weektime_1.map(x=> x.timedif).filter(x => x !== undefined);
-    // let weeksum = 0;
-    // for(let i = 0; i< weektime_2.length; i++) {
-    //   weeksum += weektime_2[i]
-    // } console.log(changeTime(weeksum))
-    // 다시 week 하려면 updateOne에 추가해줘야된다.
     await Studytime.updateOne({outTimestamp: arr_alloutTime }, {$set:{todaysum:changeTime(todaysum), todaysum_h:timeConversion(todaysum)}});
     await Studytime.updateOne({inTimestamp: arr_allinTime }, {$set:{todaysum:changeTime(todaysum), todaysum_h:timeConversion(todaysum)}});
     
@@ -231,7 +247,6 @@ router.post('/exit/:roomId', authMiddleware, async (req, res, next) => {
       out,
       todayrecord : changeTime(todaysum),
       todaysum_h: timeConversion(todaysum),
-      // weekrecord : changeTime(weeksum),
     });
   } catch (error) {
     return res.status(400).send({
