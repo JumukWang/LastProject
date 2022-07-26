@@ -4,7 +4,7 @@ const router = require('express').Router();
 const authMiddleware = require('../middlewares/authmiddleware');
 
 // 메인 페이지
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
   try {
     const roomList = await Room.find({}).sort({ create: -1 });
     return res.status(201).send({
@@ -20,11 +20,7 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-<<<<<<< HEAD
-=======
-// 좋아요
->>>>>>> origin/yechan3
-router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
+router.post('/like/:roomId', authMiddleware, async (req, res) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;
   const roomInfo = await Room.findOne({ roomId });
@@ -42,7 +38,7 @@ router.post('/like/:roomId', authMiddleware, async (req, res, next) => {
 });
 
 // 싫어요
-router.post('/dislike/:roomId', authMiddleware, async (req, res, next) => {
+router.post('/dislike/:roomId', authMiddleware, async (req, res) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;
   const roomInfo = await Room.findOne({ roomId });
