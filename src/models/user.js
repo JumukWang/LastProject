@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const { Schema } = mongoose;
-
 const userSchema = new Schema(
   {
     userId: { type: Number, unique: true, default: 0 },
@@ -51,7 +50,7 @@ async function userMypage(userId) {
 }
 
 async function userInfoUpdate(userId, nickname, hashPassword, passwordCheck, imgUrl) {
-  await await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, imgUrl } });
+  return await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, imgUrl } });
 }
 
 async function userFind() {

@@ -5,7 +5,7 @@ const { User, Day, Studytime } = require('../models');
 const Bcrypt = require('bcrypt');
 const config = require('../config');
 const { daySet } = require('../routes/studytime');
-const { upload } = require('../middlewares/upload');
+// const { upload } = require('../middlewares/upload');
 
 // 마이페이지
 router.get('/:userId', authMiddleware, async (req, res) => {

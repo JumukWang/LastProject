@@ -1,6 +1,7 @@
 const config = require('../config');
 const { User } = require('../models');
 const { authSign } = require('../util/jwt-util');
+const logger = require('../config/winston');
 const router = require('express').Router();
 
 // const logger = require('../config');
@@ -36,7 +37,7 @@ router.post('/login', (req, res) => {
 router.post('/newuser', async (req, res) => {
   try {
     // console.log("kakao_parsing의 req정보다",req)
-    const userId = await User.findOne({ userId });
+
     const user_info = req.body;
     const snsId = user_info.user_id;
     const userEmail = user_info.user_email;
@@ -45,6 +46,7 @@ router.post('/newuser', async (req, res) => {
     const accessToken = authSign({ nickname });
 
     // 만약 디비에 user의 email이 없다면,
+    // s3로 profile 넣어줘야함
 
     if (!exUser) {
       const newUser = new User({
@@ -56,7 +58,9 @@ router.post('/newuser', async (req, res) => {
         provider: 'kakao',
       });
       // 저장하기
+
       newUser.save();
+
       return res.send({
         accessToken,
         nickname,
