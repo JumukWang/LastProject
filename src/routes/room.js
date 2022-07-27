@@ -10,7 +10,7 @@ const { timeSet, changeTime, timeConversion } = require('../routes/studytime');
 router.post('/create/:userId', authMiddleware, async (req, res) => {
   try {
     const host = Number(req.params.userId);
-    const { tagName, title, content, password, date } = req.body;
+    const { public, private, tagName, title, content, password, date } = req.body;
     const newStudyRoom = await Room.create({
       title,
       password,
