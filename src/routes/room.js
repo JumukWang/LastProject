@@ -10,18 +10,34 @@ const { timeSet, changeTime, timeConversion } = require('../routes/studytime');
 router.post('/create/:userId', authMiddleware, async (req, res) => {
   try {
     const host = Number(req.params.userId);
-    const { public, private, tagName, title, content, password, date } = req.body;
-    const newStudyRoom = await Room.create({
-      title,
-      password,
-      content,
-      date,
-      tagName,
-    });
-    const roomNum = Number(newStudyRoom.roomId);
-    await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-    await User.updateOne({ userId: host }, { $push: { hostRoom: newStudyRoom } });
-    return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newStudyRoom });
+    const { tagName, title, content, password, date } = req.body;
+    const publicRoom = req.body.public;
+    const privateRoom = req.body.private;
+    if (publicRoom) {
+      const newPublicRoom = await Room.create({
+        title,
+        content,
+        date,
+        tagName,
+      });
+      const roomNum = Number(newPublicRoom.roomId);
+      await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+      await User.updateOne({ userId: host }, { $push: { hostRoom: newPublicRoom } });
+      return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
+    }
+    if (privateRoom) {
+      const newPrivaeRoom = await Room.create({
+        title,
+        password,
+        content,
+        date,
+        tagName,
+      });
+      const roomNum = Number(newPrivaeRoom.roomId);
+      await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+      await User.updateOne({ userId: host }, { $push: { hostRoom: newPrivaeRoom } });
+      return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPrivaeRoom });
+    }
   } catch (error) {
     return res.status(400).send({
       result: false,
