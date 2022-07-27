@@ -12,7 +12,7 @@ const updateToken = (payload) => {
     id: sub,
     nickname,
     email,
-    iconUrl
+    iconUrl,
   });
 
   return userToken;
