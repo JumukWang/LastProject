@@ -5,7 +5,7 @@ const { User, Day, Studytime } = require('../models');
 const Bcrypt = require('bcrypt');
 const config = require('../config');
 const { daySet } = require('../routes/studytime');
-// const { upload } = require('../middlewares/upload');
+const { profileUpload,profileDelete } = require('../middlewares/upload');
 
 // 마이페이지
 router.get('/:userId', authMiddleware, async (req, res) => {
@@ -25,9 +25,11 @@ router.get('/:userId', authMiddleware, async (req, res) => {
 });
 
 // 마이페이지수정
-router.put('/:userId/update', authMiddleware, async (req, res) => {
+router.put('/:userId/update', authMiddleware, profileUpload.single('profile_url'), async (req, res) => {
   const userId = Number(req.params.userId);
-  const { nickname, password, passwordCheck, imgUrl } = req.body;
+  const findUser = await User.findOne({ userId });
+  console.log(findUser)
+  const { nickname, password, passwordCheck } = req.body;
   try {
     const user = await User.findOne({ userId: Number(userId) });
     console.log(user);
@@ -40,13 +42,27 @@ router.put('/:userId/update', authMiddleware, async (req, res) => {
     const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
     const hashPassword = await Bcrypt.hash(password, salt);
 
-    await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, imgUrl } });
-    const updateUser = await User.findOne({ userId: Number(userId) });
-    res.send({
-      result: true,
-      msg: '유저정보가 수정되었습니다.',
-      updateUser,
-    });
+    const newprofileUrl = req.file; //추가
+    console.log(newprofileUrl)
+    if(newprofileUrl) {
+      profileDelete(findUser.profile_url);
+      await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, profile_url: newprofileUrl.transforms[0].location } });
+      const updateUser = await User.findOne({ userId: Number(userId) });
+      res.send({
+        result: true,
+        msg: '유저정보가 수정되었습니다.',
+        updateUser,
+      });
+    } else {
+      await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck } });
+      const updateUser = await User.findOne({ userId: Number(userId) });
+      res.send({
+        result: true,
+        msg: '유저정보가 수정되었습니다.',
+        updateUser,
+      });
+    }
+    
   } catch (error) {
     res.status(400).send({
       result: false,

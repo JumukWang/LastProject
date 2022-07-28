@@ -91,14 +91,13 @@ const roomUpload = multer({
 });
 
 // 프로필 이미지 삭제
-const profileDelete = (profileUrl) => {
-    if (profileUrl === 'https://changminbucket.s3.ap-northeast-2.amazonaws.com/basicProfile.png')
-        return;
-    const filename = profileUrl.split('/')[4];
+
+const profileDelete = (profile_url) => {
+    const filename = profile_url.split('/')[4];
 
     s3.deleteObject(
         {
-            Bucket: `${S3_BUCKET_NAME}/uploadProfile`,
+            Bucket: `${config.S3_BUCKET_NAME}/uploadProfile`,
             Key: filename,
         },
         function (err, data) {}
