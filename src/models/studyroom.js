@@ -11,6 +11,10 @@ const studySchema = new Schema({
     type: Number,
     default: 0,
   },
+  attendName: {
+    type: Array,
+    unique: true,
+  },
   title: {
     type: String,
     require: true,

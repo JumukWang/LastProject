@@ -16,18 +16,35 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
     console.log(imgFile)
     const host = Number(req.params.userId);
     const { tagName, title, content, password, date } = req.body;
-    const newStudyRoom = await Room.create({
-      title,
-      password,
-      content,
-      date,
-      tagName,
-      imgUrl : imgFile,
-    });
-    const roomNum = Number(newStudyRoom.roomId);
-    await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-    await User.updateOne({ userId: host }, { $push: { hostRoom: newStudyRoom } });
-    return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newStudyRoom });
+    const publicRoom = req.body.public;
+    const privateRoom = req.body.private;
+    if (publicRoom) {
+      const newPublicRoom = await Room.create({
+        title,
+        content,
+        date,
+        tagName,
+        imgUrl : imgFile,
+      });
+      const roomNum = Number(newPublicRoom.roomId);
+      await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+      await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+      return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
+    }
+    if (privateRoom) {
+      const newPrivaeRoom = await Room.create({
+        title,
+        password,
+        content,
+        date,
+        tagName,
+        imgUrl : imgFile,
+      });
+      const roomNum = Number(newPrivaeRoom.roomId);
+      await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+      await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+      return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPrivaeRoom });
+    }
   } catch (error) {
     return res.status(400).send({
       result: false,
@@ -39,11 +56,11 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
 
 // 공개방 입장
 //! 유저 직접 넣어서 length로 수정해야함
-router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
+router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
+    const userId = Number(req.params.userId)
     const { groupNum, title } = await Room.findOne({ roomId: roomId });
-    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
 
     if (groupNum >= 4) {
       return res.status(400).send({
@@ -51,6 +68,11 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
         msg: '정원이 초과되었습니다.',
       });
     }
+
+    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
+    const roomInfo = await Room.findOne({ roomId: roomId })       //정보 최신화
+    await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } })
+
     const email = req.email;
     const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
     const now = new Date();
@@ -63,7 +85,7 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
       return res.status(200).send({
         roomId,
         title,
-        groupNum,
+        groupNum: roomInfo.groupNum,
         start,
         email: total.email,
         day: total.day,
@@ -72,6 +94,7 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
         second: 0,
         todayrecord: 0,
         weekrecord: 0,
+        msg: `'${title}'에 입장하였습니다.`
       });
     } else {
       const lasttotal = total.slice(-2)[0];
@@ -84,7 +107,7 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
       return res.status(200).send({
         roomId,
         title,
-        groupNum,
+        groupNum: roomInfo.groupNum,
         email: lasttotal.email,
         day: lasttotal.day,
         hour: Number(hour),
@@ -92,6 +115,7 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
         second: Number(second),
         todayrecord: lasttotal.todaysum,
         weekrecord: lasttotal.weeksum,
+        msg: `'${title}'에 입장하였습니다.`,
       });
     }
   } catch (error) {
@@ -108,19 +132,43 @@ router.post('/public-room/:roomId', authMiddleware, async (req, res) => {
 router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
+    const userId = Number(req.params.userId)
     const { password } = req.body;
     const passCheck = await Room.findOne({ roomId: roomId });
-    const { groupNum, title } = await Room.findOne({ roomId: roomId });
-
+    const { groupNum, title, attendName } = await Room.findOne({ roomId: roomId });
+    const { nickname } = await User.findOne({ userId: userId })
+    const checkName = attendName.includes(nickname)
+//패스워드 체크
+    if (!password) {
+      return res.status(400).json({ result: false, msg: "비밀번호를 입력해주세요." })
+    }
     if (passCheck.password !== password) {
       return res.status(401).send({ msg: '비밀번호가 틀렸습니다 ' });
     }
-    if (groupNum >= 4) {
+//이미 참여인원이면 실시간 인원수만 추가
+    if (checkName === true) { 
+      if (groupNum >= 4) {
+        return res.status(400).send({
+          result: false,
+          msg: '정원이 초과되었습니다.',
+        });
+      }
+      await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
+      return res.status(200).json({ result: true, msg: `'${title}'에 입장하였습니다.` })
+    }
+//미참여인원은 참여정원확인 후 입장
+    if (attendName.length >= 4) {
       return res.status(400).send({
         result: false,
         msg: '정원이 초과되었습니다.',
       });
     }
+    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
+    await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
+    const roomInfo = await Room.findOne({ roomId: roomId })       //정보 최신화
+    await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } })
+
+
     const email = req.email;
     const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
     const now = new Date();
@@ -128,14 +176,14 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
     const inTimestamp = now.getTime();
     const start = await Studytime.create({ email, startTime, day, inTimestamp });
     const total = await Studytime.find({ email, day: day });
+    
 
-    await Room.updateOne({ groupNum }, { $inc: { groupNum: 1 } });
 
     if (total.length === 1) {
       return res.status(200).send({
         roomId,
         title,
-        groupNum,
+        groupNum: roomInfo.groupNum,
         start,
         email: total.email,
         day: total.day,
@@ -156,7 +204,7 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
       return res.status(200).send({
         roomId,
         title,
-        groupNum,
+        groupNum: roomInfo.groupNum,
         email: lasttotal.email,
         day: lasttotal.day,
         hour: Number(hour),
@@ -164,6 +212,7 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
         second: Number(second),
         todayrecord: lasttotal.todaysum,
         weekrecord: lasttotal.weeksum,
+        msg: `'${title}'에 입장하였습니다.`,
       });
     }
   } catch (error) {
@@ -179,10 +228,7 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
 router.post('/exit/:roomId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
-    const [targetRoom] = await Room.find({ roomId });
-    const { groupNum } = targetRoom;
-
-    await Room.updateOne({ groupNum }, { $inc: { groupNum: -1 } });
+    const { groupNum } = await Room.findOne({ roomId: roomId })
 
     if (groupNum <= 0) {
       return res.status(400).send({
@@ -190,6 +236,9 @@ router.post('/exit/:roomId', authMiddleware, async (req, res) => {
         msg: '참여 인원이 없습니다.',
       });
     }
+
+    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
+    const roomInfo = await Room.findOne({ roomId: roomId })     //정보 최신화 후 res.
 
     //시간저장
     const email = req.email;
@@ -237,7 +286,7 @@ router.post('/exit/:roomId', authMiddleware, async (req, res) => {
     );
 
     return res.status(201).send({
-      groupNum,
+      groupNum: roomInfo.groupNum,
       result: true,
       msg: '스터디 룸에서 나왔습니다.',
       out,
@@ -264,8 +313,13 @@ router.delete('/:roomId/:userId', authMiddleware, async (req, res) => {
         msg: '방의 호스트만 삭제할 수 있습니다.',
       });
     }
-    await Room.deleteOne({ roomId });
+
+    await Room.deleteOne({ roomId: roomId });
+    await User.findOneAndUpdate({ userId }, {$pull : { hostRoom: roomId }})
+    await User.updateMany({}, {$pull : { attendRoom: roomId }})
+
     return res.status(201).send({ result: true, msg: '스터디 룸이 삭제되었습니다.' });
+    
   } catch (error) {
     return res.status(401).send({
       result: false,
@@ -299,20 +353,20 @@ router.get('/search/:word', async (req, res) => {
 //참여중인 스터디 조회
 router.get('/entered-room', authMiddleware, async (req, res) => {
   try {
-    const nickname = req.nickname;
+      const userId = Number(req.params.userId)
+      const { attendRoom } = await User.findOne({ userId }).sort("-createAt")
+      let attendInfo = []
+      for (let i in attendRoom) {
+        if(await Room.find({ roomId: attendRoom[i] })){
+          attendInfo.push(await Room.find({ roomId: attendRoom[i] }))
+        }
+      }
 
-    const attendRoom = await User.find({ attendRoom }).sort('-createAt');
-
-    if (!nickname === attendRoom.nickname) {
-      return res.status(400).json({ result: false, msg: '참여중인 스터디를 찾을 수 없습니다.' });
-    }
-    if (!attendRoom) {
-      return res.status(400).json({ result: false, msg: '해당 카테고리 방이 존재하지 않습니다.' });
-    }
-    res.status(200).json({
-      result: true,
-      attendRoom,
-    });
+      return res.status(200).json({
+          result: true,
+          attendInfo,
+          quantity: attendRoom.length,
+      })
   } catch (error) {
     console.log(error);
     res.status(400).send({ errorMessage: error.message });
@@ -322,19 +376,20 @@ router.get('/entered-room', authMiddleware, async (req, res) => {
 //호스트중인 스터디 조회
 router.get('/host-room/:userId', authMiddleware, async (req, res) => {
   try {
-    const userId = Number(req.params.userId);
-    const hostRoom = await User.find({ hostRoom }).sort('-createAt');
+    const userId = Number(req.params.userId)
+    const { hostRoom } = await User.findOne({ userId }).sort("-createAt")
+    let hostInfo = []
+    for (let i in hostRoom) {
+      if(await Room.find({ roomId: hostRoom[i] })){
+        hostInfo.push(await Room.find({ roomId: hostRoom[i] }))
+      }
+    }
 
-    if (!userId === hostRoom.userId) {
-      return res.status(400).json({ result: false, msg: '호스트중인 스터디가 없습니다.' });
-    }
-    if (!hostRoom) {
-      return res.status(400).json({ result: false, msg: '스터디를 불러올수없습니다.' });
-    }
-    res.status(200).json({
-      result: true,
-      hostRoom,
-    });
+    return res.status(200).json({
+        result: true,
+        hostInfo,
+        quantity: hostRoom.length,
+    })
   } catch (error) {
     console.log(error);
     res.status(400).send({ errorMessage: error.message });
@@ -344,27 +399,94 @@ router.get('/host-room/:userId', authMiddleware, async (req, res) => {
 //유저 초대하기
 router.put('/invite', authMiddleware, async (req, res) => {
   try {
-    const nickname = req.nickname;
-    const { roomId } = req.body;
-    const userList = await User.find({ nickname: { $ne: nickname } }).sort('nickname');
-    //로그인한 나를 제외한 유저목록조회 (이름 순으로 정렬)
-    if (!userList) {
-      return res.status(400).json({ result: false, msg: '유저 리스트를 불러올 수 없습니다.' });
-    }
-    if (userList === nickname) {
-      return res.status(400).json({ result: false, msg: '본인 포함 오류' });
-    }
+    const roomId = Number(req.params.roomId)
+    const userId = Number(req.params.userId)
 
-    const inviteUser = await Room.findOneAndUpdate({ roomId }, { $push: { userNickname: userList.nickname } });
-    res.status(200).json({
-      result: true,
-      inviteUser,
-      msg: '초대 완료',
-    });
+    const { nickname } = await User.findOne({ userId: userId })
+    const { groupNum, attendName } = await Room.findOne({ roomId: roomId })
+    const checkName = attendName.includes(nickname)
+
+    if ( checkName === true ) {
+      return res.status(400).json({ result: false, msg: `${nickname}님은 이미 참여 중입니다.` })
+    }
+    if (attendName.length >=4){
+      return res.status(400).json({result: false, msg: "정원 초과입니다."})}
+
+    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
+    await Room.findOneAndUpdate({ roomId }, { $push: { attendName: nickname }});
+    await User.findOneAndUpdate({ userId }, { $push : { attendRoom: roomId }})
+
+    return res.status(200).json({
+        result: true,
+        nickname,
+        msg: `${nickname}님을 초대했어요!`
+    })
   } catch (error) {
     console.log(error);
     res.status(400).send({ errorMessage: error.message });
   }
 });
+
+
+//방 정보창
+router.get('/info/:roomId', async (req, res)=> {
+  try {
+      const { roomId } = req.params
+      const checkRoom = await Room.findOne({ roomId: roomId })
+      if (!checkRoom) { return res.status(400).json({ result: false, msg: "방을 찾을 수 없습니다." }) }
+      const { attendName } = await Room.findOne({ roomId: roomId })
+
+      return res.status(200).json({
+        result: true,
+        checkRoom,
+        attend: attendName.length,
+
+      })
+  } catch (error) {
+    console.log(error)
+    res.status(400).send({ result: false, errorMessage: error.message})
+  }
+})
+
+//방 탈퇴
+//host가 방탈퇴 시 방삭제
+router.post('/outroom/:roomId/:userId', authMiddleware, async (req, res)=> {
+  try {
+      const roomId = Number(req.params.roomId)
+      const userId = Number(req.params.userId)
+      const { groupNum, title, attendName, hostId } = await Room.findOne({ roomId: roomId })
+      console.log(attendName)
+      const { nickname } = await User.findOne({ userId: userId })
+      const checkName = attendName.includes(nickname)
+      console.log(checkName)
+
+
+      if (hostId === userId) {
+        await Room.findOneAndDelete({ roomId },{ hostId: userId });
+        await User.findOneAndUpdate({ userId }, {$pull : { hostRoom: roomId }})
+        await User.updateMany({}, {$pull : { attendRoom: roomId }})
+        return res.status(200).json({ result: true, msg: "호스트인 스터디룸을 탈퇴 하였습니다." })
+      }
+
+      if (checkName === false) {
+        return res.status(400).json({ result: false, msg: "참여중인 룸이 아닙니다." })
+      }
+      if (groupNum <=0){ return res.status(400).json({result: false, msg: "참여 인원이 없습니다."})}
+
+      await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
+      await Room.findOneAndUpdate({ roomId },{ $pull: { attendName: nickname }});
+      await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } })
+      
+      
+      return res.status(200).json({
+        result: true,
+        msg: `${title} 스터디룸을 탈퇴 하였습니다.`
+      })
+  } catch (error) {
+    console.log(error)
+    res.status(400).send({ result: false, errorMessage: error.message})
+  }
+})
+
 
 module.exports = router;
