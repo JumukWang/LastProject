@@ -32,7 +32,7 @@ jobs:
     steps:
       -
         name: Checkout 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
       -
         name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -50,3 +50,5 @@ jobs:
           file: ../Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dhgus132/last-project:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:buildcache,mode=max
