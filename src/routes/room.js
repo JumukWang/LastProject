@@ -3,12 +3,17 @@ const authMiddleware = require('../middlewares/authmiddleware');
 const router = require('express').Router();
 const moment = require('moment');
 const { timeSet, changeTime, timeConversion } = require('../routes/studytime');
+const { roomUpload } = require('../middlewares/upload')
 // 메인 페이지 만들기
 
 // 참여중
 // 방생성
-router.post('/create/:userId', authMiddleware, async (req, res) => {
+router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  async (req, res) => {
   try {
+    const roomUrl = req.file; //추가
+    console.log(roomUrl)
+    const imgFile = await roomUrl.transforms[0].location; //추가
+    console.log(imgFile)
     const host = Number(req.params.userId);
     const { tagName, title, content, password, date } = req.body;
     const newStudyRoom = await Room.create({
@@ -17,6 +22,7 @@ router.post('/create/:userId', authMiddleware, async (req, res) => {
       content,
       date,
       tagName,
+      imgUrl : imgFile,
     });
     const roomNum = Number(newStudyRoom.roomId);
     await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });

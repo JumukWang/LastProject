@@ -5,14 +5,19 @@ const router = require('express').Router();
 const jwt = require('../util/jwt-util');
 const config = require('../config');
 const redisClient = require('../database/redis');
+const { profileUpload } = require('../middlewares/upload')
 
 const { validateNick, validatePwd, validateAll } = require('../middlewares/validation');
 
 // 회원가입
-router.post('/signup', validateAll, async (req, res) => {
+router.post('/signup', profileUpload.single('profile_url'), async (req, res) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
-    const { email, nickname, password, passwordCheck, profile_url } = req.body;
+    const { email, nickname, password, passwordCheck } = req.body;
+    const profileUrl = req.file; //추가
+    console.log(profileUrl)
+    const imgFile = await profileUrl.transforms[0].location; //추가
+    console.log(imgFile)
     const exEmail = await User.findOne({
       email,
     });
@@ -38,7 +43,7 @@ router.post('/signup', validateAll, async (req, res) => {
       email,
       nickname,
       password: hashPassword,
-      profile_url,
+      profile_url : imgFile, //추가
     });
     await user.save();
 
@@ -58,6 +63,29 @@ router.post('/signup', validateAll, async (req, res) => {
     });
   }
 });
+
+// 회원가입 이미지 저장 
+
+// router.post('/image', profileUpload.single('profile_url'), async (req, res) => {
+//     const profileUrl = req.file; //추가
+//     console.log(profileUrl)
+//     const imgFile = await profileUrl.transforms[0].location; //추가
+//     console.log(imgFile)
+//     try {
+//       const imgFile = await profileUrl.transforms[0].location; //추가
+//       console.log(imgFile)
+
+//       const user = new User({
+//         profile_url : imgFile,
+//       });
+//       await user.save();
+//         //사진경로가있는 주소를  imgurl이라는 이름으로 저장
+//         res.status(200).json({ imgurl: imgFile });
+//     } catch (err) {
+//         res.send({ msg : "에러발생"});
+        
+//     }
+// });
 
 // 로그인
 router.post('/login', validatePwd, async (req, res) => {
