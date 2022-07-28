@@ -11,27 +11,28 @@ const { roomUpload } = require('../middlewares/upload')
 router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  async (req, res) => {
   try {
     const roomUrl = req.file; //추가
-    console.log(roomUrl)
     const imgFile = await roomUrl.transforms[0].location; //추가
-    console.log(imgFile)
     const host = Number(req.params.userId);
-    const { tagName, title, content, password, date } = req.body;
-    const publicRoom = req.body.public;
-    const privateRoom = req.body.private;
-    if (publicRoom) {
-      const newPublicRoom = await Room.create({
+    const { tagName, title, content, password, date, lock } = req.body;
+
+    if (lock === "false") {
+      let flag = false
+      const newPublicRoom =  new Room({
         title,
         content,
         date,
-        tagName,
+        tagName: [tagName, "전체"],
         imgUrl : imgFile,
+        lock : flag,
       });
+      await newPublicRoom.save();
       const roomNum = Number(newPublicRoom.roomId);
       await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
       await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
       return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
     }
-    if (privateRoom) {
+    if (lock === "true") {
+      let flag = true
       const newPrivaeRoom = await Room.create({
         title,
         password,
@@ -39,6 +40,7 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
         date,
         tagName,
         imgUrl : imgFile,
+        lock : flag
       });
       const roomNum = Number(newPrivaeRoom.roomId);
       await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
@@ -60,8 +62,8 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId)
-    const { groupNum, title } = await Room.findOne({ roomId: roomId });
-
+    const { groupNum, title, attendName } = await Room.findOne({ roomId: roomId }); 
+    const { nickname } = await User.findOne({ userId: userId })
     if (groupNum >= 4) {
       return res.status(400).send({
         result: false,
@@ -70,6 +72,7 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
     }
 
     await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
+    await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
     const roomInfo = await Room.findOne({ roomId: roomId })       //정보 최신화
     await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } })
 
@@ -129,7 +132,7 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
 
 // 비밀방 입장
 //! 유저 직접 넣어서 length로 수정해야함
-router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
+router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId)
@@ -225,11 +228,13 @@ router.post('/private-room/:roomId', authMiddleware, async (req, res) => {
 });
 
 // 방나가기
-router.post('/exit/:roomId', authMiddleware, async (req, res) => {
+router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
+    const userId = Number(req.params.userId)
     const roomId = Number(req.params.roomId);
     const { groupNum } = await Room.findOne({ roomId: roomId })
-
+    const { nickname } = await User.findOne({ userId: userId })
+    
     if (groupNum <= 0) {
       return res.status(400).send({
         result: false,
@@ -238,6 +243,9 @@ router.post('/exit/:roomId', authMiddleware, async (req, res) => {
     }
 
     await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
+    await Room.findOneAndUpdate({ roomId },{ $pull: { attendName: nickname }});
+    await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } })
+
     const roomInfo = await Room.findOne({ roomId: roomId })     //정보 최신화 후 res.
 
     //시간저장

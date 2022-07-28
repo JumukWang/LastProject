@@ -48,6 +48,10 @@ const studySchema = new Schema({
   imgUrl: {
     type: String,
   },
+  lock: {
+    type: Boolean,
+    require: true,
+  }
 });
 
 studySchema.plugin(AutoIncrement, { inc_field: 'roomId' });
