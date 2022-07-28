@@ -8,7 +8,6 @@ const redisClient = new Redis({
   password: config.REDIS_PASSWORD,
   legacyMode: true,
 });
-// test
 const { RedisMessageStore } = require('./src/server/messageStore');
 const messageStore = new RedisMessageStore(redisClient);
 
