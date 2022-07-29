@@ -50,6 +50,5 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dhgus132/last-project:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/last-project:latest
           cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/last-project:latest,mode=max

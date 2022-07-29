@@ -1,7 +1,7 @@
 #!/bin/bash
  
 # Blue 를 기준으로 현재 떠있는 컨테이너를 체크한다.
-EXIST_BLUE=$(docker-compose -p last-project:latest-blue -f docker-compose.blue.yaml ps | grep Up)
+EXIST_BLUE=$(docker-compose -p last-project-blue -f docker-compose.blue.yaml ps | grep Up)
  
 # 컨테이너 스위칭
 if [ -z "$EXIST_BLUE" ]; then
