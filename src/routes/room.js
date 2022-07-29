@@ -443,12 +443,52 @@ router.get('/info/:roomId', async (req, res)=> {
       const checkRoom = await Room.findOne({ roomId: roomId })
       if (!checkRoom) { return res.status(400).json({ result: false, msg: "방을 찾을 수 없습니다." }) }
       const { attendName } = await Room.findOne({ roomId: roomId })
+      
+      let attendInfo = []
+      for (let i in attendName ) {
+        if (await User.find({ nickname: attendName[i] })) {
+            attendInfo.push(await User.find({ nickname: attendName[i] }))
+        }
+      }
+      
+      let output = []
+      let keyname = ''
+      for (let i in attendInfo) {
+        for (let j in attendInfo[i]) {
+          const aa = attendInfo[i][j].nickname
+          const bb = attendInfo[i][j].profile_url
+          let something = {}
+          something[keyname + aa] = bb
+          output.push(something)
+        }
+      }
+    // for (let i in userList) {
+    //   const aa = userList[i].nickname
+    //   const bb = userList[i].profile_url
+    //   let something = {}
+    //   something[keyname + aa] = bb
+    //   output1.push(something)
 
+      // let output1 = []
+      // let keyname = ''
+      // for (let i in userList) {
+      //   const aa = userList[i].nickname
+      //   const bb = userList[i].email
+      //   let something = {}
+      //   something[keyname + aa] = bb
+      //   output1.push(something)
+      // }
+      // let output2 = []
+      // for (let i in attendName) {
+      //   if (await User.find({ nickname: attendName[i] })) {
+      //     output2.push(await User.find({ nickname: attendName[i] }))
+      //   }
+      // }
       return res.status(200).json({
         result: true,
         checkRoom,
         attend: attendName.length,
-
+        output,
       })
   } catch (error) {
     console.log(error)
