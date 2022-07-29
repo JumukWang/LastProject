@@ -17,7 +17,7 @@ redisClient.connect();
 connect();
 
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://egloo.link'],
+  origin: '*',
   credentials: true,
 };
 

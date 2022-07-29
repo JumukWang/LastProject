@@ -13,7 +13,7 @@ const redisClient = new Redis({
 
 const io = require('socket.io')(server, {
   cors: {
-    origin: ['http://localhost:3000', 'https://egloo.link'],
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true,
   },
