@@ -4,9 +4,9 @@ const router = require('express').Router();
 const moment = require('moment');
 const { timeSet, changeTime, timeConversion } = require('../routes/studytime');
 const { roomUpload } = require('../middlewares/upload')
-// 메인 페이지 만들기
 
-// 참여중
+
+
 // 방생성
 router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  async (req, res) => {
   try {
@@ -57,7 +57,6 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
 });
 
 // 공개방 입장
-//! 유저 직접 넣어서 length로 수정해야함
 router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
@@ -131,7 +130,6 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
 });
 
 // 비밀방 입장
-//! 유저 직접 넣어서 length로 수정해야함
 router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
@@ -141,14 +139,14 @@ router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) =>
     const { groupNum, title, attendName } = await Room.findOne({ roomId: roomId });
     const { nickname } = await User.findOne({ userId: userId })
     const checkName = attendName.includes(nickname)
-//패스워드 체크
+    //패스워드 체크
     if (!password) {
       return res.status(400).json({ result: false, msg: "비밀번호를 입력해주세요." })
     }
     if (passCheck.password !== password) {
       return res.status(401).send({ msg: '비밀번호가 틀렸습니다 ' });
     }
-//이미 참여인원이면 실시간 인원수만 추가
+    //이미 참여인원이면 실시간 인원수만 추가
     if (checkName === true) { 
       if (groupNum >= 4) {
         return res.status(400).send({
@@ -159,7 +157,7 @@ router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) =>
       await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
       return res.status(200).json({ result: true, msg: `'${title}'에 입장하였습니다.` })
     }
-//미참여인원은 참여정원확인 후 입장
+    //미참여인원은 참여정원확인 후 입장
     if (attendName.length >= 4) {
       return res.status(400).send({
         result: false,
@@ -338,9 +336,8 @@ router.delete('/:roomId/:userId', authMiddleware, async (req, res) => {
 });
 
 // 스터디룸 검색
-//! body로 받아서 수정하기
-router.get('/search/:word', async (req, res) => {
-  const { word } = req.params;
+router.get('/search', async (req, res) => {
+  const { word } = req.body;
   let roomArr = [];
   let rooms = await Room.find({});
   try {
@@ -350,8 +347,8 @@ router.get('/search/:word', async (req, res) => {
       }
     }
     return res.status(201).send({
-      roomArr,
       result: true,
+      roomArr,
     });
   } catch (error) {
     return res.status(401).json({ result: false, msg: '찾으시는 스터디가 없습니다.' });
