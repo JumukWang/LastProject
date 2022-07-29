@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: Dockerfile
+          file: ../Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/dhgus132/last-project:latest
           cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/last-project:latest
