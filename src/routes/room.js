@@ -17,7 +17,7 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
 
     if (lock === "false") {
       let flag = false
-      const newPublicRoom =  new Room({
+      const newPublicRoom = await Room.create({
         title,
         content,
         date,
@@ -38,7 +38,7 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
         password,
         content,
         date,
-        tagName,
+        tagName: [tagName, "전체"],
         imgUrl : imgFile,
         lock : flag
       });
@@ -443,7 +443,8 @@ router.get('/info/:roomId', async (req, res)=> {
       const checkRoom = await Room.findOne({ roomId: roomId })
       if (!checkRoom) { return res.status(400).json({ result: false, msg: "방을 찾을 수 없습니다." }) }
       const { attendName } = await Room.findOne({ roomId: roomId })
-      
+
+      //방에 참여중인 인원만 파악해서 출력
       let attendInfo = []
       for (let i in attendName ) {
         if (await User.find({ nickname: attendName[i] })) {
@@ -451,6 +452,8 @@ router.get('/info/:roomId', async (req, res)=> {
         }
       }
       
+      //위 조건의 결과를 이중for문으로 뽑아내고,
+      //동적인 key값을 적용시켜 출력 ex) output: {aa:bb}
       let output = []
       let keyname = ''
       for (let i in attendInfo) {
