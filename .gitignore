@@ -3,3 +3,4 @@
 logs
 Dockerfile
 README.md
+init-letsencrypt.sh
