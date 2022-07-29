@@ -359,17 +359,17 @@ router.get('/search/:word', async (req, res) => {
 });
 
 //참여중인 스터디 조회
-router.get('/entered-room', authMiddleware, async (req, res) => {
+router.get('/entered-room/:userId', authMiddleware, async (req, res) => {
   try {
       const userId = Number(req.params.userId)
       const { attendRoom } = await User.findOne({ userId }).sort("-createAt")
-      let attendInfo = []
+      let flat = []
       for (let i in attendRoom) {
         if(await Room.find({ roomId: attendRoom[i] })){
-          attendInfo.push(await Room.find({ roomId: attendRoom[i] }))
+          flat.push(await Room.find({ roomId: attendRoom[i] }))
         }
       }
-
+      const attendInfo = flat.flat(1)
       return res.status(200).json({
           result: true,
           attendInfo,
@@ -386,13 +386,13 @@ router.get('/host-room/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId)
     const { hostRoom } = await User.findOne({ userId }).sort("-createAt")
-    let hostInfo = []
+    let flat = []
     for (let i in hostRoom) {
       if(await Room.find({ roomId: hostRoom[i] })){
-        hostInfo.push(await Room.find({ roomId: hostRoom[i] }))
+        flat.push(await Room.find({ roomId: hostRoom[i] }))
       }
     }
-
+    const hostInfo = flat.flat(1)
     return res.status(200).json({
         result: true,
         hostInfo,
@@ -444,6 +444,8 @@ router.get('/info/:roomId', async (req, res)=> {
       if (!checkRoom) { return res.status(400).json({ result: false, msg: "방을 찾을 수 없습니다." }) }
       const { attendName } = await Room.findOne({ roomId: roomId })
 
+  //참여인원 프로필사진 각각 매칭해서 출력하기
+
       //방에 참여중인 인원만 파악해서 출력
       let attendInfo = []
       for (let i in attendName ) {
@@ -465,28 +467,7 @@ router.get('/info/:roomId', async (req, res)=> {
           output.push(something)
         }
       }
-    // for (let i in userList) {
-    //   const aa = userList[i].nickname
-    //   const bb = userList[i].profile_url
-    //   let something = {}
-    //   something[keyname + aa] = bb
-    //   output1.push(something)
 
-      // let output1 = []
-      // let keyname = ''
-      // for (let i in userList) {
-      //   const aa = userList[i].nickname
-      //   const bb = userList[i].email
-      //   let something = {}
-      //   something[keyname + aa] = bb
-      //   output1.push(something)
-      // }
-      // let output2 = []
-      // for (let i in attendName) {
-      //   if (await User.find({ nickname: attendName[i] })) {
-      //     output2.push(await User.find({ nickname: attendName[i] }))
-      //   }
-      // }
       return res.status(200).json({
         result: true,
         checkRoom,
