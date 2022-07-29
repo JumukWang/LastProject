@@ -1,6 +1,5 @@
 .env
 /node_modules
 logs
-Dockerfile
 README.md
 init-letsencrypt.sh
