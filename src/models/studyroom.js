@@ -51,7 +51,10 @@ const studySchema = new Schema({
   lock: {
     type: Boolean,
     require: true,
-  }
+  },
+  likeUser: {
+    type: Array,
+  },
 });
 
 studySchema.plugin(AutoIncrement, { inc_field: 'roomId' });

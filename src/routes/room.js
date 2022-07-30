@@ -355,6 +355,29 @@ router.get('/search', async (req, res) => {
   }
 });
 
+//찜한 스터디 조회
+router.get('/like-room/:userId', authMiddleware, async (req, res) => {
+  try {
+      const userId = Number(req.params.userId)
+      const { userLike } = await User.findOne({ userId }).sort("-createAt")
+      let flat = []
+      for (let i in userLike) {
+        if(await Room.find({ roomId: userLike[i] })){
+          flat.push(await Room.find({ roomId: userLike[i] }))
+        }
+      }
+      const likeInfo = flat.flat(1)
+      return res.status(200).json({
+          result: true,
+          likeInfo,
+          quantity: likeInfo.length,
+      })
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ errorMessage: error.message });
+  }
+});
+
 //참여중인 스터디 조회
 router.get('/entered-room/:userId', authMiddleware, async (req, res) => {
   try {
@@ -442,7 +465,7 @@ router.get('/info/:roomId', async (req, res)=> {
       const { attendName } = await Room.findOne({ roomId: roomId })
 
   //참여인원 프로필사진 각각 매칭해서 출력하기
-
+    console.log(attendName)
       //방에 참여중인 인원만 파악해서 출력
       let attendInfo = []
       for (let i in attendName ) {
@@ -450,7 +473,7 @@ router.get('/info/:roomId', async (req, res)=> {
             attendInfo.push(await User.find({ nickname: attendName[i] }))
         }
       }
-      
+      console.log(attendInfo)
       //위 조건의 결과를 이중for문으로 뽑아내고,
       //동적인 key값을 적용시켜 출력 ex) output: {aa:bb}
       let output = []
