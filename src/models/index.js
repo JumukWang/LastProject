@@ -3,5 +3,4 @@ module.exports = {
   ...require('./studyroom'),
   ...require('./studytime'),
   ...require('./day'),
-  ...require('./like'),
 };

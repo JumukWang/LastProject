@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const { Schema } = mongoose;
+
 const studySchema = new Schema({
   roomId: {
     type: Number,
@@ -37,9 +38,8 @@ const studySchema = new Schema({
     type: Number,
     default: 0,
   },
-  isLiked: {
-    type: Boolean,
-    default: false,
+  likeUser: {
+    type: Array,
   },
   createAt: {
     type: Date,
