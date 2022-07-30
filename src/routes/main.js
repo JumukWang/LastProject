@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Room, User } = require('../models');
+const { Room, User, Like } = require('../models');
 const router = require('express').Router();
 const authMiddleware = require('../middlewares/authmiddleware');
 
@@ -20,22 +20,37 @@ router.get('/', async (req, res) => {
   }
 });
 
+//좋아요
 router.post('/like/:roomId', authMiddleware, async (req, res) => {
   const roomId = Number(req.params.roomId);
   const nickname = req.nickname;
-  const roomInfo = await Room.findOne({ roomId });
-
-  if (roomId) {
-    let flag = true;
-    await Room.updateOne({ roomId }, { $set: { isLiked: flag } });
+  const { isLiked } = req.body;
+  try {
+    if (isLiked === true ) {
+      let flag = true;
+      await Room.updateOne({ roomId }, { $set: { isLiked: flag } });
+      await User.updateOne({ nickname }, { $push: { userLike: roomId } });
+      const a = await User.findOne({ nickname })
+      console.log(a)
+      return res.status(201).send({
+        result: true,
+        msg: '스터디룸 좋아요를 눌렀습니다.',
+      });
+    } 
+    if (isLiked === false )  {
+      let flag = false;
+      await Room.updateOne({ roomId }, { $set: { isLiked: flag } });
+      await User.updateOne({ nickname }, { $pull: { userLike: roomId } });
+      return res.status(201).send({
+      result: true,
+      msg: '스터디룸 좋아요를 취소했습니다.',
+      });
+    }
+  } catch (error) {
+    return res.status(400).send({ errorMessage: error.message });
   }
-
-  await User.updateOne({ nickname }, { $push: { userLike: roomInfo } });
-  return res.status(201).send({
-    result: true,
-    msg: '스터디룸 좋아요를 눌렀습니다.',
-  });
 });
+
 
 // 싫어요
 router.post('/dislike/:roomId', authMiddleware, async (req, res) => {

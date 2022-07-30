@@ -11,6 +11,10 @@ const studySchema = new Schema({
     type: Number,
     default: 0,
   },
+  attendName: {
+    type: Array,
+    unique: true,
+  },
   title: {
     type: String,
     require: true,
@@ -33,6 +37,10 @@ const studySchema = new Schema({
     type: Number,
     default: 0,
   },
+  isLiked: {
+    type: Boolean,
+    default: false,
+  },
   createAt: {
     type: Date,
     default: Date.now(),
@@ -43,6 +51,10 @@ const studySchema = new Schema({
   },
   imgUrl: {
     type: String,
+  },
+  lock : {
+    type: Boolean,
+    require: true,
   },
 });
 

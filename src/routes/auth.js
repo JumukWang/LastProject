@@ -95,7 +95,7 @@ router.post('/login', validatePwd, async (req, res) => {
       userId: user.userId,
       email: user.email,
       nickname: user.nickname,
-      userImg: user.profile_url,
+      imgurl: user.profile_url,
       accessToken: accessToken,
       refreshToken: refreshToken,
       result: true,
