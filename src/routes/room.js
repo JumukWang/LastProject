@@ -9,6 +9,7 @@ const { roomUpload } = require('../middlewares/upload')
 
 // 방생성
 router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  async (req, res) => {
+
   try {
     const roomUrl = req.file; //추가
     const imgFile = await roomUrl.transforms[0].location; //추가
@@ -17,6 +18,7 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
 
     if (lock === "false") {
       let flag = false
+
       const newPublicRoom = await Room.create({
         title,
         content,
@@ -31,8 +33,10 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
       await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
       return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
     }
+
     if (lock === "true") {
       let flag = true
+
       const newPrivaeRoom = await Room.create({
         title,
         password,

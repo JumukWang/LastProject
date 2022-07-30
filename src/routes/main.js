@@ -3,6 +3,7 @@ const { Room, User } = require('../models');
 const router = require('express').Router();
 const authMiddleware = require('../middlewares/authmiddleware');
 
+
 // 메인 페이지
 router.get('/', async (req, res) => {
   try {
@@ -19,7 +20,9 @@ router.get('/', async (req, res) => {
       result: true,
       roomList,
       mainLength,
+
     })
+
   } catch (error) {
     return res.status(400).send({
       result: false,
@@ -75,94 +78,6 @@ router.post('/like/:roomId/:userId', authMiddleware, async (req, res) => {
 });
 
 
-
-// 찜 2
-router.post('/like2/:roomId/:userId', authMiddleware, async (req, res) => {
-  try {
-    const roomId = Number(req.params.roomId);
-    const userId = Number(req.params.userId);
-    // console.log(userId)     //내 아이디
-    const { likeUser, title } = await Room.findOne({ roomId: roomId })
-    // console.log(likeUser)   //방안에 유저아이디
-    let msg = ''
-    let keyname = ''
-    // const aa = userId
-    // const bb = true
-    // const cc = false
-    console.log(userId)
-    console.log(likeUser)
-
-    let likeInfo = []
-    for (let i in likeUser){
-      if (await User.find({ userId: likeUser[i] })){
-        likeInfo.push(await Room.find({ userId: likeUser[i] }))
-      }
-    }
-    console.log(likeInfo)
-    
-    // for (let i in likeUser) {
-    //   console.log(likeUser[i])
-    //   if (!Object.keys(likeUser[i]).includes(userId)) {
-    //     let something = {}
-    //     something[keyname + aa] = bb
-    //     await Room.updateOne({ roomId }, { $push: { likeUser: something } })
-    //     await User.updateOne({ userId }, { $push: { userLike: roomId } });
-    //     msg = `${title}방을 찜 했어요!`
-    //   }
-    //   else {
-    //     let something = {}
-    //     something[keyname + aa] = bb
-    //     await Room.updateOne({ roomId }, { $pull: { likeUser: something } })
-
-    //     let something2 = {}
-    //     something2[keyname + aa] = cc
-    //     await Room.updateOne({ roomId }, { $push: { likeUser: something2 } })
-    //     await User.updateOne({ userId }, { $pull: { userLike: roomId } });
-    //     likeStatus = false          
-    //     msg = `${title}방 찜 해제`
-    //   }
-    // }
-
-    const aaa = await Room.findOne({ roomId })
-    return res.status(201).send({
-      result: true,
-      msg: msg,
-      aaa,
-      // output,
-    });
-  } catch (error) {
-    console.log(error)
-    return res.status(400).send({ errorMessage: error.message })
-  }
-});
-
-
-
-  // if (roomId) {
-    // let flag = true;
-    // await Room.updateOne({ roomId }, { $set: { isLiked: flag } });
-  // }
-  //  await User.updateOne({ nickname }, { $push: { userLike: roomId } });
-
-
-
-
-
-  // await User.updateOne({ nickname }, { $push: { userLike: roomId } });
-  // const [likeCheck] = await User.find({ nickname })
-  // console.log(likeCheck)
-  // const check = likeCheck.userLike
-  // console.log(check)  //[ 27, 27, 27, 27 ]
-
-  // let likeInfo = []
-  // for (let i in check) {
-  //   if (await Room.find({ roomId: check[i] })) {
-  //     likeInfo.push(await Room.find({ roomId: check[i] }))
-  //   }
-  // }
-  // console.log(likeInfo)//userLike한 방정보 출력
-
-
 //카테고리
 router.get('/tag/:tagName', async (req, res) => {
   try {
@@ -175,6 +90,7 @@ router.get('/tag/:tagName', async (req, res) => {
         .sort({ createAt: -1 })
         .skip(perPage * (page - 1))
         .limit(perPage)
+
 
     res.status(200).json({
       result: true,
