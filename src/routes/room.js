@@ -3,39 +3,47 @@ const authMiddleware = require('../middlewares/authmiddleware');
 const router = require('express').Router();
 const moment = require('moment');
 const { timeSet, changeTime, timeConversion } = require('../routes/studytime');
+const { roomUpload } = require('../middlewares/upload');
 // 메인 페이지 만들기
 
-// 참여중
 // 방생성
-router.post('/create/:userId', authMiddleware, async (req, res) => {
+router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'), async (req, res) => {
   try {
+    const roomUrl = req.file; //추가
+    const imgFile = await roomUrl.transforms[0].location; //추가
     const host = Number(req.params.userId);
-    const { tagName, title, content, password, date } = req.body;
-    const publicRoom = req.body.public;
-    const privateRoom = req.body.private;
-    if (publicRoom) {
+    const { tagName, title, content, password, date, lock } = req.body;
+
+    if (lock === 'false') {
+      let flag = false;
       const newPublicRoom = await Room.create({
         title,
         content,
         date,
-        tagName,
+        tagName: [tagName, '전체'],
+        imgUrl: imgFile,
+        lock: flag,
       });
+      await newPublicRoom.save();
       const roomNum = Number(newPublicRoom.roomId);
       await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-      await User.updateOne({ userId: host }, { $push: { hostRoom: newPublicRoom } });
+      await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
       return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
     }
-    if (privateRoom) {
+    if (lock === 'true') {
+      let flag = true;
       const newPrivaeRoom = await Room.create({
         title,
         password,
         content,
         date,
-        tagName,
+        tagName: [tagName, '전체'],
+        imgUrl: imgFile,
+        lock: flag,
       });
       const roomNum = Number(newPrivaeRoom.roomId);
       await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-      await User.updateOne({ userId: host }, { $push: { hostRoom: newPrivaeRoom } });
+      await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
       return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPrivaeRoom });
     }
   } catch (error) {

@@ -103,7 +103,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnecting', () => {
+  socket.on('disconnect', () => {
     if (users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
 
