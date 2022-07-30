@@ -17,7 +17,7 @@ redisClient.connect();
 connect();
 
 const corsOptions = {
-  origin: '*',
+  origin: ['http://localhost:3000'],
   credentials: true,
 };
 
