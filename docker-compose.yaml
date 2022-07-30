@@ -17,6 +17,7 @@ services:
         volumes:
             - './data/certbot/conf:/etc/letsencrypt'
             - './data/certbot/www:/var/www/certbot'
+        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
     backend:
         depends_on:
@@ -38,4 +39,28 @@ services:
             - PORT=4000
         ports:
             - "4000:4000"
+        restart: always
+
+    backend3:
+        depends_on:
+            - nginxproxy
+        image: dhgus132/last-project:latest
+        env_file:
+            - ./.env
+        environment:
+            - PORT=3001
+        ports:
+            - "3001:3001"
+        restart: always
+
+    backend4:
+        depends_on:
+            - nginxproxy
+        image: dhgus132/last-project:latest
+        env_file:
+            - ./.env
+        environment:
+            - PORT=4001
+        ports:
+            - "4001:4001"
         restart: always
