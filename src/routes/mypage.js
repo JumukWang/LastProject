@@ -1,7 +1,7 @@
 require('dotenv').config();
 const router = require('express').Router();
 const authMiddleware = require('../middlewares/authmiddleware');
-const { User, Day, Studytime } = require('../models');
+const { User, Day, Studytime, Room } = require('../models');
 const Bcrypt = require('bcrypt');
 const config = require('../config');
 const { daySet } = require('../routes/studytime');
@@ -11,10 +11,42 @@ const { profileUpload,profileDelete } = require('../middlewares/upload');
 router.get('/:userId', authMiddleware, async (req, res) => {
   try {
     const { userId } = req.params;
-    const myPage = await User.findOne({ userId });
+    const myPage = await User.findOne({ userId }, {userLike: 0, attendRoom: 0, hostRoom: 0});
+    const { userLike, attendRoom, hostRoom } = await User.findOne({ userId }).sort("-createAt")
+
+    let flat1 = []
+    for (let i in userLike) {
+      if(await Room.find({ roomId: userLike[i] })){
+        flat1.push(await Room.find({ roomId: userLike[i] }))
+      }
+    }
+    const likeInfo = flat1.flat(1)
+
+    let flat2 = []
+    for (let i in attendRoom) {
+      if(await Room.find({ roomId: attendRoom[i] })){
+        flat2.push(await Room.find({ roomId: attendRoom[i] }))
+      }
+    }
+    const attendInfo = flat2.flat(1)
+
+    let flat3 = []
+    for (let i in hostRoom) {
+      if(await Room.find({ roomId: hostRoom[i] })){
+        flat3.push(await Room.find({ roomId: hostRoom[i] }))
+      }
+    }
+    const hostInfo = flat3.flat(1)
+
     res.status(200).send({
       result: true,
       myPage,
+      likeInfo,
+      likeInfoLength: likeInfo.length,
+      attendInfo,
+      attendInfoLength: attendInfo.length,
+      hostInfo,
+      hostInfoLength: hostInfo.length,
     });
   } catch (error) {
     res.status(400).send({

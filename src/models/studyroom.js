@@ -52,7 +52,7 @@ const studySchema = new Schema({
   imgUrl: {
     type: String,
   },
-  lock : {
+  lock: {
     type: Boolean,
     require: true,
   },

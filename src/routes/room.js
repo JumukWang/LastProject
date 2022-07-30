@@ -4,7 +4,6 @@ const router = require('express').Router();
 const moment = require('moment');
 const { timeSet, changeTime, timeConversion } = require('../routes/studytime');
 const { roomUpload } = require('../middlewares/upload');
-// 메인 페이지 만들기
 
 // 방생성
 router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'), async (req, res) => {
@@ -56,12 +55,11 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'), asyn
 });
 
 // 공개방 입장
-//! 유저 직접 넣어서 length로 수정해야함
 router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
-    const { groupNum, title, attendName } = await Room.findOne({ roomId: roomId });
+    const { groupNum, title } = await Room.findOne({ roomId: roomId });
     const { nickname } = await User.findOne({ userId: userId });
     if (groupNum >= 4) {
       return res.status(400).send({
@@ -130,7 +128,6 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
 });
 
 // 비밀방 입장
-//! 유저 직접 넣어서 length로 수정해야함
 router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const roomId = Number(req.params.roomId);
@@ -333,9 +330,8 @@ router.delete('/:roomId/:userId', authMiddleware, async (req, res) => {
 });
 
 // 스터디룸 검색
-//! body로 받아서 수정하기
-router.get('/search/:word', async (req, res) => {
-  const { word } = req.params;
+router.get('/search', async (req, res) => {
+  const { word } = req.body;
   let roomArr = [];
   let rooms = await Room.find({});
   try {
@@ -345,8 +341,8 @@ router.get('/search/:word', async (req, res) => {
       }
     }
     return res.status(201).send({
-      roomArr,
       result: true,
+      roomArr,
     });
   } catch (error) {
     return res.status(401).json({ result: false, msg: '찾으시는 스터디가 없습니다.' });
@@ -354,21 +350,21 @@ router.get('/search/:word', async (req, res) => {
 });
 
 //찜한 스터디 조회
-router.get('/liked-room/:userId', authMiddleware, async (req, res) => {
+router.get('/like-room/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const { userLike } = await User.findOne({ userId }).sort('-createAt');
-    let likeInfo = [];
+    let flat = [];
     for (let i in userLike) {
       if (await Room.find({ roomId: userLike[i] })) {
-        likeInfo.push(await Room.find({ roomId: userLike[i] }));
+        flat.push(await Room.find({ roomId: userLike[i] }));
       }
     }
-
+    const likeInfo = flat.flat(1);
     return res.status(200).json({
       result: true,
       likeInfo,
-      quantity: userLike.length,
+      quantity: likeInfo.length,
     });
   } catch (error) {
     console.log(error);
@@ -381,13 +377,13 @@ router.get('/entered-room/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const { attendRoom } = await User.findOne({ userId }).sort('-createAt');
-    let attendInfo = [];
+    let flat = [];
     for (let i in attendRoom) {
       if (await Room.find({ roomId: attendRoom[i] })) {
-        attendInfo.push(await Room.find({ roomId: attendRoom[i] }));
+        flat.push(await Room.find({ roomId: attendRoom[i] }));
       }
     }
-
+    const attendInfo = flat.flat(1);
     return res.status(200).json({
       result: true,
       attendInfo,
@@ -404,13 +400,13 @@ router.get('/host-room/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const { hostRoom } = await User.findOne({ userId }).sort('-createAt');
-    let hostInfo = [];
+    let flat = [];
     for (let i in hostRoom) {
       if (await Room.find({ roomId: hostRoom[i] })) {
-        hostInfo.push(await Room.find({ roomId: hostRoom[i] }));
+        flat.push(await Room.find({ roomId: hostRoom[i] }));
       }
     }
-
+    const hostInfo = flat.flat(1);
     return res.status(200).json({
       result: true,
       hostInfo,
@@ -429,7 +425,7 @@ router.put('/invite', authMiddleware, async (req, res) => {
     const userId = Number(req.params.userId);
 
     const { nickname } = await User.findOne({ userId: userId });
-    const { groupNum, attendName } = await Room.findOne({ roomId: roomId });
+    const { attendName } = await Room.findOne({ roomId: roomId });
     const checkName = attendName.includes(nickname);
 
     if (checkName === true) {
@@ -499,6 +495,7 @@ router.get('/info/:roomId', async (req, res) => {
     res.status(400).send({ result: false, errorMessage: error.message });
   }
 });
+
 //방 탈퇴
 //host가 방탈퇴 시 방삭제
 router.post('/outroom/:roomId/:userId', authMiddleware, async (req, res) => {
