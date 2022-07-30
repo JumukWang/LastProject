@@ -25,3 +25,4 @@ if [ -n "$EXIST_AFTER" ]; then
     docker-compose -p last-project-${BEFORE_COMPOSE_COLOR} -f docker-compose.${BEFORE_COMPOSE_COLOR}.yaml down
     echo "$BEFORE_COMPOSE_COLOR down"
 fi
+

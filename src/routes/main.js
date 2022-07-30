@@ -36,39 +36,38 @@ router.post('/like/:roomId/:userId', authMiddleware, async (req, res) => {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
     // const nickname = req.nickname;
-    console.log(userId)     //내 아이디
-    const { likeUser, title } = await Room.findOne({ roomId })
-    console.log(likeUser)   //방안에 유저아이디
+    console.log(userId); //내 아이디
+    const { likeUser, title } = await Room.findOne({ roomId });
+    console.log(likeUser); //방안에 유저아이디
 
-    let likeStatus = ''
-    let msg = ''
+    let likeStatus = '';
+    let msg = '';
 
     //해당 방안에 내 아이디 유무확인
     if (!likeUser.includes(userId)) {
-      await Room.updateOne({ roomId }, { $push: { likeUser: userId } })
+      await Room.updateOne({ roomId }, { $push: { likeUser: userId } });
       await User.updateOne({ userId }, { $push: { userLike: roomId } });
-      likeStatus = true
-      msg = `${title}방을 찜 했어요!`
-    }
-    else {
-      await Room.updateOne({ roomId }, { $pull: { likeUser: userId } })
+      likeStatus = true;
+      msg = `${title}방을 찜 했어요!`;
+    } else {
+      await Room.updateOne({ roomId }, { $pull: { likeUser: userId } });
       await User.updateOne({ userId }, { $pull: { userLike: roomId } });
-      likeStatus = false
-      msg = `${title}방 찜 해제`
+      likeStatus = false;
+      msg = `${title}방 찜 해제`;
     }
-    
-    const [user] = await Room.find({ roomId }) 
-    const likedUser = user.likeUser
+
+    const [user] = await Room.find({ roomId });
+    const likedUser = user.likeUser;
 
     return res.status(201).send({
       // result: true,
-      likeUser : likedUser,
+      likeUser: likedUser,
       likeStatus: likeStatus,
       msg: msg,
     });
   } catch (error) {
-    console.log(error)
-    return res.status(400).send({ errorMessage: error.message })
+    console.log(error);
+    return res.status(400).send({ errorMessage: error.message });
   }
 });
 
