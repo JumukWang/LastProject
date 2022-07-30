@@ -4,12 +4,22 @@ const router = require('express').Router();
 const authMiddleware = require('../middlewares/authmiddleware');
 
 // 메인 페이지
+// 메인 페이지
 router.get('/', async (req, res) => {
   try {
-    const roomList = await Room.find({}).sort({ create: -1 });
-    return res.status(201).send({
+    const page = Number(req.query.page || 1);
+    const perPage = Number(req.query.perPage || 6);
+    const roomLength = await Room.find({});
+    const mainLength = roomLength.length;
+    const roomList = await Room.find({})
+      .sort({ createAt: -1 })
+      .skip(perPage * (page - 1)) //perPage가 6이라면 1page로 왔을 때 6*(1-1) = 0이라서 스킵할게 없으니 0부터 6까지 출력
+      .limit(perPage);
+
+    res.status(200).json({
       result: true,
       roomList,
+      mainLength,
     });
   } catch (error) {
     return res.status(400).send({
@@ -80,22 +90,21 @@ router.post('/dislike/:roomId', authMiddleware, async (req, res) => {
   });
 });
 
-router.post('/tag/:tagName', async (req, res) => {
+//카테고리
+router.get('/tag/:tagName', async (req, res) => {
   try {
     const { tagName } = req.params;
+    const page = Number(req.query.page || 1);
+    const perPage = Number(req.query.perPage || 6);
     const roomLength = await Room.find({ tagName });
-    const roomList = await Room.find({ tagName }).sort({ createAt: -1 }).limit(6);
     const tagLength = roomLength.length;
-    console.log(tagLength);
+    const roomList = await Room.find({ tagName })
+      .sort({ createAt: -1 })
+      .skip(perPage * (page - 1)) //만약 perPage가 10이라면 1page로 왔을 때 10*(1-1) = 0이라서 0부터 9까지 출력
+      .limit(perPage);
 
-    if (!roomList) {
-      return res.status(400).json({
-        success: false,
-        msg: '해당 카테고리 방이 존재하지 않습니다.',
-      });
-    }
     res.status(200).json({
-      success: true,
+      result: true,
       roomList,
       tagLength,
     });
