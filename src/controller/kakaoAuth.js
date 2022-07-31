@@ -1,7 +1,6 @@
 const config = require('../config');
 const { User } = require('../models');
 const { authSign } = require('../util/jwt-util');
-const logger = require('../config/winston');
 const router = require('express').Router();
 
 // const logger = require('../config');

@@ -5,38 +5,38 @@ const { User, Day, Studytime, Room } = require('../models');
 const Bcrypt = require('bcrypt');
 const config = require('../config');
 const { daySet } = require('../routes/studytime');
-const { profileUpload,profileDelete } = require('../middlewares/upload');
+const { profileUpload, profileDelete } = require('../middlewares/upload');
 
 // 마이페이지
 router.get('/:userId', authMiddleware, async (req, res) => {
   try {
     const { userId } = req.params;
-    const myPage = await User.findOne({ userId }, {userLike: 0, attendRoom: 0, hostRoom: 0});
-    const { userLike, attendRoom, hostRoom } = await User.findOne({ userId }).sort("-createAt")
+    const myPage = await User.findOne({ userId }, { userLike: 0, attendRoom: 0, hostRoom: 0 });
+    const { userLike, attendRoom, hostRoom } = await User.findOne({ userId }).sort('-createAt');
 
-    let flat1 = []
+    let flat1 = [];
     for (let i in userLike) {
-      if(await Room.find({ roomId: userLike[i] })){
-        flat1.push(await Room.find({ roomId: userLike[i] }))
+      if (await Room.find({ roomId: userLike[i] })) {
+        flat1.push(await Room.find({ roomId: userLike[i] }));
       }
     }
-    const likeInfo = flat1.flat(1)
+    const likeInfo = flat1.flat(1);
 
-    let flat2 = []
+    let flat2 = [];
     for (let i in attendRoom) {
-      if(await Room.find({ roomId: attendRoom[i] })){
-        flat2.push(await Room.find({ roomId: attendRoom[i] }))
+      if (await Room.find({ roomId: attendRoom[i] })) {
+        flat2.push(await Room.find({ roomId: attendRoom[i] }));
       }
     }
-    const attendInfo = flat2.flat(1)
+    const attendInfo = flat2.flat(1);
 
-    let flat3 = []
+    let flat3 = [];
     for (let i in hostRoom) {
-      if(await Room.find({ roomId: hostRoom[i] })){
-        flat3.push(await Room.find({ roomId: hostRoom[i] }))
+      if (await Room.find({ roomId: hostRoom[i] })) {
+        flat3.push(await Room.find({ roomId: hostRoom[i] }));
       }
     }
-    const hostInfo = flat3.flat(1)
+    const hostInfo = flat3.flat(1);
 
     res.status(200).send({
       result: true,
@@ -60,7 +60,7 @@ router.get('/:userId', authMiddleware, async (req, res) => {
 router.put('/:userId/update', authMiddleware, profileUpload.single('profile_url'), async (req, res) => {
   const userId = Number(req.params.userId);
   const findUser = await User.findOne({ userId });
-  console.log(findUser)
+  console.log(findUser);
   const { nickname, password, passwordCheck } = req.body;
   try {
     const user = await User.findOne({ userId: Number(userId) });
@@ -75,10 +75,15 @@ router.put('/:userId/update', authMiddleware, profileUpload.single('profile_url'
     const hashPassword = await Bcrypt.hash(password, salt);
 
     const newprofileUrl = req.file; //추가
-    console.log(newprofileUrl)
-    if(newprofileUrl) {
+    console.log(newprofileUrl);
+    if (newprofileUrl) {
       profileDelete(findUser.profile_url);
-      await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, profile_url: newprofileUrl.transforms[0].location } });
+      await User.updateOne(
+        { userId },
+        {
+          $set: { nickname, password: hashPassword, passwordCheck, profile_url: newprofileUrl.transforms[0].location },
+        },
+      );
       const updateUser = await User.findOne({ userId: Number(userId) });
       res.send({
         result: true,
@@ -94,7 +99,6 @@ router.put('/:userId/update', authMiddleware, profileUpload.single('profile_url'
         updateUser,
       });
     }
-    
   } catch (error) {
     res.status(400).send({
       result: false,
