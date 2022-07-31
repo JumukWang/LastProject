@@ -22,6 +22,7 @@ const CONFIG = {
   S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
   S3_BUCKET_REGION: process.env.S3_BUCKET_REGION,
   S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+  KAKAO_IMAGE: process.env.KAKAO_IMAGE,
 };
 
 module.exports = CONFIG;

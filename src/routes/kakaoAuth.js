@@ -52,7 +52,7 @@ router.post('/newuser', async (req, res) => {
         email: userEmail,
         nickname: nickname,
         password: config.KAKAO_BASIC_PASSWORD,
-        profileUrl: '',
+        profileUrl: config.KAKAO_IMAGE,
         snsId: snsId,
         provider: 'kakao',
       });
@@ -63,7 +63,7 @@ router.post('/newuser', async (req, res) => {
       return res.send({
         accessToken,
         nickname,
-        profileUrl: '',
+        profileUrl: config.KAKAO_IMAGE,
         snsId,
       });
     }
