@@ -13,6 +13,5 @@ FROM node:16-alpine
 
 WORKDIR /LASTPROJECT
 COPY nginx/nginx.conf /LASTPROJECT/
-COPY data/certbot /LASTPROJECT/
 ENV PORT 3000
 CMD switchServer.sh
