@@ -50,12 +50,7 @@
     "sharp": "^0.30.7",
     "socket.io": "^4.5.1",
     "socket.io-redis": "^6.1.1",
-<<<<<<< HEAD
-    "swagger-autogen": "^2.21.5",
-    "swagger-ui-express": "^4.5.0",
-=======
     "tweetnacl": "^1.0.3",
->>>>>>> 7a16f0b2ec985004b01594fe3846a792533a8e1e
     "winston": "^3.8.1",
     "winston-daily-rotate-file": "^4.7.1"
   },
