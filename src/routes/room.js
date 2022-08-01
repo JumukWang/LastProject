@@ -222,12 +222,12 @@ router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) =>
 });
 
 // 방나가기
+// 방나가기
 router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const roomId = Number(req.params.roomId);
     const { groupNum } = await Room.findOne({ roomId: roomId });
-    const { nickname } = await User.findOne({ userId: userId });
 
     if (groupNum <= 0) {
       return res.status(400).send({
@@ -237,7 +237,7 @@ router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
     }
 
     await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
-    await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
+    // await Room.findOneAndUpdate({ roomId },{ $pull: { attendName: nickname }});
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
 
     const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화 후 res.
