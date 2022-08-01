@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
   let roomId;
   socket.on('join room', async (payload) => {
     roomId = payload.roomId;
-    const [messages, session] = await Promise.all([messageStore.findMessagesForUser(payload.nickname)]);
+    const [messages] = await Promise.all([messageStore.findMessagesForUser(payload.nickname)]);
     const messagePerUser = new Map();
     messages.forEach((payload) => {
       const { from, to } = payload;
@@ -44,12 +44,6 @@ io.on('connection', (socket) => {
       }
     });
 
-    session.forEach(() => {
-      users.push({
-        userId: payload.nickname,
-        messages: messagePerUser.get(payload.nickname) || [],
-      });
-    });
     socket.emit('users', users);
     if (users[roomId]) {
       users[roomId].push(socket.id);
