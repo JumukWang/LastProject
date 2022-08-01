@@ -21,7 +21,7 @@
 
 
 ## E-GLOO 백엔드 기술스택 🧑‍💻
-
+<p>
 <img src="https://img.shields.io/badge/nodeJS-339933?style=for-the-badge&logo=nodeJS&logoColor=white">
 <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
 <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
@@ -39,10 +39,12 @@
 <img src="https://img.shields.io/badge/githubaction-2088FF?style=for-the-badge&logo=githubaction&logoColor=white">
 <img src="https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=Socket.io&logoColor=white">
 
+<br>
+  
 <img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white">
 <img src="https://img.shields.io/badge/express.js-000000?style=for-the-badge&logo=express.js&logoColor=white">
 <img src="https://img.shields.io/badge/redis-DC382D?style=for-the-badge&logo=redis&logoColor=white">
-
+<p>
 
 ## E-GLOO 트러블슈팅 ❌
 
