@@ -6,9 +6,9 @@ const authMiddleware = require('../middlewares/authmiddleware');
 const moment = require('moment');
 
 //할 일 목록
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/:roomId', authMiddleware, async (req, res) => {
   try {
-    const { roomId } = req.body;
+    const roomId = Number(req.params.roomId);
     const todos = await Todo.find({ roomId }).sort('-createAt').exec();
     if (!todos) {
       return res.status(400).json({
@@ -27,9 +27,9 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 //할 일 생성
-router.post('/input', authMiddleware, async (req, res) => {
+router.post('/input/:roomId', authMiddleware, async (req, res) => {
   try {
-    const { roomId } = req.body;
+    const roomId = Number(req.params.roomId);
     const { text, todoId } = req.body;
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
     const todo = await Todo.create({
@@ -58,9 +58,9 @@ router.post('/input', authMiddleware, async (req, res) => {
 });
 
 //할 일 삭제
-router.delete('/remove', authMiddleware, async (req, res) => {
+router.delete('/remove/:roomId', authMiddleware, async (req, res) => {
   try {
-    const { todoId } = req.body;
+    const todoId = Number(req.params.roomId);
     const deleteTodo = await Todo.findOne({ todoId });
     if (!todoId) {
       return res.status(400).json({ success: false, errorMessage: 'todoId를 찾을 수 없습니다.' });
