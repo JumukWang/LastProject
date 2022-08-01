@@ -20,7 +20,6 @@ const io = require('socket.io')(server, {
     subClient: redisClient.duplicate(),
   }),
 });
-
 const { RedisMessageStore } = require('./src/server/messageStore');
 const messageStore = new RedisMessageStore(redisClient);
 
@@ -33,7 +32,7 @@ io.on('connection', (socket) => {
   let roomId;
   socket.on('join room', async (payload) => {
     roomId = payload.roomId;
-    const [messages] = await Promise.all([messageStore.findMessagesForUser(payload.nickname)]);
+    const [messages, session] = await Promise.all([messageStore.findMessagesForUser(payload.nickname)]);
     const messagePerUser = new Map();
     messages.forEach((payload) => {
       const { from, to } = payload;
@@ -44,6 +43,14 @@ io.on('connection', (socket) => {
         messagePerUser.set(otherUser, [payload]);
       }
     });
+
+    session.forEach(() => {
+      users.push({
+        userId: payload.nickname,
+        messages: messagePerUser.get(payload.nickname) || [],
+      });
+    });
+    socket.emit('users', users);
     if (users[roomId]) {
       users[roomId].push(socket.id);
     } else {
@@ -91,15 +98,9 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('send_message', (payload, to) => {
-    const message = {
-      payload,
-      message: payload.message,
-      from: payload.nickname,
-      to,
-    };
-    socket.to(payload.roomId).emit('receive_message', message);
-    messageStore.saveMessage(message);
+  socket.on('send_message', (payload) => {
+    socket.to(payload.nick).emit('receive_message', payload);
+    messageStore.saveMessage(payload);
     console.log(payload);
   });
 
