@@ -9,8 +9,6 @@ router.post('/login', (req, res) => {
     const api_url = 'https://kapi.kakao.com/v2/user/me';
     const request = require('request');
     const access_token = req.body.access_token;
-    // const refresh_token = req.body.refresh_token;
-    // var header = 'Bearer ' + token; // Bearer 다음에 공백 추가
     const options = {
       url: api_url,
       headers: { Authorization: `Bearer ${access_token}` },

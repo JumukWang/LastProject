@@ -9,11 +9,11 @@ const userSchema = new Schema(
     nickname: { type: String, unique: true },
     password: { type: String },
     profile_url: { type: String },
-    // snsId: {
-    //   type: String,
-    //   require: true,
-    //   unique: true,
-    // },
+    snsId: {
+      type: String,
+      require: true,
+      unique: true,
+    },
     provider: {
       type: String,
       require: true,

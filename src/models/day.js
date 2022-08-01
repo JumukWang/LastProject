@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const daySchema = new Schema(
   {
-    userId: {
-      type: Number,
+    nickname: {
+      type: String,
     },
     day0: {
       type: Array,

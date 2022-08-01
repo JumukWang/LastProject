@@ -8,12 +8,11 @@ const { daySet } = require('../routes/studytime');
 const { profileUpload, profileDelete } = require('../middlewares/upload');
 
 // 마이페이지
-router.get('/:userId', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
-    const { userId } = req.params;
-    const myPage = await User.findOne({ userId }, { userLike: 0, attendRoom: 0, hostRoom: 0 });
-    const { userLike, attendRoom, hostRoom } = await User.findOne({ userId }).sort('-createAt');
-
+    const userNick = req.nickname;
+    const myPage = await User.findOne({ nickname: userNick }, { userLike: 0, attendRoom: 0, hostRoom: 0 });
+    const { userLike, attendRoom, hostRoom } = await User.findOne({ nickname: userNick }).sort('-createAt');
     let flat1 = [];
     for (let i in userLike) {
       if (await Room.find({ roomId: userLike[i] })) {
@@ -57,13 +56,13 @@ router.get('/:userId', authMiddleware, async (req, res) => {
 });
 
 // 마이페이지수정
-router.put('/:userId/update', authMiddleware, profileUpload.single('profile_url'), async (req, res) => {
-  const userId = Number(req.params.userId);
-  const findUser = await User.findOne({ userId });
+router.put('/update', authMiddleware, profileUpload.single('profile_url'), async (req, res) => {
+  const userNick = req.nickname;
+  const findUser = await User.findOne({ nickname: userNick });
   console.log(findUser);
   const { nickname, password, passwordCheck } = req.body;
   try {
-    const user = await User.findOne({ userId: Number(userId) });
+    const user = await User.findOne({ nickname: userNick });
     console.log(user);
     if (passwordCheck !== password) {
       return res.send({
@@ -79,20 +78,20 @@ router.put('/:userId/update', authMiddleware, profileUpload.single('profile_url'
     if (newprofileUrl) {
       profileDelete(findUser.profile_url);
       await User.updateOne(
-        { userId },
+        { nickname: userNick },
         {
           $set: { nickname, password: hashPassword, passwordCheck, profile_url: newprofileUrl.transforms[0].location },
         },
       );
-      const updateUser = await User.findOne({ userId: Number(userId) });
+      const updateUser = await User.findOne({ nickname: userNick });
       res.send({
         result: true,
         msg: '유저정보가 수정되었습니다.',
         updateUser,
       });
     } else {
-      await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck } });
-      const updateUser = await User.findOne({ userId: Number(userId) });
+      await User.updateOne({ nickname: userNick }, { $set: { nickname, password: hashPassword, passwordCheck } });
+      const updateUser = await User.findOne({ nickname: userNick });
       res.send({
         result: true,
         msg: '유저정보가 수정되었습니다.',
@@ -127,43 +126,44 @@ router.get('/search', async (req, res) => {
 });
 
 // 마이페이지 Study Time,day 조회
-router.get('/:userId/time', authMiddleware, async (req, res) => {
-  const userId = Number(req.params.userId);
+router.get('/time', authMiddleware, async (req, res) => {
+  const userNick = req.nickname;
   const email = req.email;
   try {
-    const days = await Day.find({ userId });
+    const days = await Day.findOne({ nickname: userNick });
     const now = new Date();
     const day = now.getDay();
-
+    console.log(days);
     if (days.length === 0) {
-      await Day.create({ userId });
+      await Day.create({ userNick });
     }
     if (day) {
       const dayAll = await Studytime.find({ email, day: day });
+
       const dayOne = dayAll.slice(-1)[0];
 
       if (dayOne.day === 0) {
-        await Day.updateOne({ userId }, { $set: { day0: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
+        await Day.updateOne({ userNick }, { $set: { day0: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
       }
       if (dayOne.day === 1) {
-        await Day.updateOne({ userId }, { $set: { day1: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
+        await Day.updateOne({ userNick }, { $set: { day1: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
       }
       if (dayOne.day === 2) {
-        await Day.updateOne({ userId }, { $set: { day2: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
+        await Day.updateOne({ userNick }, { $set: { day2: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
       }
       if (dayOne.day === 3) {
-        await Day.updateOne({ userId }, { $set: { day3: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
+        await Day.updateOne({ userNick }, { $set: { day3: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
       }
       if (dayOne.day === 4) {
-        await Day.updateOne({ userId }, { $set: { day4: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
+        await Day.updateOne({ userNick }, { $set: { day4: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
       }
       if (dayOne.day === 5) {
-        await Day.updateOne({ userId }, { $set: { day5: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
+        await Day.updateOne({ userNick }, { $set: { day5: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
       }
       if (dayOne.day === 6) {
-        await Day.updateOne({ userId }, { $set: { day6: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
+        await Day.updateOne({ userNick }, { $set: { day6: { day: daySet(dayOne.day), time: dayOne.todaysum_h } } });
       }
-      const [days_1] = await Day.find({ userId });
+      const [days_1] = await Day.find({ userNick });
       const [Sun] = days_1.day0;
       const [Mon] = days_1.day1;
       const [Tue] = days_1.day2;
