@@ -7,7 +7,7 @@ const config = require('../config');
 const redisClient = require('../database/redis');
 const { profileUpload } = require('../middlewares/upload');
 
-const { validateNick, validatePwd, validateAll } = require('../middlewares/validation');
+const { validateNick, validatePwd } = require('../middlewares/validation');
 
 // 회원가입
 router.post('/signup', profileUpload.single('profile_url'), async (req, res) => {

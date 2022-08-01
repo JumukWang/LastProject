@@ -8,8 +8,8 @@ const redisClient = new Redis({
   password: config.REDIS_PASSWORD,
   legacyMode: true,
 });
-// const { RedisMessageStore } = require('./src/server/messageStore');
-// const messageStore = new RedisMessageStore(redisClient);
+const { RedisMessageStore } = require('./src/server/messageStore');
+const messageStore = new RedisMessageStore(redisClient);
 
 const io = require('socket.io')(server, {
   cors: {
@@ -30,8 +30,19 @@ const socketToUser = {};
 
 io.on('connection', (socket) => {
   let roomId;
-  socket.on('join room', (payload) => {
-    console.log(payload.roomId);
+  socket.on('join room', async (payload) => {
+    await redisClient.sadd('room_' + roomId, payload.nickname);
+    const [messages] = await Promise.all([messageStore.findMessagesForUser(payload.nickname)]);
+    const messagePerUser = new Map();
+    messages.forEach((payload) => {
+      const { from, to } = payload;
+      const otherUser = payload === from ? to : from;
+      if (messagePerUser.has(otherUser).push(payload)) {
+        messagePerUser.get(otherUser).push(payload);
+      } else {
+        messagePerUser.set(otherUser, [payload]);
+      }
+    });
     roomId = payload.roomId;
     if (users[roomId]) {
       users[roomId].push(socket.id);
@@ -58,7 +69,7 @@ io.on('connection', (socket) => {
         nickname: socketToNickname[socketId],
       };
     });
-
+    await redisClient.smembers('room_' + others);
     socket.emit('all users', usersInThisRoom);
   });
 
@@ -81,6 +92,7 @@ io.on('connection', (socket) => {
   });
   socket.on('send_message', (payload) => {
     socket.to(payload.roomId).emit('receive_message', payload);
+    messageStore.saveMessage(payload);
     console.log(payload);
   });
 
@@ -108,7 +120,7 @@ io.on('connection', (socket) => {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
 
       const userInfo = socketToUser[socket.id];
-
+      redisClient.del(userInfo);
       socket.broadcast.to(roomId).emit('user left', {
         socketId: socket.id,
         userInfo,
@@ -123,54 +135,4 @@ io.on('connection', (socket) => {
   });
 });
 
-// const users = {};
-// const socketToRoom = {};
-
-// io.on('connection', async (socket) => {
-//   console.log(`User Connected: ${socket.id}`);
-
-//   socket.on('join room', async (roomId, nick) => {
-//     await redisClient.sadd('room_' + roomId, nick);
-//     const [messages] = await Promise.all([messageStore.findMessagesForUser(nick)]);
-//     const messagePerUser = new Map();
-//     messages.forEach((data) => {
-//       const { from, to } = data;
-//       const otherUser = nick === from ? to : from;
-//       if (messagePerUser.has(otherUser)) {
-//         messagePerUser.get(otherUser).push(data);
-//       } else {
-//         messagePerUser.set(otherUser, [data]);
-//       }
-//     });
-//     socketToRoom[socket.id] = roomId;
-//     socket.broadcast.to(roomId).emit(); // 이벤트명으로 emit 이벤트 명과 메세지를 출력
-//     const smembers = await redisClient.smembers('room_' + roomId);
-//     const filteredlist = smembers.filter((userId) => userId !== nick);
-
-//     socket.emit('all users', filteredlist);
-//   });
-
-//   socket.on('sending signal', (payload) => {
-//     io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerId: payload.callerId });
-//   });
-
-//   socket.on('returning signal', (payload) => {
-//     io.to(payload.callerId).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
-//   });
-
-//   socket.on('send_message', (data) => {
-//     socket.to(data.roomId).emit('receive_message', data);
-//     messageStore.saveMessage(data);
-//     console.log(data.roomId);
-//   });
-
-//   socket.on('disconnect', () => {
-//     const roomId = socketToRoom[socket.id];
-//     let room = users[roomId];
-//     if (room) {
-//       room = room.filter((id) => id !== socket.id);
-//       users[roomId] = room;
-//     }
-//   });
-// });
 module.exports = { server };

@@ -82,6 +82,8 @@ router.get('/tag/:tagName', async (req, res) => {
     const perPage = Number(req.query.perPage || 6);
     const roomLength = await Room.find({ tagName });
     const tagLength = roomLength.length;
+    console.log(roomLength.length);
+    console.log(tagLength);
     const roomList = await Room.find({ tagName })
       .sort({ createAt: -1 })
       .skip(perPage * (page - 1))

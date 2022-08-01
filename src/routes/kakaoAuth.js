@@ -1,7 +1,7 @@
 const config = require('../config');
 const { User } = require('../models');
-const { authSign } = require('../util/jwt-util');
 const router = require('express').Router();
+const jwt = require('../util/jwt-util');
 
 // const logger = require('../config');
 router.post('/login', (req, res) => {
@@ -42,10 +42,8 @@ router.post('/newuser', async (req, res) => {
     const userEmail = user_info.user_email;
     const nickname = user_info.user_name;
     const exUser = await User.findOne({ $and: [{ snsId }, { provider: 'kakao' }] });
-    const accessToken = authSign({ nickname });
-
-    // 만약 디비에 user의 email이 없다면,
-    // s3로 profile 넣어줘야함
+    const accessToken = jwt.authSign({ nickname });
+    const refreshToken = jwt.refreshToken();
 
     if (!exUser) {
       const newUser = new User({
@@ -56,12 +54,12 @@ router.post('/newuser', async (req, res) => {
         snsId: snsId,
         provider: 'kakao',
       });
-      // 저장하기
 
       newUser.save();
 
       return res.send({
         accessToken,
+        refreshToken,
         nickname,
         profileUrl: config.KAKAO_IMAGE,
         snsId,
@@ -70,6 +68,7 @@ router.post('/newuser', async (req, res) => {
     const profileUrl = exUser.profile_url;
     return res.send({
       accessToken,
+      refreshToken,
       nickname,
       profileUrl,
       snsId,

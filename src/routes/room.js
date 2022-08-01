@@ -12,14 +12,15 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'), asyn
     const imgFile = await roomUrl.transforms[0].location; //추가
     const host = Number(req.params.userId);
     const { tagName, title, content, password, date, lock } = req.body;
-
+    let stringTag = tagName.toString();
+    const arrTag = stringTag.split(',');
     if (lock === 'false') {
       let flag = false;
       const newPublicRoom = await Room.create({
         title,
         content,
         date,
-        tagName: [tagName, '전체'],
+        tagName: arrTag,
         imgUrl: imgFile,
         lock: flag,
       });
@@ -36,7 +37,7 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'), asyn
         password,
         content,
         date,
-        tagName: [tagName, '전체'],
+        tagName: arrTag,
         imgUrl: imgFile,
         lock: flag,
       });
@@ -330,8 +331,8 @@ router.delete('/:roomId/:userId', authMiddleware, async (req, res) => {
 });
 
 // 스터디룸 검색
-router.get('/search', async (req, res) => {
-  const { word } = req.body;
+router.get('/search/:word', async (req, res) => {
+  const { word } = req.params;
   let roomArr = [];
   let rooms = await Room.find({});
   try {
