@@ -35,8 +35,7 @@ const studySchema = new Schema({
     type: String,
   },
   groupNum: {
-    type: Number,
-    default: 0,
+    type: Array,
   },
   likeUser: {
     type: Array,
