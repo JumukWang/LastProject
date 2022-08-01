@@ -61,7 +61,6 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
     const { groupNum, title } = await Room.findOne({ roomId: roomId });
-    const { nickname } = await User.findOne({ userId: userId });
     if (groupNum >= 4) {
       return res.status(400).send({
         result: false,
@@ -70,7 +69,7 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
     }
 
     await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
-    await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
+    // await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
     const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화
     await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } });
 
