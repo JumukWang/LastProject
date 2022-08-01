@@ -5,16 +5,16 @@ const router = require('express').Router();
 const jwt = require('../util/jwt-util');
 const config = require('../config');
 const redisClient = require('../database/redis');
-const { profileUpload } = require('../middlewares/upload')
+const { profileUpload } = require('../middlewares/upload');
 
-const { validateNick, validatePwd, validateAll } = require('../middlewares/validation');
+const { validateNick, validatePwd } = require('../middlewares/validation');
 
 // 회원가입
 router.post('/signup', profileUpload.single('profile_url'), async (req, res) => {
   try {
     // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck } = req.body;
-    const profileUrl = req.file; 
+    const profileUrl = req.file;
     const imgFile = await profileUrl.transforms[0].location;
     const exEmail = await User.findOne({
       email,
@@ -41,7 +41,7 @@ router.post('/signup', profileUpload.single('profile_url'), async (req, res) => 
       email,
       nickname,
       password: hashPassword,
-      profile_url : imgFile, 
+      profile_url: imgFile,
     });
     await user.save();
 

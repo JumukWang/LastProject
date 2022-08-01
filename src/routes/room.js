@@ -12,14 +12,15 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'), asyn
     const imgFile = await roomUrl.transforms[0].location; //추가
     const host = Number(req.params.userId);
     const { tagName, title, content, password, date, lock } = req.body;
-
+    let stringTag = tagName.toString();
+    const arrTag = stringTag.split(',');
     if (lock === 'false') {
       let flag = false;
       const newPublicRoom = await Room.create({
         title,
         content,
         date,
-        tagName: [tagName, '전체'],
+        tagName: arrTag,
         imgUrl: imgFile,
         lock: flag,
       });
@@ -36,7 +37,7 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'), asyn
         password,
         content,
         date,
-        tagName: [tagName, '전체'],
+        tagName: arrTag,
         imgUrl: imgFile,
         lock: flag,
       });
@@ -221,12 +222,12 @@ router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) =>
 });
 
 // 방나가기
+// 방나가기
 router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const roomId = Number(req.params.roomId);
     const { groupNum } = await Room.findOne({ roomId: roomId });
-    const { nickname } = await User.findOne({ userId: userId });
 
     if (groupNum.length <= 0) {
       return res.status(400).send({
@@ -235,8 +236,8 @@ router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
       });
     }
 
-    await Room.updateOne({ roomId: roomId }, { $pull: { groupNum: userId } });
-    await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
+    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
+    // await Room.findOneAndUpdate({ roomId },{ $pull: { attendName: nickname }});
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
 
     const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화 후 res.
@@ -330,8 +331,8 @@ router.delete('/:roomId/:userId', authMiddleware, async (req, res) => {
 });
 
 // 스터디룸 검색
-router.get('/search', async (req, res) => {
-  const { word } = req.body;
+router.get('/search/:word', async (req, res) => {
+  const { word } = req.params;
   let roomArr = [];
   let rooms = await Room.find({});
   try {
@@ -474,12 +475,15 @@ router.get('/info/:roomId', async (req, res) => {
     //동적인 key값을 적용시켜 출력 ex) output: {aa:bb}
     let output = [];
     let keyname = '';
+    let nick = 'nickname';
+    let image = 'imageUrl';
     for (let i in attendInfo) {
       for (let j in attendInfo[i]) {
         const aa = attendInfo[i][j].nickname;
         const bb = attendInfo[i][j].profile_url;
         let something = {};
-        something[keyname + aa] = bb;
+        something[nick] = keyname + aa;
+        something[image] = bb;
         output.push(something);
       }
     }
