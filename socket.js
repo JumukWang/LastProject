@@ -8,8 +8,6 @@ const redisClient = new Redis({
   password: config.REDIS_PASSWORD,
   legacyMode: true,
 });
-const { RedisMessageStore } = require('./src/server/messageStore');
-const messageStore = new RedisMessageStore(redisClient);
 
 const io = require('socket.io')(server, {
   cors: {
@@ -23,6 +21,9 @@ const io = require('socket.io')(server, {
   }),
 });
 
+const { RedisMessageStore } = require('./src/server/messageStore');
+const messageStore = new RedisMessageStore(redisClient);
+
 const users = {};
 const socketToRoom = {};
 const socketToNickname = {};
@@ -31,19 +32,18 @@ const socketToUser = {};
 io.on('connection', (socket) => {
   let roomId;
   socket.on('join room', async (payload) => {
-    await redisClient.sadd('room_' + roomId, payload.nickname);
+    roomId = payload.roomId;
     const [messages] = await Promise.all([messageStore.findMessagesForUser(payload.nickname)]);
     const messagePerUser = new Map();
     messages.forEach((payload) => {
       const { from, to } = payload;
-      const otherUser = payload === from ? to : from;
-      if (messagePerUser.has(otherUser).push(payload)) {
+      const otherUser = payload.nickname === from ? to : from;
+      if (messagePerUser.has(otherUser)) {
         messagePerUser.get(otherUser).push(payload);
       } else {
         messagePerUser.set(otherUser, [payload]);
       }
     });
-    roomId = payload.roomId;
     if (users[roomId]) {
       users[roomId].push(socket.id);
     } else {
@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
         nickname: socketToNickname[socketId],
       };
     });
-    await redisClient.smembers('room_' + others);
+
     socket.emit('all users', usersInThisRoom);
   });
 
@@ -90,9 +90,15 @@ io.on('connection', (socket) => {
       id: socket.id,
     });
   });
-  socket.on('send_message', (payload) => {
-    socket.to(payload.roomId).emit('receive_message', payload);
-    messageStore.saveMessage(payload);
+  socket.on('send_message', (payload, to) => {
+    const message = {
+      payload,
+      message: payload.message,
+      from: payload.nickname,
+      to,
+    };
+    socket.to(payload.roomId).emit('receive_message', message);
+    messageStore.saveMessage(message);
     console.log(payload);
   });
 
@@ -120,7 +126,7 @@ io.on('connection', (socket) => {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
 
       const userInfo = socketToUser[socket.id];
-      redisClient.del(userInfo);
+
       socket.broadcast.to(roomId).emit('user left', {
         socketId: socket.id,
         userInfo,

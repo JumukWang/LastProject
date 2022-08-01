@@ -475,12 +475,15 @@ router.get('/info/:roomId', async (req, res) => {
     //동적인 key값을 적용시켜 출력 ex) output: {aa:bb}
     let output = [];
     let keyname = '';
+    let nick = 'nickname';
+    let image = 'imageUrl';
     for (let i in attendInfo) {
       for (let j in attendInfo[i]) {
         const aa = attendInfo[i][j].nickname;
         const bb = attendInfo[i][j].profile_url;
         let something = {};
-        something[keyname + aa] = bb;
+        something[nick] = keyname + aa;
+        something[image] = bb;
         output.push(something);
       }
     }
