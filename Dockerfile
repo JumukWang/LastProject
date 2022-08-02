@@ -1,17 +1,13 @@
 FROM node:16.15.0
 
-ARG ENV_FILE=.env
 WORKDIR /LASTPROJECT
 
-COPY ${ENV_FILE} /LASTPROJECT/.env
-COPY .eslintrc .eslintignore .prettierrc package.json package-lock.json /LASTPROJECT/
-ADD src /LASTPROJECT/src
+COPY . .
+
 RUN npm install --prod
 
+RUN npm install nodemon -g
 
-FROM node:16-alpine
+EXPOSE 3000 4000
 
-WORKDIR /LASTPROJECT
-COPY nginx/nginx.conf /LASTPROJECT/
-ENV PORT 3000
-CMD switchServer.sh
+CMD ["npm", "start"] 
