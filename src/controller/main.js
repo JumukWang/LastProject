@@ -1,5 +1,4 @@
 require('dotenv').config();
-const authMiddleware = require('../middlewares/authmiddleware');
 const { Room, User } = require('../models');
 
 async function main(req, res) {

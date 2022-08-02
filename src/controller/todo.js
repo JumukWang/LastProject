@@ -1,12 +1,10 @@
 require('dotenv').config();
-const router = require('express').Router();
 const Todo = require('../models/todo');
-const authMiddleware = require('../middlewares/authmiddleware');
+
 
 const moment = require('moment');
 
-//할 일 목록
-router.get('/:roomId', authMiddleware, async (req, res) => {
+async function getList(req, res) {
   try {
     const roomId = Number(req.params.roomId);
     const todos = await Todo.find({ roomId }).sort('-createAt').exec();
@@ -24,10 +22,9 @@ router.get('/:roomId', authMiddleware, async (req, res) => {
     console.log(error);
     return res.status(400).send({ errorMessage: error.message });
   }
-});
+}
 
-//할 일 생성
-router.post('/input/:roomId', authMiddleware, async (req, res) => {
+async function postList(req, res) {
   try {
     const roomId = Number(req.params.roomId);
     const { text, todoId } = req.body;
@@ -38,7 +35,7 @@ router.post('/input/:roomId', authMiddleware, async (req, res) => {
       text: text,
       date: date,
     });
-
+    await todo.save();
     if (!text) {
       return res.status(401).json({ result: false, errorMessage: '빈 칸을 채워주세요.' });
     }
@@ -46,19 +43,19 @@ router.post('/input/:roomId', authMiddleware, async (req, res) => {
       return res.status(401).json({ result: false, errorMessage: '할 일 생성 오류' });
     }
 
+    const todos = await Todo.findOne({ todoId: todoId }).sort('-createAt').exec();
     res.status(201).json({
       result: true,
-      todo,
+      todos,
       msg: '할 일 목록 추가',
     });
   } catch (error) {
     console.log(error);
     return res.status(400).send({ errorMessage: error.message });
   }
-});
+}
 
-//할 일 수정
-router.put('/:todoId', authMiddleware, async (req, res) => {
+async function updateList(req, res) {
   try {
     const todoId = Number(req.params.todoId);
     const { text, checkBox } = req.body;
@@ -69,6 +66,7 @@ router.put('/:todoId', authMiddleware, async (req, res) => {
 
     await Todo.updateOne({ todoId }, { $set: { checkBox: checkBox } });
     await Todo.updateOne({ todoId }, { $set: { text: text } });
+
     const todos = await Todo.findOne({ todoId: todoId }).sort('-createAt').exec();
     res.status(200).json({
       result: true,
@@ -78,10 +76,9 @@ router.put('/:todoId', authMiddleware, async (req, res) => {
     console.log(error);
     return res.status(400).send({ errorMessage: error.message });
   }
-});
+}
 
-//할 일 삭제
-router.delete('/remove/:todoId', authMiddleware, async (req, res) => {
+async function deleteList(req, res) {
   try {
     const todoId = Number(req.params.todoId);
     const deleteTodo = await Todo.findOne({ todoId });
@@ -101,6 +98,6 @@ router.delete('/remove/:todoId', authMiddleware, async (req, res) => {
     console.log(error);
     return res.status(400).send({ errorMessage: error.message });
   }
-});
+}
 
-module.exports = router;
+module.exports = { getList, postList, updateList, deleteList };

@@ -1,6 +1,4 @@
 const { Room, User, Studytime } = require('../models');
-const authMiddleware = require('../middlewares/authmiddleware');
-const router = require('express').Router();
 const moment = require('moment');
 const { timeSet, changeTime, timeConversion } = require('../routes/studytime');
 // 메인 페이지 만들기
@@ -403,4 +401,168 @@ async function searchRoom(req, res) {
   }
 }
 
-module.exports = router;
+async function userLikeRoom(req, res) {
+  try {
+    const userId = Number(req.params.userId);
+    const { userLike } = await User.findOne({ userId }).sort('-createAt');
+    let flat = [];
+    for (let i in userLike) {
+      if (await Room.find({ roomId: userLike[i] })) {
+        flat.push(await Room.find({ roomId: userLike[i] }));
+      }
+    }
+    const likeInfo = flat.flat(1);
+    return res.status(200).json({
+      result: true,
+      likeInfo,
+      quantity: likeInfo.length,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ errorMessage: error.message });
+  }
+}
+
+async function enteredRoom(req, res) {
+  try {
+    const userId = Number(req.params.userId);
+    const { attendRoom } = await User.findOne({ userId }).sort('-createAt');
+    let flat = [];
+    for (let i in attendRoom) {
+      if (await Room.find({ roomId: attendRoom[i] })) {
+        flat.push(await Room.find({ roomId: attendRoom[i] }));
+      }
+    }
+    const attendInfo = flat.flat(1);
+    return res.status(200).json({
+      result: true,
+      attendInfo,
+      quantity: attendRoom.length,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ errorMessage: error.message });
+  }
+}
+
+async function hostRoom(req, res) {
+  try {
+    const userId = Number(req.params.userId);
+    const { hostRoom } = await User.findOne({ userId }).sort('-createAt');
+    let flat = [];
+    for (let i in hostRoom) {
+      if (await Room.find({ roomId: hostRoom[i] })) {
+        flat.push(await Room.find({ roomId: hostRoom[i] }));
+      }
+    }
+    const hostInfo = flat.flat(1);
+    return res.status(200).json({
+      result: true,
+      hostInfo,
+      quantity: hostRoom.length,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ errorMessage: error.message });
+  }
+}
+
+async function roomInfo(req, res) {
+  try {
+    const { roomId } = req.params;
+    const checkRoom = await Room.findOne({ roomId: roomId });
+    if (!checkRoom) {
+      return res.status(400).json({ result: false, msg: '방을 찾을 수 없습니다.' });
+    }
+    const { attendName } = await Room.findOne({ roomId: roomId });
+
+    //참여인원 프로필사진 각각 매칭해서 출력하기
+    console.log(attendName);
+    //방에 참여중인 인원만 파악해서 출력
+    let attendInfo = [];
+    for (let i in attendName) {
+      if (await User.find({ nickname: attendName[i] })) {
+        attendInfo.push(await User.find({ nickname: attendName[i] }));
+      }
+    }
+    console.log(attendInfo);
+    //위 조건의 결과를 이중for문으로 뽑아내고,
+    //동적인 key값을 적용시켜 출력 ex) output: {aa:bb}
+    let output = [];
+    let keyname = '';
+    let nick = 'nickname';
+    let image = 'imageUrl';
+    for (let i in attendInfo) {
+      for (let j in attendInfo[i]) {
+        const aa = attendInfo[i][j].nickname;
+        const bb = attendInfo[i][j].profile_url;
+        let something = {};
+        something[nick] = keyname + aa;
+        something[image] = bb;
+        output.push(something);
+      }
+    }
+
+    return res.status(200).json({
+      result: true,
+      checkRoom,
+      attend: attendName.length,
+      output,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ result: false, errorMessage: error.message });
+  }
+}
+
+async function outRoom(req, res) {
+  try {
+    const roomId = Number(req.params.roomId);
+    const userId = Number(req.params.userId);
+    const { groupNum, title, attendName, hostId } = await Room.findOne({ roomId: roomId });
+    console.log(attendName);
+    const { nickname } = await User.findOne({ userId: userId });
+    const checkName = attendName.includes(nickname);
+    console.log(checkName);
+
+    if (hostId === userId) {
+      await Room.findOneAndDelete({ roomId }, { hostId: userId });
+      await User.findOneAndUpdate({ userId }, { $pull: { hostRoom: roomId } });
+      await User.updateMany({}, { $pull: { attendRoom: roomId } });
+      return res.status(200).json({ result: true, msg: '호스트인 스터디룸을 탈퇴 하였습니다.' });
+    }
+
+    if (checkName === false) {
+      return res.status(400).json({ result: false, msg: '참여중인 룸이 아닙니다.' });
+    }
+    if (groupNum <= 0) {
+      return res.status(400).json({ result: false, msg: '참여 인원이 없습니다.' });
+    }
+
+    await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
+    await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
+    await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
+
+    return res.status(200).json({
+      result: true,
+      msg: `${title} 스터디룸을 탈퇴 하였습니다.`,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ result: false, errorMessage: error.message });
+  }
+}
+
+module.exports = {
+  roomCreate,
+  roomExit,
+  roomInfo,
+  outRoom,
+  hostRoom,
+  enteredRoom,
+  userLikeRoom,
+  searchRoom,
+  deleteRoom,
+  privateRoom,
+  publicRoom,
+};
