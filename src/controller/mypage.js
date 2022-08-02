@@ -1,33 +1,63 @@
 require('dotenv').config();
-const router = require('express').Router();
-const authMiddleware = require('../middlewares/authmiddleware');
-const { User, Day, Studytime } = require('../models');
+const { User, Day, Studytime, Room } = require('../models');
 const Bcrypt = require('bcrypt');
 const config = require('../config');
 const { daySet } = require('../routes/studytime');
-// const { upload } = require('../middlewares/upload');
+const { profileDelete } = require('../middlewares/upload');
 
-// 마이페이지
-router.get('/:userId', authMiddleware, async (req, res) => {
+async function mypage(req, res) {
   try {
     const { userId } = req.params;
-    const myPage = await User.findOne({ userId });
-    res.status(200).send({
+    const myPage = await User.findOne({ userId }, { userLike: 0, attendRoom: 0, hostRoom: 0 });
+    const { userLike, attendRoom, hostRoom } = await User.findOne({ userId }).sort('-createAt');
+
+    let flat1 = [];
+    for (let i in userLike) {
+      if (await Room.find({ roomId: userLike[i] })) {
+        flat1.push(await Room.find({ roomId: userLike[i] }));
+      }
+    }
+    const likeInfo = flat1.flat(1);
+
+    let flat2 = [];
+    for (let i in attendRoom) {
+      if (await Room.find({ roomId: attendRoom[i] })) {
+        flat2.push(await Room.find({ roomId: attendRoom[i] }));
+      }
+    }
+    const attendInfo = flat2.flat(1);
+
+    let flat3 = [];
+    for (let i in hostRoom) {
+      if (await Room.find({ roomId: hostRoom[i] })) {
+        flat3.push(await Room.find({ roomId: hostRoom[i] }));
+      }
+    }
+    const hostInfo = flat3.flat(1);
+
+    return res.status(200).send({
       result: true,
       myPage,
+      likeInfo,
+      likeInfoLength: likeInfo.length,
+      attendInfo,
+      attendInfoLength: attendInfo.length,
+      hostInfo,
+      hostInfoLength: hostInfo.length,
     });
   } catch (error) {
-    res.status(400).send({
+    return res.status(400).send({
       result: false,
       msg: error.message,
     });
   }
-});
+}
 
-// 마이페이지수정
-router.put('/:userId/update', authMiddleware, async (req, res) => {
+async function mypageUpdate(req, res) {
   const userId = Number(req.params.userId);
-  const { nickname, password, passwordCheck, imgUrl } = req.body;
+  const findUser = await User.findOne({ userId });
+  console.log(findUser);
+  const { nickname, password, passwordCheck } = req.body;
   try {
     const user = await User.findOne({ userId: Number(userId) });
     console.log(user);
@@ -40,24 +70,40 @@ router.put('/:userId/update', authMiddleware, async (req, res) => {
     const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
     const hashPassword = await Bcrypt.hash(password, salt);
 
-    await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, imgUrl } });
-    const updateUser = await User.findOne({ userId: Number(userId) });
-    res.send({
-      result: true,
-      msg: '유저정보가 수정되었습니다.',
-      updateUser,
-    });
+    const newprofileUrl = req.file; //추가
+    console.log(newprofileUrl);
+    if (newprofileUrl) {
+      profileDelete(findUser.profile_url);
+      await User.updateOne(
+        { userId },
+        {
+          $set: { nickname, password: hashPassword, passwordCheck, profile_url: newprofileUrl.transforms[0].location },
+        },
+      );
+      const updateUser = await User.findOne({ userId: Number(userId) });
+      res.send({
+        result: true,
+        msg: '유저정보가 수정되었습니다.',
+        updateUser,
+      });
+    } else {
+      await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck } });
+      const updateUser = await User.findOne({ userId: Number(userId) });
+      res.send({
+        result: true,
+        msg: '유저정보가 수정되었습니다.',
+        updateUser,
+      });
+    }
   } catch (error) {
     res.status(400).send({
       result: false,
       msg: error.message,
     });
   }
-});
+}
 
-// 유저찾기
-
-router.get('/search', async (req, res) => {
+async function userSearch(req, res) {
   try {
     const users = await User.find({}, { userId: 1, nickname: 1, email: 1 });
     console.log(users);
@@ -72,10 +118,9 @@ router.get('/search', async (req, res) => {
       errmsg: error.message,
     });
   }
-});
+}
 
-// 마이페이지 Study Time,day 조회
-router.get('/:userId/time', authMiddleware, async (req, res) => {
+async function mypageTimeGraph(req, res) {
   const userId = Number(req.params.userId);
   const email = req.email;
   try {
@@ -133,6 +178,11 @@ router.get('/:userId/time', authMiddleware, async (req, res) => {
       msg: error.msg,
     });
   }
-});
+}
 
-module.exports = router;
+module.exports = {
+  mypage,
+  mypageTimeGraph,
+  mypageUpdate,
+  userSearch,
+};

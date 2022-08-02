@@ -586,7 +586,7 @@ router.post('/outroom/:roomId/:userId', authMiddleware, async (req, res) => {
       return res.status(400).json({ result: false, msg: '참여 인원이 없습니다.' });
     }
 
-    await Room.updateOne({ roomId: roomId }, { $pull: { groupNum: userId } });
+    await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
     await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
 
