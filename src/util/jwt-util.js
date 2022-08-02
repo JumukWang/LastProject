@@ -14,7 +14,7 @@ module.exports = {
     return jwt.sign(payload, config.SECRET_KEY, {
       // token 발급
       algorithm: 'HS256',
-      expiresIn: '1h',
+      expiresIn: '30s',
     });
   },
   tokenVerify: (authToken) => {

@@ -227,17 +227,78 @@ router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId);
     const roomId = Number(req.params.roomId);
-    const { groupNum } = await Room.findOne({ roomId: roomId });
+    const { groupNum, lock } = await Room.findOne({ roomId: roomId });
+    const { nickname } = await User.findOne({ userId: userId });
 
-    if (groupNum.length <= 0) {
+    if (groupNum <= 0) {
       return res.status(400).send({
         result: false,
         msg: '참여 인원이 없습니다.',
       });
     }
+    if (lock === true) {
+      await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
+      await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
+      const roomInfo = await Room.findOne({ roomId: roomId });
 
+      //시간저장
+      const email = req.email;
+
+      const { todayStart, weekStart, weekEnd } = timeSet();
+      console.log(todayStart, weekStart, weekEnd);
+      const outTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      const now = new Date();
+      const day = now.getDay();
+      const outTimestamp = now.getTime();
+      const out = await Studytime.create({ email, outTime, day, outTimestamp });
+
+      const inTime = await Studytime.find({ email }, { inTimestamp: 1, email: 1 });
+      const outTime_1 = await Studytime.find({ email }, { outTimestamp: 1, email: 1 });
+      const allinTime = inTime.map((intime) => intime.inTimestamp).filter((intime) => intime !== undefined);
+      const arr_allinTime = allinTime[allinTime.length - 1]; //맨마지막타임스타드
+      const alloutTime = outTime_1.map((outtime) => outtime.outTimestamp).filter((outtime) => outtime !== undefined);
+      const arr_alloutTime = alloutTime[alloutTime.length - 1]; //맨마지막타임아웃
+      const timedif = arr_alloutTime - arr_allinTime;
+      const finaltime = changeTime(timedif);
+      console.log('hi');
+      await Studytime.updateOne({ outTimestamp: arr_alloutTime }, { $set: { studytime: finaltime, timedif: timedif } });
+      await Studytime.updateOne({ inTimestamp: arr_allinTime }, { $set: { studytime: finaltime, timedif: timedif } });
+
+      // todayRecord
+      // TotalstudyTime, +1은 다음날을 기준으로 하기위해서 한것이고 -9시간은 UTC와 KRA 시간이 달라서 조정하기 위해 뺀것!!
+      const today = new Date(todayStart);
+      const tommorownum = today.getTime() + 24 * 60 * 60 * 1000 - 9 * 60 * 60 * 1000;
+      const todayKST = today.getTime() - 9 * 60 * 60 * 1000;
+      const todaytime_1 = await Studytime.find({ email, inTimestamp: { $gt: todayKST, $lt: tommorownum } });
+      const todaytime_2 = todaytime_1.map((x) => x.timedif).filter((x) => x !== undefined);
+      let todaysum = 0;
+      for (let i = 0; i < todaytime_2.length; i++) {
+        todaysum += todaytime_2[i];
+      }
+      console.log(changeTime(todaysum));
+
+      await Studytime.updateOne(
+        { outTimestamp: arr_alloutTime },
+        { $set: { todaysum: changeTime(todaysum), todaysum_h: timeConversion(todaysum) } },
+      );
+      await Studytime.updateOne(
+        { inTimestamp: arr_allinTime },
+        { $set: { todaysum: changeTime(todaysum), todaysum_h: timeConversion(todaysum) } },
+      );
+
+      return res.status(400).json({
+        groupNum: roomInfo.groupNum,
+        result: true,
+        msg: '스터디 룸에서 나왔습니다.',
+        out,
+        todayrecord: changeTime(todaysum),
+        todaysum_h: timeConversion(todaysum),
+      });
+    }
+
+    //lock === false면 (공개방이면)
     await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
-    // await Room.findOneAndUpdate({ roomId },{ $pull: { attendName: nickname }});
+    await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
 
     const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화 후 res.

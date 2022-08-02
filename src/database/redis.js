@@ -17,12 +17,12 @@ const get = (req, res, next) => {
     if (error) {
       res.status(400).send({
         result: false,
-        msg: error.message,
+        message: error,
       });
     }
     if (data !== null) {
       console.log('data from redis!');
-      res.status(200).send({
+      return res.status(200).send({
         result: true,
         data: JSON.parse(data),
       });

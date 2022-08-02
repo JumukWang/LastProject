@@ -50,7 +50,7 @@ router.post('/signup', profileUpload.single('profile_url'), async (req, res) => 
     return res.status(200).send({
       result: true,
       msg: '회원가입이 되었습니다.',
-      accesstoken: token,
+      accessToken: token,
     });
   } catch (error) {
     console.error(error);
@@ -88,7 +88,6 @@ router.post('/login', validatePwd, async (req, res) => {
     const refreshToken = jwt.refreshToken();
     redisClient.set(email, {
       refreshToken,
-      nickname: user.nickname,
     });
 
     return res.status(200).send({

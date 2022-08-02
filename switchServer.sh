@@ -21,6 +21,7 @@ sleep 10
 # 새로운 컨테이너가 제대로 떴는지 확인
 EXIST_AFTER=$(docker-compose -p last-project-${AFTER_COMPOSE_COLOR} -f docker-compose.${AFTER_COMPOSE_COLOR}.yaml ps | grep Up)
 if [ -n "$EXIST_AFTER" ]; then
+    cp /
     # 이전 컨테이너 종료
     docker-compose -p last-project-${BEFORE_COMPOSE_COLOR} -f docker-compose.${BEFORE_COMPOSE_COLOR}.yaml down
     echo "$BEFORE_COMPOSE_COLOR down"

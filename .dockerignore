@@ -1,6 +1,4 @@
-node_modules
 Dockerfile
-.env
 README.md
 .gitignore
 logs
