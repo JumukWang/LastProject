@@ -222,7 +222,6 @@ router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) =>
 });
 
 // 방나가기
-// 방나가기
 router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
   try {
     const userId = Number(req.params.userId);
@@ -237,7 +236,7 @@ router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
       });
     }
     if (lock === true) {
-      await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
+      await Room.updateOne({ roomId: roomId }, { $pull: { groupNum: userId } });
       await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
       const roomInfo = await Room.findOne({ roomId: roomId });
 
@@ -297,7 +296,7 @@ router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
     }
 
     //lock === false면 (공개방이면)
-    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
+    await Room.updateOne({ roomId: roomId }, { $pull: { groupNum: userId } });
     await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
 
