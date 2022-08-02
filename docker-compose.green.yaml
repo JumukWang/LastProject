@@ -20,7 +20,7 @@ services:
     backend:
         depends_on:
             - nginxproxy
-        image: dhgus132/last-project:latest
+        image: dhgus132/last-project:green
         env_file:
             - ./.env
         ports:
@@ -30,7 +30,7 @@ services:
     backend2:
         depends_on:
             - nginxproxy
-        image: dhgus132/last-project:latest
+        image: dhgus132/last-project:green
         env_file:
             - ./.env
         environment:
@@ -42,7 +42,7 @@ services:
     backend3:
         depends_on:
             - nginxproxy
-        image: dhgus132/last-project:latest
+        image: dhgus132/last-project:green
         env_file:
             - ./.env
         environment:
@@ -54,7 +54,7 @@ services:
     backend4:
         depends_on:
             - nginxproxy
-        image: dhgus132/last-project:latest
+        image: dhgus132/last-project:green
         env_file:
             - ./.env
         environment:

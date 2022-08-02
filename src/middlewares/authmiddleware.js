@@ -21,14 +21,13 @@ module.exports = async (req, res, next) => {
     });
     return;
   }
-
   try {
     // 헤더에서 인증, 토큰 비교 검증
-    logger.info('jwt 인증 시작');
-    if (req.headers.authorization && req.headers.refreshToken) {
+    logger.info('jwt refresh 인증 시작');
+    if (req.headers.authorization && req.headers.refreshtoken) {
       const authToken = req.headers.authorization.split('Bearer ')[1];
-      const refreshToken = req.headers.refreshToken;
-
+      const refreshToken = req.headers.refreshtoken;
+      logger.info('jwt refresh 인증의 시작 시작');
       // access token이 만료됐는지 검증
       const accessResult = tokenVerify(authToken);
       // access token 디코딩
@@ -44,8 +43,9 @@ module.exports = async (req, res, next) => {
       //access token decoding 값에서 id를 가져와 refresh token 검증
       let user = null;
       user = await User.findOne({ email: decode.email });
+      console.log(user.email);
       const refreshResult = refreshVerify(refreshToken, user.email);
-
+      logger.info('jwt refresh 중간 인증 시작');
       if (accessResult.msg === 'jwt expired' && accessResult.result === false) {
         if (refreshResult.result === false) {
           return res.status(401).send({
@@ -57,10 +57,8 @@ module.exports = async (req, res, next) => {
 
           return res.status(200).send({
             result: true,
-            token: {
-              accessToken: newToken,
-              refreshToken,
-            },
+            accessToken: newToken,
+            refreshToken,
           });
         }
       } else {
@@ -78,12 +76,3 @@ module.exports = async (req, res, next) => {
     });
   }
 };
-
-// await redisClient.connect();
-
-// let token = await redisClient.get("key")
-// 프론트에서 쿠키에 세션 아이디를 쿠키에 담아서 키로 벨류를 비교
-// 세션 아이디를 확인 세션아이디 토큰 확인 ex) 이메일 / 토큰
-// if(token) {
-//   return;
-// }

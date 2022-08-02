@@ -10,23 +10,18 @@ const redisClient = redis.createClient({
 const set = (key, value) => {
   redisClient.set(key, JSON.stringify(value));
 };
-const get = (req, res, next) => {
+const get = (res, req, next) => {
   let key = req.originalUrl;
 
   redisClient.get(key, (error, data) => {
-    if (error) {
-      res.status(400).send({
-        result: false,
-        msg: error.message,
-      });
+    try {
+      if (data !== null) {
+        console.log('data from redis!');
+        return JSON.parse(data);
+      } else next();
+    } catch {
+      console.log(error);
     }
-    if (data !== null) {
-      console.log('data from redis!');
-      res.status(200).send({
-        result: true,
-        data: JSON.parse(data),
-      });
-    } else next();
   });
 };
 

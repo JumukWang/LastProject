@@ -18,10 +18,11 @@ const CONFIG = {
   MONGO_USERNAME: process.env.MONGO_USERNAME,
   MONGO_PASSWORD: process.env.MONGO_PASSWORD,
   MONGO_URL: process.env.MONGO_URL,
-  S3_ACCESS_KEY : process.env.S3_ACCESS_KEY,
-  S3_SECRET_ACCESS_KEY : process.env.S3_SECRET_ACCESS_KEY,
-  S3_BUCKET_REGION : process.env.S3_BUCKET_REGION,
-  S3_BUCKET_NAME : process.env.S3_BUCKET_NAME,
+  S3_ACCESS_KEY: process.env.S3_ACCESS_KEY,
+  S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
+  S3_BUCKET_REGION: process.env.S3_BUCKET_REGION,
+  S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+  KAKAO_IMAGE: process.env.KAKAO_IMAGE,
 };
 
 module.exports = CONFIG;

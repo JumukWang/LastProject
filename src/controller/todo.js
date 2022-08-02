@@ -1,35 +1,31 @@
 require('dotenv').config();
-const router = require('express').Router();
 const Todo = require('../models/todo');
-const authMiddleware = require('../middlewares/authmiddleware');
 
 const moment = require('moment');
 
-//할 일 목록
-router.get('/', authMiddleware, async (req, res) => {
+async function getList(req, res) {
   try {
-    const { roomId } = req.body;
+    const roomId = Number(req.params.roomId);
     const todos = await Todo.find({ roomId }).sort('-createAt').exec();
     if (!todos) {
       return res.status(400).json({
-        success: false,
+        result: false,
         errorMessage: '할 일 목록이 없습니다.',
       });
     }
     res.status(200).json({
-      success: true,
+      result: true,
       todos,
     });
   } catch (error) {
     console.log(error);
     return res.status(400).send({ errorMessage: error.message });
   }
-});
+}
 
-//할 일 생성
-router.post('/input', authMiddleware, async (req, res) => {
+async function postList(req, res) {
   try {
-    const { roomId } = req.body;
+    const roomId = Number(req.params.roomId);
     const { text, todoId } = req.body;
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
     const todo = await Todo.create({
@@ -38,46 +34,69 @@ router.post('/input', authMiddleware, async (req, res) => {
       text: text,
       date: date,
     });
-
+    await todo.save();
     if (!text) {
-      return res.status(401).json({ success: false, errorMessage: '빈 칸을 채워주세요.' });
+      return res.status(401).json({ result: false, errorMessage: '빈 칸을 채워주세요.' });
     }
     if (!todo) {
-      return res.status(401).json({ success: false, errorMessage: '할 일 생성 오류' });
+      return res.status(401).json({ result: false, errorMessage: '할 일 생성 오류' });
     }
 
+    const todos = await Todo.findOne({ todoId: todoId }).sort('-createAt').exec();
     res.status(201).json({
-      success: true,
-      todo,
+      result: true,
+      todos,
       msg: '할 일 목록 추가',
     });
   } catch (error) {
     console.log(error);
     return res.status(400).send({ errorMessage: error.message });
   }
-});
+}
 
-//할 일 삭제
-router.delete('/remove', authMiddleware, async (req, res) => {
+async function updateList(req, res) {
   try {
-    const { todoId } = req.body;
+    const todoId = Number(req.params.todoId);
+    const { text, checkBox } = req.body;
+    const check = await Todo.findOne({ todoId: todoId });
+    if (!check) {
+      return res.status(400).json({ result: false, msg: 'todo가 없습니다.' });
+    }
+
+    await Todo.updateOne({ todoId }, { $set: { checkBox: checkBox } });
+    await Todo.updateOne({ todoId }, { $set: { text: text } });
+
+    const todos = await Todo.findOne({ todoId: todoId }).sort('-createAt').exec();
+    res.status(200).json({
+      result: true,
+      todos,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({ errorMessage: error.message });
+  }
+}
+
+async function deleteList(req, res) {
+  try {
+    const todoId = Number(req.params.todoId);
     const deleteTodo = await Todo.findOne({ todoId });
     if (!todoId) {
-      return res.status(400).json({ success: false, errorMessage: 'todoId를 찾을 수 없습니다.' });
+      return res.status(400).json({ result: false, errorMessage: 'todoId를 찾을 수 없습니다.' });
     }
     if (!deleteTodo) {
-      return res.status(400).json({ success: false, errorMessage: '삭제 할 목록이 없습니다.' });
+      return res.status(400).json({ result: false, errorMessage: '삭제 할 목록이 없습니다.' });
     }
 
     await Todo.deleteOne({ todoId });
     res.status(200).json({
-      success: true,
+      result: true,
       msg: '할 일 목록이 삭제 되었습니다.',
     });
   } catch (error) {
     console.log(error);
     return res.status(400).send({ errorMessage: error.message });
   }
-});
+}
 
-module.exports = router;
+module.exports = { getList, postList, updateList, deleteList };

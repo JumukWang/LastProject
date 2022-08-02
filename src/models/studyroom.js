@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const { Schema } = mongoose;
+
 const studySchema = new Schema({
   roomId: {
     type: Number,
@@ -36,6 +37,9 @@ const studySchema = new Schema({
   groupNum: {
     type: Array,
   },
+  likeUser: {
+    type: Array,
+  },
   createAt: {
     type: Date,
     default: Date.now(),
@@ -50,9 +54,6 @@ const studySchema = new Schema({
   lock: {
     type: Boolean,
     require: true,
-  },
-  likeUser: {
-    type: Array,
   },
 });
 
