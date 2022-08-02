@@ -57,10 +57,8 @@ module.exports = async (req, res, next) => {
 
           return res.status(200).send({
             result: true,
-            token: {
-              accessToken: newToken,
-              refreshToken,
-            },
+            accessToken: newToken,
+            refreshToken,
           });
         }
       } else {
