@@ -21,15 +21,15 @@
 
 
 ## E-GLOO 백엔드 기술스택 🧑‍💻
-<img src="https://img.shields.io/badge/nodeJS-#339933?style=for-the-badge&logo=nodeJS&logoColor=white">
-<img src="https://img.shields.io/badge/docker-#2496ED?style=for-the-badge&logo=docker&logoColor=white">
-<img src="https://img.shields.io/badge/nginx-#009639?style=for-the-badge&logo=nginx&logoColor=white">
-<img src="https://img.shields.io/badge/github-#181717?style=for-the-badge&logo=github&logoColor=white">
-<img src="https://img.shields.io/badge/git-#F05032?style=for-the-badge&logo=git&logoColor=white">
-<img src="https://img.shields.io/badge/JSONWebTokens-#2496ED?style=for-the-badge&logo=JSONWebTokens&logoColor=white">
-<img src="https://img.shields.io/badge/mongodb-#47A248?style=for-the-badge&logo=mongodb&logoColor=white">
-<img src="https://img.shields.io/badge/githubaction-#2088FF?style=for-the-badge&logo=githubaction&logoColor=white">
-<img src="https://img.shields.io/badge/socketio-#010101?style=for-the-badge&logo=socketio&logoColor=white">
+<img src="https://img.shields.io/badge/nodeJS-339933?style=for-the-badge&logo=nodeJS&logoColor=white">
+<img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
+<img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
+<img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
+<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+<img src="https://img.shields.io/badge/JSONWebTokens-2496ED?style=for-the-badge&logo=JSONWebTokens&logoColor=white">
+<img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=mongodb&logoColor=white">
+<img src="https://img.shields.io/badge/githubaction-2088FF?style=for-the-badge&logo=githubaction&logoColor=white">
+<img src="https://img.shields.io/badge/socketio-010101?style=for-the-badge&logo=socketio&logoColor=white">
 
 
 ## E-GLOO 트러블슈팅 ❌
