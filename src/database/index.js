@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const connect = async () => {
   await mongoose
     .connect(
-      `mongodb+srv://${config.MONGO_USERNAME}:${config.MONGO_PASSWORD}@${config.MONGO_URL}/?retryWrites=true&w=majority`,
+      // `mongodb+srv://${config.MONGO_USERNAME}:${config.MONGO_PASSWORD}@${config.MONGO_URL}/?retryWrites=true&w=majority`,
+      "mongodb://localhost/last_pj111",
       {
         ignoreUndefined: true,
       },

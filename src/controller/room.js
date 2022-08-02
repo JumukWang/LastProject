@@ -55,7 +55,7 @@ async function publicRoom(req, res) {
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
-    const { groupNum, title } = await Room.findOne({ roomId: roomId });
+    const { groupNum, title, attendName } = await Room.findOne({ roomId: roomId });
     const { nickname } = await User.findOne({ userId: userId });
     if (groupNum.length >= 4) {
       return res.status(400).send({
@@ -82,6 +82,7 @@ async function publicRoom(req, res) {
         roomId,
         title,
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         start,
         email: total.email,
         day: total.day,
@@ -104,6 +105,7 @@ async function publicRoom(req, res) {
         roomId,
         title,
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         email: lasttotal.email,
         day: lasttotal.day,
         hour: Number(hour),
@@ -132,6 +134,7 @@ async function privateRoom(req, res) {
     const { groupNum, title, attendName } = await Room.findOne({ roomId: roomId });
     const { nickname } = await User.findOne({ userId: userId })
     const checkName = attendName.includes(nickname)
+    console.log(1)
     //패스워드 체크
     if (!password) {
       return res.status(400).json({ result: false, msg: "비밀번호를 입력해주세요." })
@@ -164,7 +167,8 @@ async function privateRoom(req, res) {
         return res.status(200).send({
           roomId,
           title,
-          groupNum: attendName.length,
+          groupNum,
+          attendNum: attendName.length,
           start,
           email: total.email,
           day: total.day,
@@ -185,7 +189,8 @@ async function privateRoom(req, res) {
         return res.status(200).send({
           roomId,
           title,
-          groupNum: attendName.length,
+          groupNum,
+          attendNum: attendName.length,
           email: lasttotal.email,
           day: lasttotal.day,
           hour: Number(hour),
@@ -226,6 +231,7 @@ async function privateRoom(req, res) {
         roomId,
         title,
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         start,
         email: total.email,
         day: total.day,
@@ -247,6 +253,7 @@ async function privateRoom(req, res) {
         roomId,
         title,
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         email: lasttotal.email,
         day: lasttotal.day,
         hour: Number(hour),
@@ -331,6 +338,7 @@ async function roomExit(req, res) {
 
       return res.status(400).json({
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         result: true,
         msg: '스터디 룸에서 나왔습니다.',
         out,
@@ -392,7 +400,8 @@ async function roomExit(req, res) {
     );
 
     return res.status(201).send({
-      groupNum: attendName.length,
+      groupNum,
+      attendNum: attendName.length,
       result: true,
       msg: '스터디 룸에서 나왔습니다.',
       out,
@@ -557,7 +566,7 @@ async function roomInfo(req, res) {
     return res.status(200).json({
       result: true,
       checkRoom,
-      attend: attendName.length,
+      attendNum: attendName.length,
       output,
     });
   } catch (error) {
