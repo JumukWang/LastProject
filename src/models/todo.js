@@ -8,6 +8,7 @@ const todoSchema = new Schema(
     todoId: { type: Number, unique: true },
     text: { type: String, required: true },
     date: { type: String },
+    checkBox: { type: Boolean, default: false },
   },
   {
     timestamps: true,
