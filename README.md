@@ -21,6 +21,7 @@
 
 
 ## E-GLOO 백엔드 기술스택 🧑‍💻
+<p>
 <img src="https://img.shields.io/badge/nodeJS-339933?style=for-the-badge&logo=nodeJS&logoColor=white">
 <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
 <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
@@ -30,6 +31,13 @@
 <img src="https://img.shields.io/badge/mongodb-47A248?style=for-the-badge&logo=mongodb&logoColor=white">
 <img src="https://img.shields.io/badge/githubaction-2088FF?style=for-the-badge&logo=githubaction&logoColor=white">
 <img src="https://img.shields.io/badge/socketio-010101?style=for-the-badge&logo=socketio&logoColor=white">
+<img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=aws&logoColor=white">
+<img src="https://img.shields.io/badge/pm2-2B037A?style=for-the-badge&logo=pm2&logoColor=white">
+<img src="https://img.shields.io/badge/babel-F9DC3E?style=for-the-badge&logo=babel&logoColor=white">
+<img src="https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=white">
+<img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white">
+
+<p>
 
 
 ## E-GLOO 트러블슈팅 ❌
