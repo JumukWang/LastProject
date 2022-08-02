@@ -37,35 +37,40 @@ userSchema.plugin(AutoIncrement, { inc_field: 'userId' });
 
 const User = mongoose.model('User', userSchema);
 
+async function newUser(user) {
+  return new User(user).save().then((data) => data.id);
+}
+
 async function findByUser(email) {
-  return await User.findOne({ email });
+  return User.findOne({ email });
 }
 
 async function nicknameCheck(nickname) {
-  return await User.findOne({ nickname });
+  return User.findOne({ nickname });
 }
 
 async function userMypage(userId) {
-  return await User.findOne({ userId: Number(userId) });
+  return User.findOne({ userId: Number(userId) });
 }
 
 async function userInfoUpdate(userId, nickname, hashPassword, passwordCheck, imgUrl) {
-  return await User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, imgUrl } });
+  return User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, imgUrl } });
 }
 
 async function userFind() {
-  return await User.find({}, { userId: 1, nickname: 1, email: 1 });
+  return User.find({}, { userId: 1, nickname: 1, email: 1 });
 }
 
 async function userRoomLikeUpdate(nickname, roomInfo) {
-  return await User.updateOne({ nickname }, { $push: { userLike: roomInfo } });
+  return User.updateOne({ nickname }, { $push: { userLike: roomInfo } });
 }
 
 async function userRoomDisLikeUpdate(nickname, roomInfo) {
-  return await User.updateOne({ nickname }, { $pull: { userLike: roomInfo } });
+  return User.updateOne({ nickname }, { $pull: { userLike: roomInfo } });
 }
 module.exports = {
   User,
+  newUser,
   findByUser,
   nicknameCheck,
   userMypage,

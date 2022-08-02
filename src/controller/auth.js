@@ -1,8 +1,8 @@
-const { User } = require('../models');
 const Bcrypt = require('bcrypt');
 const jwt = require('../util/jwt-util');
 const config = require('../config');
 const redisClient = require('../database/redis');
+const userData = require('../models/user');
 
 async function signup(req, res) {
   try {
@@ -10,9 +10,7 @@ async function signup(req, res) {
     const { email, nickname, password, passwordCheck } = req.body;
     const profileUrl = req.file;
     const imgFile = await profileUrl.transforms[0].location;
-    const exEmail = await User.findOne({
-      email,
-    });
+    const exEmail = await userData.findByUser(email);
 
     if (exEmail) {
       return res.status(400).send({
@@ -31,13 +29,12 @@ async function signup(req, res) {
     const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
     const hashPassword = await Bcrypt.hash(password, salt);
 
-    const user = new User({
+    const user = userData.newUser({
       email,
       nickname,
       password: hashPassword,
       profile_url: imgFile,
     });
-    await user.save();
 
     const token = jwt.authSign(user);
 
@@ -60,7 +57,7 @@ async function login(req, res) {
   try {
     // 여기도 중복검사, 해쉬화된 비밀번호 검증
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await userData.findByUser(email);
     if (!user) {
       return res.status(400).send({
         msg: '아이디 혹은 비밀번호를 확인해주세요.',
@@ -105,7 +102,7 @@ async function login(req, res) {
 async function exnickname(req, res) {
   try {
     const { nickname } = req.body;
-    const exNick = await User.findOne({ nickname });
+    const exNick = await userData.nicknameCheck(nickname);
 
     if (exNick) {
       return res.status(400).send({

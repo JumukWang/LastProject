@@ -55,7 +55,7 @@ async function publicRoom(req, res) {
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
-    const { groupNum, title } = await Room.findOne({ roomId: roomId });
+    const { groupNum, title, attendName } = await Room.findOne({ roomId: roomId });
     const { nickname } = await User.findOne({ userId: userId });
     if (groupNum.length >= 4) {
       return res.status(400).send({
@@ -82,6 +82,7 @@ async function publicRoom(req, res) {
         roomId,
         title,
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         start,
         email: total.email,
         day: total.day,
@@ -104,6 +105,7 @@ async function publicRoom(req, res) {
         roomId,
         title,
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         email: lasttotal.email,
         day: lasttotal.day,
         hour: Number(hour),
@@ -136,7 +138,7 @@ async function privateRoom(req, res) {
     if (!password) {
       return res.status(400).json({ result: false, msg: '비밀번호를 입력해주세요.' });
     }
-    if (passCheck.password !== password) {
+    if (Number(passCheck.password) !== Number(password)) {
       return res.status(401).send({ msg: '비밀번호가 틀렸습니다 ' });
     }
     //이미 참여인원이면 실시간 인원수만 추가
@@ -148,8 +150,56 @@ async function privateRoom(req, res) {
         });
       }
       await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
-      return res.status(200).json({ result: true, msg: `'${title}'에 입장하였습니다.` });
+
+      //시간
+      const email = req.email;
+      const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      const now = new Date();
+      const day = now.getDay();
+      const inTimestamp = now.getTime();
+      const start = await Studytime.create({ email, startTime, day, inTimestamp });
+      const total = await Studytime.find({ email, day: day });
+
+      if (total.length === 1) {
+        return res.status(200).send({
+          roomId,
+          title,
+          groupNum,
+          attendNum: attendName.length,
+          start,
+          email: total.email,
+          day: total.day,
+          hour: 0,
+          minute: 0,
+          second: 0,
+          todayrecord: 0,
+          weekrecord: 0,
+        });
+      } else {
+        const lasttotal = total.slice(-2)[0];
+        console.log(lasttotal);
+        let hour = lasttotal.todaysum.substr(0, 2);
+        let minute = lasttotal.todaysum.substr(3, 2);
+        let second = lasttotal.todaysum.substr(6, 2);
+        console.log(hour, minute, second);
+
+        return res.status(200).send({
+          roomId,
+          title,
+          groupNum,
+          attendNum: attendName.length,
+          email: lasttotal.email,
+          day: lasttotal.day,
+          hour: Number(hour),
+          minute: Number(minute),
+          second: Number(second),
+          todayrecord: lasttotal.todaysum,
+          weekrecord: lasttotal.weeksum,
+          msg: `'${title}'에 입장하였습니다.`,
+        });
+      }
     }
+
     //미참여인원은 참여정원확인 후 입장
     if (attendName.length >= 4) {
       return res.status(400).send({
@@ -175,6 +225,7 @@ async function privateRoom(req, res) {
         roomId,
         title,
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         start,
         email: total.email,
         day: total.day,
@@ -196,6 +247,7 @@ async function privateRoom(req, res) {
         roomId,
         title,
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         email: lasttotal.email,
         day: lasttotal.day,
         hour: Number(hour),
@@ -219,10 +271,10 @@ async function roomExit(req, res) {
   try {
     const userId = Number(req.params.userId);
     const roomId = Number(req.params.roomId);
-    const { groupNum, lock } = await Room.findOne({ roomId: roomId });
+    const { groupNum, lock, attendName } = await Room.findOne({ roomId: roomId });
     const { nickname } = await User.findOne({ userId: userId });
 
-    if (groupNum <= 0) {
+    if (groupNum.length <= 0) {
       return res.status(400).send({
         result: false,
         msg: '참여 인원이 없습니다.',
@@ -280,6 +332,7 @@ async function roomExit(req, res) {
 
       return res.status(400).json({
         groupNum: roomInfo.groupNum,
+        attendNum: attendName.length,
         result: true,
         msg: '스터디 룸에서 나왔습니다.',
         out,
@@ -341,7 +394,8 @@ async function roomExit(req, res) {
     );
 
     return res.status(201).send({
-      groupNum: roomInfo.groupNum,
+      groupNum,
+      attendNum: attendName.length,
       result: true,
       msg: '스터디 룸에서 나왔습니다.',
       out,
@@ -489,7 +543,7 @@ async function roomInfo(req, res) {
     //위 조건의 결과를 이중for문으로 뽑아내고,
     //동적인 key값을 적용시켜 출력 ex) output: {aa:bb}
     let output = [];
-    let keyname = '';
+    // let keyname = '';
     let nick = 'nickname';
     let image = 'imageUrl';
     for (let i in attendInfo) {
@@ -497,7 +551,7 @@ async function roomInfo(req, res) {
         const aa = attendInfo[i][j].nickname;
         const bb = attendInfo[i][j].profile_url;
         let something = {};
-        something[nick] = keyname + aa;
+        something[nick] = aa;
         something[image] = bb;
         output.push(something);
       }
@@ -506,7 +560,7 @@ async function roomInfo(req, res) {
     return res.status(200).json({
       result: true,
       checkRoom,
-      attend: attendName.length,
+      attendNum: attendName.length,
       output,
     });
   } catch (error) {
@@ -539,7 +593,7 @@ async function outRoom(req, res) {
       return res.status(400).json({ result: false, msg: '참여 인원이 없습니다.' });
     }
 
-    await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
+    await Room.updateOne({ roomId: roomId }, { $pull: { groupNum: userId } });
     await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
 

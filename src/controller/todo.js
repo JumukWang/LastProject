@@ -28,21 +28,20 @@ async function postList(req, res) {
     const roomId = Number(req.params.roomId);
     const { text, todoId } = req.body;
     const date = moment().format('YYYY-MM-DD HH:mm:ss');
-    const todo = await Todo.create({
+    const todos = await Todo.create({
       roomId: Number(roomId),
       todoId,
       text: text,
       date: date,
     });
-    await todo.save();
+    await todos.save();
     if (!text) {
       return res.status(401).json({ result: false, errorMessage: '빈 칸을 채워주세요.' });
     }
-    if (!todo) {
+    if (!todos) {
       return res.status(401).json({ result: false, errorMessage: '할 일 생성 오류' });
     }
 
-    const todos = await Todo.findOne({ todoId: todoId }).sort('-createAt').exec();
     res.status(201).json({
       result: true,
       todos,

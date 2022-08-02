@@ -60,7 +60,11 @@ const studySchema = new Schema({
 studySchema.plugin(AutoIncrement, { inc_field: 'roomId' });
 const Room = mongoose.model('Room', studySchema);
 
-async function roomList() {
+async function mainRoomList() {
+  return await Room.find({}).sort({ createAt: -1 }).skip().limit();
+}
+
+async function allRoomList() {
   return await Room.find({}).sort({ create: -1 });
 }
 
@@ -82,4 +86,4 @@ async function roomTagLength(tagName) {
   return await Room.find({ tagName });
 }
 
-module.exports = { Room, roomList, roomNumber, roomLikeUpdate, roomTagName, roomTagLength };
+module.exports = { Room, allRoomList, roomNumber, roomLikeUpdate, roomTagName, roomTagLength };

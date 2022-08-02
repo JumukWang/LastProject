@@ -1,11 +1,12 @@
 require('dotenv').config();
 const { Room, User } = require('../models');
+const roomData = require('../models/studyroom');
 
 async function main(req, res) {
   try {
     const page = Number(req.query.page || 1);
     const perPage = Number(req.query.perPage || 6);
-    const roomLength = await Room.find({});
+    const roomLength = roomData.allRoomList();
     const mainLength = roomLength.length;
     const roomList = await Room.find({})
       .sort({ createAt: -1 })
