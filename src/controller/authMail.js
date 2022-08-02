@@ -1,12 +1,10 @@
-const express = require('express');
-const router = express.Router();
 const nodemailer = require('nodemailer');
 const ejs = require('ejs');
 const path = require('path');
 const appDir = path.dirname(require.main.filename);
 const config = require('../config');
 
-router.post('/', async (req, res) => {
+async function authMail(req, res) {
   let authNum = Math.random().toString().substr(2, 6);
   let emailTemplete;
   ejs.renderFile(appDir + '/src/template/mail.ejs', { authCode: authNum }, function (err, data) {
@@ -42,6 +40,6 @@ router.post('/', async (req, res) => {
     res.send({ authNum, success: true });
     transporter.close();
   });
-});
+}
 
-module.exports = router;
+module.exports = authMail;

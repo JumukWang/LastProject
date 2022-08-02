@@ -1,7 +1,6 @@
 require('dotenv').config();
 const Todo = require('../models/todo');
 
-
 const moment = require('moment');
 
 async function getList(req, res) {

@@ -4,7 +4,7 @@ const userRouter = require('./mypage');
 const roomRouter = require('./room');
 const todoRouter = require('./todo');
 const mainRouter = require('./main');
-const authMail = require('./authMail');
+const authMail = require('../controller/authMail');
 const { logging } = require('../middlewares');
 
 router.use('/auth', logging, authRouter);
