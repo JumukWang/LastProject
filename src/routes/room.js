@@ -61,15 +61,16 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
     const { groupNum, title } = await Room.findOne({ roomId: roomId });
-    if (groupNum >= 4) {
+    const { nickname } = await User.findOne({ userId: userId });
+    if (groupNum.length >= 4) {
       return res.status(400).send({
         result: false,
         msg: '정원이 초과되었습니다.',
       });
     }
 
-    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
-    // await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
+    await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
+    await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
     const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화
     await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } });
 
@@ -146,13 +147,13 @@ router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) =>
     }
     //이미 참여인원이면 실시간 인원수만 추가
     if (checkName === true) {
-      if (groupNum >= 4) {
+      if (groupNum.length >= 4) {
         return res.status(400).send({
           result: false,
           msg: '정원이 초과되었습니다.',
         });
       }
-      await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
+      await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
       return res.status(200).json({ result: true, msg: `'${title}'에 입장하였습니다.` });
     }
     //미참여인원은 참여정원확인 후 입장
@@ -162,7 +163,7 @@ router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) =>
         msg: '정원이 초과되었습니다.',
       });
     }
-    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
+    await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
     await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
     const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화
     await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } });
@@ -228,7 +229,7 @@ router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
     const roomId = Number(req.params.roomId);
     const { groupNum } = await Room.findOne({ roomId: roomId });
 
-    if (groupNum <= 0) {
+    if (groupNum.length <= 0) {
       return res.status(400).send({
         result: false,
         msg: '참여 인원이 없습니다.',
@@ -435,7 +436,7 @@ router.put('/invite', authMiddleware, async (req, res) => {
       return res.status(400).json({ result: false, msg: '정원 초과입니다.' });
     }
 
-    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: 1 } });
+    await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
     await Room.findOneAndUpdate({ roomId }, { $push: { attendName: nickname } });
     await User.findOneAndUpdate({ userId }, { $push: { attendRoom: roomId } });
 
@@ -525,7 +526,7 @@ router.post('/outroom/:roomId/:userId', authMiddleware, async (req, res) => {
       return res.status(400).json({ result: false, msg: '참여 인원이 없습니다.' });
     }
 
-    await Room.updateOne({ roomId: roomId }, { $inc: { groupNum: -1 } });
+    await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
     await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
 
