@@ -38,7 +38,7 @@ router.get('/:userId', authMiddleware, async (req, res) => {
     }
     const hostInfo = flat3.flat(1);
 
-    res.status(200).send({
+    return res.status(200).send({
       result: true,
       myPage,
       likeInfo,
@@ -49,7 +49,7 @@ router.get('/:userId', authMiddleware, async (req, res) => {
       hostInfoLength: hostInfo.length,
     });
   } catch (error) {
-    res.status(400).send({
+    return res.status(400).send({
       result: false,
       msg: error.message,
     });
