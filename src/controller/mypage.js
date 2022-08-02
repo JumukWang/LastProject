@@ -2,7 +2,7 @@ require('dotenv').config();
 const { User, Day, Studytime, Room } = require('../models');
 const Bcrypt = require('bcrypt');
 const config = require('../config');
-const { daySet } = require('../routes/studytime');
+const { daySet } = require('./studytime');
 const { profileDelete } = require('../middlewares/upload');
 
 async function mypage(req, res) {
