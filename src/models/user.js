@@ -65,13 +65,6 @@ async function userFind() {
   return User.find({}, { userId: 1, nickname: 1, email: 1 });
 }
 
-async function userRoomLikeUpdate(nickname, roomInfo) {
-  return User.updateOne({ nickname }, { $push: { userLike: roomInfo } });
-}
-
-async function userRoomDisLikeUpdate(nickname, roomInfo) {
-  return User.updateOne({ nickname }, { $pull: { userLike: roomInfo } });
-}
 module.exports = {
   User,
   newUser,
@@ -81,6 +74,4 @@ module.exports = {
   userMypage,
   userInfoUpdate,
   userFind,
-  userRoomLikeUpdate,
-  userRoomDisLikeUpdate,
 };
