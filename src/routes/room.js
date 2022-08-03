@@ -23,14 +23,14 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
         title,
         content,
         date,
-        tagName: [tagName, "전체"],
+        tagName,
         imgUrl : imgFile,
         lock : flag,
       });
       await newPublicRoom.save();
       const roomNum = Number(newPublicRoom.roomId);
       await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-      await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+      await User.updateOne({ userId: host }, { $push: { hostRoom: newPublicRoom } });
       return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
     }
 
@@ -42,13 +42,13 @@ router.post('/create/:userId', authMiddleware, roomUpload.single('imgUrl'),  asy
         password,
         content,
         date,
-        tagName: [tagName, "전체"],
+        tagName: ["전체", tagName],
         imgUrl : imgFile,
         lock : flag
       });
       const roomNum = Number(newPrivaeRoom.roomId);
       await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-      await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+      await User.updateOne({ userId: host }, { $push: { hostRoom: newPublicRoom } });
       return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPrivaeRoom });
     }
   } catch (error) {
@@ -76,8 +76,8 @@ router.post('/public-room/:roomId/:userId', authMiddleware, async (req, res) => 
 
     await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
     await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
-    const roomInfo = await Room.findOne({ roomId: roomId })       //정보 최신화
-    await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } })
+    const roomInfo = await Room.findOne({ roomId: roomId })
+    await User.updateOne({ userId: userId }, { $push: { attendRoom: roomInfo } })
 
     const email = req.email;
     const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -219,7 +219,7 @@ router.post('/private-room/:roomId/:userId', authMiddleware, async (req, res) =>
     await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
     await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
     const roomInfo = await Room.findOne({ roomId: roomId })       //정보 최신화
-    await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } })
+    await User.updateOne({ userId: userId }, { $push: { attendRoom: roomInfo } })
 
 
     const email = req.email;
@@ -284,7 +284,7 @@ router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
     const roomId = Number(req.params.roomId);
     const { groupNum, lock } = await Room.findOne({ roomId: roomId })
     const { nickname } = await User.findOne({ userId: userId })
-    
+    const roomCheck = await Room.findOne({ roomId: roomId })
     if (groupNum <= 0) {
       return res.status(400).send({
         result: false,
@@ -351,9 +351,10 @@ router.post('/exit/:roomId/:userId', authMiddleware, async (req, res) => {
     }
 
 //lock === false면 (공개방이면)
+    await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomCheck } }) 
     await Room.updateOne({ roomId: roomId }, { $pull: { groupNum: userId } });
     await Room.findOneAndUpdate({ roomId },{ $pull: { attendName: nickname }});
-    await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } })
+    // await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } })
 
     const roomInfo = await Room.findOne({ roomId: roomId })     //정보 최신화 후 res.
 
