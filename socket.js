@@ -20,46 +20,35 @@ const io = require('socket.io')(server, {
     subClient: redisClient.duplicate(),
   }),
 });
-const { RedisMessageStore } = require('./src/server/messageStore');
-const messageStore = new RedisMessageStore(redisClient);
 
 const users = {};
+
 const socketToRoom = {};
 const socketToNickname = {};
 const socketToUser = {};
+const socketToProfileImg = {};
 
 io.on('connection', (socket) => {
   let roomId;
-  socket.on('join room', async (payload) => {
+  socket.on('join room', (payload) => {
+    console.log(payload);
     roomId = payload.roomId;
-    const [messages] = await Promise.all([messageStore.findMessagesForUser(payload.nickname)]);
-    const messagePerUser = new Map();
-    messages.forEach((payload) => {
-      const { from, to } = payload;
-      const otherUser = payload.nickname === from ? to : from;
-      if (messagePerUser.has(otherUser)) {
-        messagePerUser.get(otherUser).push(payload);
-      } else {
-        messagePerUser.set(otherUser, [payload]);
-      }
-    });
-
-    socket.emit('users', users);
     if (users[roomId]) {
       users[roomId].push(socket.id);
     } else {
       users[roomId] = [socket.id];
     }
     socket.join(roomId);
-    socket.to(roomId).emit('welcome', { author: payload.nickname });
     console.log(`User with ID: ${socket.id} joined room: ${roomId} nick:${payload.nickname}`);
 
     socketToRoom[socket.id] = roomId;
     socketToNickname[socket.id] = payload.nickname;
+    socketToProfileImg[socket.id] = payload.profileImg;
 
     socketToUser[socket.id] = {
       test: 'test',
       nickname: payload.nickname,
+      profileImg: payload.profileImg,
       //   profileImg: payload.profileImg,
     };
     const others = users[roomId].filter((id) => id !== socket.id);
@@ -68,6 +57,7 @@ io.on('connection', (socket) => {
       return {
         socketId,
         nickname: socketToNickname[socketId],
+        profileImg: socketToProfileImg[socketId],
       };
     });
 
@@ -76,11 +66,13 @@ io.on('connection', (socket) => {
 
   socket.on('sending signal', (payload) => {
     const callerNickname = socketToNickname[payload.callerID];
+    const callerProfileImg = socketToProfileImg[payload.callerID];
     const userInfo = socketToUser[socket.id];
     io.to(payload.userToSignal).emit('user joined', {
       signal: payload.signal,
       callerID: payload.callerID,
       callerNickname,
+      callerProfileImg,
       userInfo,
     });
   });
@@ -91,33 +83,12 @@ io.on('connection', (socket) => {
       id: socket.id,
     });
   });
-
   socket.on('send_message', (payload) => {
-    socket.to(payload.nick).emit('receive_message', payload);
-    messageStore.saveMessage(payload);
+    socket.to(payload.roomId).emit('receive_message', payload);
     console.log(payload);
   });
 
-  socket.on('exit room', () => {
-    if (users[roomId]) {
-      users[roomId] = users[roomId].filter((id) => id !== socket.id);
-
-      const userInfo = socketToUser[socket.id];
-
-      socket.broadcast.to(roomId).emit('user left', {
-        socketId: socket.id,
-        userInfo,
-      });
-
-      socket.leave(roomId);
-
-      delete socketToNickname[socket.id];
-      delete socketToUser[socket.id];
-      delete socketToRoom[socket.id];
-    }
-  });
-
-  socket.on('disconnect', () => {
+  socket.on('disconnecting', () => {
     if (users[roomId]) {
       users[roomId] = users[roomId].filter((id) => id !== socket.id);
 

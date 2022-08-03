@@ -48,7 +48,7 @@ async function roomLike(req, res) {
     const [user] = await roomData.allRoomList(roomId);
     const likedUser = user.likeUser;
     return res.status(201).send({
-      // result: true,
+      result: true,
       likeUser: likedUser,
       likeStatus: likeStatus,
       msg: msg,

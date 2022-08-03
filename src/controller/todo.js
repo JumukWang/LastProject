@@ -18,7 +18,6 @@ async function getList(req, res) {
       todos,
     });
   } catch (error) {
-    console.log(error);
     return res.status(400).send({ errorMessage: error.message });
   }
 }

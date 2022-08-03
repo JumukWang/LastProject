@@ -66,8 +66,8 @@ async function publicRoom(req, res) {
 
     await Room.updateOne({ roomId: roomId }, { $push: { groupNum: userId } });
     await Room.updateOne({ roomId: roomId }, { $push: { attendName: nickname } });
-    const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화
     await User.updateOne({ userId: userId }, { $push: { attendRoom: roomId } });
+    const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화
 
     const email = req.email;
     const startTime = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -95,11 +95,9 @@ async function publicRoom(req, res) {
       });
     } else {
       const lasttotal = total.slice(-2)[0];
-      console.log(lasttotal);
       let hour = lasttotal.todaysum.substr(0, 2);
       let minute = lasttotal.todaysum.substr(3, 2);
       let second = lasttotal.todaysum.substr(6, 2);
-      console.log(hour, minute, second);
 
       return res.status(200).send({
         roomId,
@@ -177,11 +175,9 @@ async function privateRoom(req, res) {
         });
       } else {
         const lasttotal = total.slice(-2)[0];
-        console.log(lasttotal);
         let hour = lasttotal.todaysum.substr(0, 2);
         let minute = lasttotal.todaysum.substr(3, 2);
         let second = lasttotal.todaysum.substr(6, 2);
-        console.log(hour, minute, second);
 
         return res.status(200).send({
           roomId,
@@ -288,8 +284,7 @@ async function roomExit(req, res) {
       //시간저장
       const email = req.email;
 
-      const { todayStart, weekStart, weekEnd } = timeSet();
-      console.log(todayStart, weekStart, weekEnd);
+      const { todayStart } = timeSet();
       const outTime = moment().format('YYYY-MM-DD HH:mm:ss');
       const now = new Date();
       const day = now.getDay();
@@ -304,7 +299,6 @@ async function roomExit(req, res) {
       const arr_alloutTime = alloutTime[alloutTime.length - 1]; //맨마지막타임아웃
       const timedif = arr_alloutTime - arr_allinTime;
       const finaltime = changeTime(timedif);
-      console.log('hi');
       await Studytime.updateOne({ outTimestamp: arr_alloutTime }, { $set: { studytime: finaltime, timedif: timedif } });
       await Studytime.updateOne({ inTimestamp: arr_allinTime }, { $set: { studytime: finaltime, timedif: timedif } });
 
@@ -346,13 +340,10 @@ async function roomExit(req, res) {
     await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
 
-    const roomInfo = await Room.findOne({ roomId: roomId }); //정보 최신화 후 res.
-
     //시간저장
     const email = req.email;
 
-    const { todayStart, weekStart, weekEnd } = timeSet();
-    console.log(todayStart, weekStart, weekEnd);
+    const { todayStart } = timeSet();
     const outTime = moment().format('YYYY-MM-DD HH:mm:ss');
     const now = new Date();
     const day = now.getDay();
@@ -367,7 +358,7 @@ async function roomExit(req, res) {
     const arr_alloutTime = alloutTime[alloutTime.length - 1]; //맨마지막타임아웃
     const timedif = arr_alloutTime - arr_allinTime;
     const finaltime = changeTime(timedif);
-    console.log('hi');
+
     await Studytime.updateOne({ outTimestamp: arr_alloutTime }, { $set: { studytime: finaltime, timedif: timedif } });
     await Studytime.updateOne({ inTimestamp: arr_allinTime }, { $set: { studytime: finaltime, timedif: timedif } });
 
@@ -494,7 +485,6 @@ async function enteredRoom(req, res) {
       quantity: attendRoom.length,
     });
   } catch (error) {
-    console.log(error);
     res.status(400).send({ errorMessage: error.message });
   }
 }
@@ -516,7 +506,6 @@ async function hostRoom(req, res) {
       quantity: hostRoom.length,
     });
   } catch (error) {
-    console.log(error);
     res.status(400).send({ errorMessage: error.message });
   }
 }
@@ -531,7 +520,6 @@ async function roomInfo(req, res) {
     const { attendName } = await Room.findOne({ roomId: roomId });
 
     //참여인원 프로필사진 각각 매칭해서 출력하기
-    console.log(attendName);
     //방에 참여중인 인원만 파악해서 출력
     let attendInfo = [];
     for (let i in attendName) {
@@ -539,11 +527,9 @@ async function roomInfo(req, res) {
         attendInfo.push(await User.find({ nickname: attendName[i] }));
       }
     }
-    console.log(attendInfo);
     //위 조건의 결과를 이중for문으로 뽑아내고,
     //동적인 key값을 적용시켜 출력 ex) output: {aa:bb}
     let output = [];
-    // let keyname = '';
     let nick = 'nickname';
     let image = 'imageUrl';
     for (let i in attendInfo) {
@@ -564,7 +550,6 @@ async function roomInfo(req, res) {
       output,
     });
   } catch (error) {
-    console.log(error);
     res.status(400).send({ result: false, errorMessage: error.message });
   }
 }
@@ -574,10 +559,8 @@ async function outRoom(req, res) {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
     const { groupNum, title, attendName, hostId } = await Room.findOne({ roomId: roomId });
-    console.log(attendName);
     const { nickname } = await User.findOne({ userId: userId });
     const checkName = attendName.includes(nickname);
-    console.log(checkName);
 
     if (hostId === userId) {
       await Room.findOneAndDelete({ roomId }, { hostId: userId });
@@ -602,7 +585,6 @@ async function outRoom(req, res) {
       msg: `${title} 스터디룸을 탈퇴 하였습니다.`,
     });
   } catch (error) {
-    console.log(error);
     res.status(400).send({ result: false, errorMessage: error.message });
   }
 }

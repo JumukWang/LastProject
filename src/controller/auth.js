@@ -35,7 +35,6 @@ async function signup(req, res) {
       password: hashPassword,
       profile_url: imgFile,
     });
-
     const token = jwt.authSign(user);
 
     return res.status(200).send({

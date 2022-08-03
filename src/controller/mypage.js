@@ -56,11 +56,8 @@ async function mypage(req, res) {
 async function mypageUpdate(req, res) {
   const userId = Number(req.params.userId);
   const findUser = await User.findOne({ userId });
-  console.log(findUser);
   const { nickname, password, passwordCheck } = req.body;
   try {
-    const user = await User.findOne({ userId: Number(userId) });
-    console.log(user);
     if (passwordCheck !== password) {
       return res.send({
         result: false,
@@ -71,7 +68,6 @@ async function mypageUpdate(req, res) {
     const hashPassword = await Bcrypt.hash(password, salt);
 
     const newprofileUrl = req.file; //추가
-    console.log(newprofileUrl);
     if (newprofileUrl) {
       profileDelete(findUser.profile_url);
       await User.updateOne(
@@ -106,7 +102,6 @@ async function mypageUpdate(req, res) {
 async function userSearch(req, res) {
   try {
     const users = await User.find({}, { userId: 1, nickname: 1, email: 1 });
-    console.log(users);
     return res.status(200).json({
       result: true,
       users,
