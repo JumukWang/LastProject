@@ -51,6 +51,8 @@ async function roomCreate(req, res) {
   }
 }
 
+
+// 공개방 입장
 async function publicRoom(req, res) {
   try {
     const roomId = Number(req.params.roomId);
@@ -125,6 +127,8 @@ async function publicRoom(req, res) {
   }
 }
 
+
+// 비밀방 입장
 async function privateRoom(req, res) {
   try {
     const roomId = Number(req.params.roomId);
@@ -203,7 +207,7 @@ async function privateRoom(req, res) {
       }
     }
 
-    //미참여인원은 참여정원확인 후 입장
+  //미참여인원은 참여정원확인 후 입장
     if (attendName.length >= 4) {
       return res.status(400).send({
         result: false,
@@ -273,6 +277,7 @@ async function privateRoom(req, res) {
   }
 }
 
+// 방 나가기
 async function roomExit(req, res) {
   try {
     const userId = Number(req.params.userId);
@@ -347,7 +352,7 @@ async function roomExit(req, res) {
       });
     }
 
-    //lock === false면 (공개방이면)
+  //lock === false면 (공개방이면)
     await Room.updateOne({ roomId: roomId }, { $pull: { groupNum: userId } });
     await Room.findOneAndUpdate({ roomId }, { $pull: { attendName: nickname } });
     await User.findOneAndUpdate({ userId }, { $pull: { attendRoom: roomId } });
@@ -417,6 +422,7 @@ async function roomExit(req, res) {
   }
 }
 
+// 방 삭제
 async function deleteRoom(req, res) {
   try {
     const roomId = Number(req.params.roomId);
@@ -442,6 +448,7 @@ async function deleteRoom(req, res) {
   }
 }
 
+// 스터디룸 검색
 async function searchRoom(req, res) {
   const { word } = req.params;
   let roomArr = [];
@@ -461,6 +468,7 @@ async function searchRoom(req, res) {
   }
 }
 
+// 찜한 방 조회
 async function userLikeRoom(req, res) {
   try {
     const userId = Number(req.params.userId);
@@ -483,6 +491,7 @@ async function userLikeRoom(req, res) {
   }
 }
 
+// 참여중인 방 조회
 async function enteredRoom(req, res) {
   try {
     const userId = Number(req.params.userId);
@@ -505,6 +514,7 @@ async function enteredRoom(req, res) {
   }
 }
 
+// 호스트인 룸 조회
 async function hostRoom(req, res) {
   try {
     const userId = Number(req.params.userId);
@@ -527,6 +537,7 @@ async function hostRoom(req, res) {
   }
 }
 
+// 방 정보창
 async function roomInfo(req, res) {
   try {
     const { roomId } = req.params;
@@ -575,6 +586,7 @@ async function roomInfo(req, res) {
   }
 }
 
+// 방 탈퇴
 async function outRoom(req, res) {
   try {
     const roomId = Number(req.params.roomId);
