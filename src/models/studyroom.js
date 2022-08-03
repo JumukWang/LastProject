@@ -39,6 +39,7 @@ const studySchema = new Schema({
   },
   likeUser: {
     type: Array,
+    default: [1],
   },
   createAt: {
     type: Date,
@@ -60,30 +61,33 @@ const studySchema = new Schema({
 studySchema.plugin(AutoIncrement, { inc_field: 'roomId' });
 const Room = mongoose.model('Room', studySchema);
 
-async function mainRoomList() {
-  return await Room.find({}).sort({ createAt: -1 }).skip().limit();
+async function mainRoomList(perPage, page) {
+  return Room.find({})
+    .sort({ createAt: -1 })
+    .skip(perPage * (page - 1))
+    .limit(perPage);
 }
 
-async function allRoomList() {
-  return await Room.find({}).sort({ create: -1 });
+async function allRoomList(roomId) {
+  return Room.find({ roomId });
 }
 
 async function roomNumber(roomId) {
-  return await Room.findOne({ roomId });
+  return Room.findOne({ roomId });
 }
 
-async function roomLikeUpdate(roomId) {
-  return await Room.updateOne({ roomId }), { $set: { isLiked: true } };
+async function roomLikeUserUpdate(roomId, userId) {
+  return Room.updateOne({ roomId }), { $push: { likeUser: userId } };
 }
 
-async function roomTagName(tagName) {
-  return await Room.find({ tagName })
-    .sord('-createAt')
-    .skip((tagName - 1) * 2)
-    .limit(6);
+async function roomTagName(tagName, perPage, page) {
+  return Room.find({ tagName })
+    .sord({ createAt: -1 })
+    .skip(perPage * (page - 1))
+    .limit(perPage);
 }
 async function roomTagLength(tagName) {
-  return await Room.find({ tagName });
+  return Room.find({ tagName });
 }
 
-module.exports = { Room, allRoomList, roomNumber, roomLikeUpdate, roomTagName, roomTagLength };
+module.exports = { Room, allRoomList, roomNumber, roomLikeUserUpdate, roomTagName, roomTagLength, mainRoomList };

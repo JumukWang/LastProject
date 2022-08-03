@@ -49,6 +49,10 @@ async function nicknameCheck(nickname) {
   return User.findOne({ nickname });
 }
 
+async function userRoomLike(userId, roomId) {
+  return User.updateOne({ userId }, { $pull: { userLike: roomId } });
+}
+
 async function userMypage(userId) {
   return User.findOne({ userId: Number(userId) });
 }
@@ -72,6 +76,7 @@ module.exports = {
   User,
   newUser,
   findByUser,
+  userRoomLike,
   nicknameCheck,
   userMypage,
   userInfoUpdate,

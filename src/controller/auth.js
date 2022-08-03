@@ -29,7 +29,7 @@ async function signup(req, res) {
     const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
     const hashPassword = await Bcrypt.hash(password, salt);
 
-    const user = userData.newUser({
+    const user = await userData.newUser({
       email,
       nickname,
       password: hashPassword,
@@ -44,11 +44,10 @@ async function signup(req, res) {
       accessToken: token,
     });
   } catch (error) {
-    console.error(error);
     return res.status(400).send({
       result: false,
       msg: '다시 회원가입을 신청해 주세요',
-      message: error.message,
+      errmsg: error.message,
     });
   }
 }
@@ -69,7 +68,7 @@ async function login(req, res) {
     }
     if (!bcpassword) {
       return res.status(400).send({
-        errorMessage: '이메일 또는 패스워드가 틀렸습니다.',
+        errmsg: '이메일 또는 패스워드가 틀렸습니다.',
         result: false,
       });
     }
@@ -94,7 +93,7 @@ async function login(req, res) {
     return res.status(400).send({
       result: false,
       msg: '다시 로그인 신청해 주세요',
-      message: error.message,
+      errmsg: error.message,
     });
   }
 }
@@ -115,7 +114,10 @@ async function exnickname(req, res) {
       msg: '사용 가능한 닉네임 입니다.',
     });
   } catch (error) {
-    error.message;
+    return res.status(400).send({
+      result: false,
+      errmsg: error.message,
+    });
   }
 }
 
