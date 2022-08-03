@@ -1,3 +1,4 @@
+![스크린샷 2022-08-01 20 43 59](https://user-images.githubusercontent.com/96240712/182506934-208475f8-70c1-408e-819d-a25d5b425551.png)
 # E-GLOO ⛄️
 
 ## E-GLOO ⛄️ : https://www.egloo.link
