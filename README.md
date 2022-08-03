@@ -23,7 +23,7 @@
 
 ## E-GLOO 백엔드 기술스택 🧑‍💻
 <div align = "center">
-<p>
+<p align = "center">
 <img src="https://img.shields.io/badge/nodeJS-339933?style=for-the-badge&logo=nodeJS&logoColor=white">
 <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white">
 <img src="https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white">
