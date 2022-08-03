@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-
-=======
 ![스크린샷 2022-08-01 20 43 59](https://user-images.githubusercontent.com/96240712/182506934-208475f8-70c1-408e-819d-a25d5b425551.png)
->>>>>>> d5f26c2f7db74100739f4f124b9489d4c9412a9b
 # E-GLOO ⛄️
 
 ## E-GLOO ⛄️ : https://www.egloo.link
