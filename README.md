@@ -60,17 +60,13 @@ TimeStamp로 시간을 비교하여 타이머를 구현하는 과정에서 UTC�
 
 2. UTC기준으로 측정되어 있는 것이므로 KST시간으로 변경하기 위해 -9을 해준 후 오늘과 내일 TimeStamp의 차이에 있는 시간대를 불러왔습니다. 또한 todayStart함수를 조정하여 UTC시간 기준으로 매일이 바뀌게 설정하였습니다. 
 
-https://s3.us-west-2.amazonaws.com/secure.notion-static.com/14bcc76d-ef19-4b18-80b0-ec075073d82e/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220804%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220804T124823Z&X-Amz-Expires=86400&X-Amz-Signature=1a488636d1378d39b082b5184c0528aae1119fc6ed0cc66213b4454fc83d2a65&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22&x-id=GetObject
+https://s3.us-west-2.amazonaws.com/secure.notion-static.com/14bcc76d-ef19-4b18-80b0-ec075073d82e/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220804%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220804T124928Z&X-Amz-Expires=86400&X-Amz-Signature=25d3f69db2d1eca879176cbf79ec127a808977ecd38abaf2e03bc568d1b81597&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22&x-id=GetObject
 
 3. 시간대 변경에 따른 로컬환경에서 new Date()의 변화를 확인 할 수 있었습니다.  AWS 인스턴스  환경에서의 시간대는 UTC기준이고 자바스크립트 내의 함수에서는 KST기준으로 작동하기 때문에 결국 0시에 Day가 초기화 되는 것이 아닌 오전9시에 Day가 초기화 되는 것을 확인 할 수 있었습니다.  
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/748c852f-4eea-4e51-8fb1-ce91efcb1430/Untitled.png)
+https://s3.us-west-2.amazonaws.com/secure.notion-static.com/a795b7b6-009c-4253-bc5f-e42ebbe28f27/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220804%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220804T125028Z&X-Amz-Expires=86400&X-Amz-Signature=65d68a17412d7fcb09545f8a495c26afe61dd9cd8f8885bec65cf7d222148abc&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22&x-id=GetObject
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/a795b7b6-009c-4253-bc5f-e42ebbe28f27/Untitled.png)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fe8109d1-cf37-472a-9462-36ab6048b969/Untitled.png)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/536ccb83-85f7-4f2c-a4b0-f1d33f568cca/Untitled.png)
+https://s3.us-west-2.amazonaws.com/secure.notion-static.com/fe8109d1-cf37-472a-9462-36ab6048b969/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20220804%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20220804T125046Z&X-Amz-Expires=86400&X-Amz-Signature=a64422180b63b88a73a5e3c5bc9f5665c8e79e6bfc72994ef083819d963fa073&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22&x-id=GetObject
 
 4. 결국 자바스크립트내에서는 todaystart을 통해 KST시간대로 고정한 상태에서 AWS인스턴스 시간대를 KST로 변경하는 방법을 찾아보았습니다. 그리고 —root 계정으로 접속 후 시간대를 KST시간대로 변경하니 오전9시에 초기화되었던 문제를 해결 할 수 있었습니다.  또한 이를 통해 그래프에서 시간조회 시 12시가 지나도 Day가 넘어가지 않았던 문제까지 같이 해결 할 수 있었습니다.  
 
