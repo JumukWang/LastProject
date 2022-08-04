@@ -6,47 +6,84 @@ const userData = require('../models/user');
 
 async function signup(req, res) {
   try {
+    // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck } = req.body;
     const profileUrl = req.file;
-    const imgFile = await profileUrl.transforms[0].location;
-    const exEmail = await userData.findByUser(email);
-    // 중복 이메일 검사
-    if (exEmail) {
-      return res.status(400).send({
-        result: false,
-        msg: '이미 사용중인 이메일 입니다.',
+    if (profileUrl) {
+      const imgFile = await profileUrl.transforms[0].location;
+      const exEmail = await userData.findByUser(email);
+
+      if (exEmail) {
+        return res.status(400).send({
+          result: false,
+          msg: '이미 사용중인 이메일 입니다.',
+        });
+      }
+      if (password !== passwordCheck) {
+        res.status(400).send({
+          message: '비밀번호 확인란이 일치하지 않습니다.',
+          result: false,
+        });
+        return;
+      }
+
+      const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
+      const hashPassword = await Bcrypt.hash(password, salt);
+
+      const user = await userData.newUser({
+        email,
+        nickname,
+        password: hashPassword,
+        profile_url: imgFile,
+      });
+
+      const token = jwt.authSign(user);
+
+      return res.status(200).send({
+        result: true,
+        msg: '회원가입이 되었습니다.',
+        accessToken: token,
+      });
+    } else {
+      const exEmail = await userData.findByUser(email);
+
+      if (exEmail) {
+        return res.status(400).send({
+          result: false,
+          msg: '이미 사용중인 이메일 입니다.',
+        });
+      }
+      if (password !== passwordCheck) {
+        res.status(400).send({
+          message: '비밀번호 확인란이 일치하지 않습니다.',
+          result: false,
+        });
+        return;
+      }
+
+      const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
+      const hashPassword = await Bcrypt.hash(password, salt);
+
+      const user = await userData.newUser({
+        email,
+        nickname,
+        password: hashPassword,
+        profile_url: 'https://lastproject01.s3.ap-northeast-2.amazonaws.com/uploadProfile/2631659277971842.png',
+      });
+
+      const token = jwt.authSign(user);
+
+      return res.status(200).send({
+        result: true,
+        msg: '회원가입이 되었습니다.',
+        accessToken: token,
       });
     }
-    // 패스워드 체크
-    if (password !== passwordCheck) {
-      res.status(400).send({
-        message: '비밀번호 확인란이 일치하지 않습니다.',
-        result: false,
-      });
-      return;
-    }
-    // 비밀번호 해쉬화
-    const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
-    const hashPassword = await Bcrypt.hash(password, salt);
-
-    const user = await userData.newUser({
-      email,
-      nickname,
-      password: hashPassword,
-      profile_url: imgFile,
-    });
-    const token = jwt.authSign(user);
-
-    return res.status(200).send({
-      result: true,
-      msg: '회원가입이 되었습니다.',
-      accessToken: token,
-    });
   } catch (error) {
     return res.status(400).send({
       result: false,
       msg: '다시 회원가입을 신청해 주세요',
-      errmsg: error.message,
+      message: error.message,
     });
   }
 }
