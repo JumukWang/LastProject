@@ -12,6 +12,8 @@ const { redisClient } = require('./src/database/redis');
 const config = require('./src/config');
 const logger = require('./src/config/winston');
 const app = express();
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("./swagger-output");
 
 redisClient.connect();
 connect();
@@ -41,6 +43,9 @@ app.use(
     store: new RedisStore({ client: redisClient }),
   }),
 );
+
+// swagger
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // 라우터
 app.use('/api', Router);
