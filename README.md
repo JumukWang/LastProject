@@ -49,7 +49,34 @@
 
 
 ## E-GLOO 트러블슈팅 ❌
+  - 문제상황
 
+TimeStamp로 시간을 비교하여 타이머를 구현하는 과정에서 UTC와 KST의 시간차이로 인해 9시간의 갭이 발생하였습니다. 또한 로컬환경에서는 KST시간으로 자바스크립트에서 Day를 불러오지만 새로 개설한 AWS 인스턴스 환경에서는 UTC시간으로 읽혀서 시간 갭으로 인해 0시 기준으로 Day가 초기화되지 않는 오류가 발생하였습니다. 
+
+- 해결방안
+1. today start함수를 지정하여 UTC시간으로 날마다 갱신되는 오늘의 시작날짜와 시간을 정했습니다. 
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7420419c-4337-41b5-841a-3b2c70715770/Untitled.png)
+
+1. UTC기준으로 측정되어 있는 것이므로 KST시간으로 변경하기 위해 -9을 해준 후 오늘과 내일 TimeStamp의 차이에 있는 시간대를 불러왔습니다. 또한 todayStart함수를 조정하여 UTC시간 기준으로 매일이 바뀌게 설정하였습니다. 
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/14bcc76d-ef19-4b18-80b0-ec075073d82e/Untitled.png)
+
+1. 시간대 변경에 따른 로컬환경에서 new Date()의 변화를 확인 할 수 있었습니다.  AWS 인스턴스  환경에서의 시간대는 UTC기준이고 자바스크립트 내의 함수에서는 KST기준으로 작동하기 때문에 결국 0시에 Day가 초기화 되는 것이 아닌 오전9시에 Day가 초기화 되는 것을 확인 할 수 있었습니다.  
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/748c852f-4eea-4e51-8fb1-ce91efcb1430/Untitled.png)
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/a795b7b6-009c-4253-bc5f-e42ebbe28f27/Untitled.png)
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fe8109d1-cf37-472a-9462-36ab6048b969/Untitled.png)
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/536ccb83-85f7-4f2c-a4b0-f1d33f568cca/Untitled.png)
+
+1. 결국 자바스크립트내에서는 todaystart을 통해 KST시간대로 고정한 상태에서 AWS인스턴스 시간대를 KST로 변경하는 방법을 찾아보았습니다. 그리고 —root 계정으로 접속 후 시간대를 KST시간대로 변경하니 오전9시에 초기화되었던 문제를 해결 할 수 있었습니다.  또한 이를 통해 그래프에서 시간조회 시 12시가 지나도 Day가 넘어가지 않았던 문제까지 같이 해결 할 수 있었습니다.  
+
+- 개선사항
+
+AWS 인스턴스 환경에서의 시간대 역시 자연스럽게 KST라고 생각하는 바람에 왜 자꾸 시간차이 오류가 발생하는 지 파악하기가 어려웠습니다. 그래서 혼자 PostMan으로 실험하였을 때랑 배포하였을 때 차이가 생기는 것에 대해 이해하지 못했습니다. 이번 트러블슈팅을 통해 local 환경과 인스턴스환경의 차이에 대해서 항상 염두해 두어야 겠다고 생각했습니다.
 ## E-GLOO 백엔드 팀원소개 👨‍👨‍👦
 
 |이미지|![4ffcfac596ce78b6359f6703e5ffe57e](https://user-images.githubusercontent.com/107375500/182104419-9c0bc974-77b0-48d8-beeb-98574f881577.jpg)|![014f6bf2dccf97d1cfc97dff79b028e182f3bd8c9735553d03f6f982e10ebe70](https://user-images.githubusercontent.com/107375500/182104497-2989dd73-d46a-4e31-ab60-1e1ed72f9244.png)|![a2a82850f6db5ee6033c48f55d5e15a7113e2bd2b7407c8202a97d2241a96625](https://user-images.githubusercontent.com/107375500/182104592-a256a2fc-c249-4b90-bee3-ad5c8ad21920.png)|
