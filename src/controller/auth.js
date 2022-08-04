@@ -6,18 +6,18 @@ const userData = require('../models/user');
 
 async function signup(req, res) {
   try {
-    // test 용 confirm password 넣어야함 비밀번호 해쉬화 해야함
     const { email, nickname, password, passwordCheck } = req.body;
     const profileUrl = req.file;
     const imgFile = await profileUrl.transforms[0].location;
     const exEmail = await userData.findByUser(email);
-
+    // 중복 이메일 검사
     if (exEmail) {
       return res.status(400).send({
         result: false,
         msg: '이미 사용중인 이메일 입니다.',
       });
     }
+    // 패스워드 체크
     if (password !== passwordCheck) {
       res.status(400).send({
         message: '비밀번호 확인란이 일치하지 않습니다.',
@@ -25,7 +25,7 @@ async function signup(req, res) {
       });
       return;
     }
-
+    // 비밀번호 해쉬화
     const salt = await Bcrypt.genSalt(Number(config.SALT_NUM));
     const hashPassword = await Bcrypt.hash(password, salt);
 
@@ -53,7 +53,6 @@ async function signup(req, res) {
 
 async function login(req, res) {
   try {
-    // 여기도 중복검사, 해쉬화된 비밀번호 검증
     const { email, password } = req.body;
     const user = await userData.findByUser(email);
     if (!user) {
@@ -71,7 +70,7 @@ async function login(req, res) {
         result: false,
       });
     }
-
+    // 토큰 발급 refreshToken은 redis에 키벨류로 저장
     const accessToken = jwt.authSign(user);
     const refreshToken = jwt.refreshToken();
     redisClient.set(email, {

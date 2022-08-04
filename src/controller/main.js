@@ -8,6 +8,7 @@ async function main(req, res) {
     const perPage = Number(req.query.perPage || 6);
     const roomLength = await roomData.allRoomList();
     const mainLength = roomLength.length;
+    // 더 보기 한번 누를때마다 게시물 6개씩 요청
     const roomList = await roomData.mainRoomList(perPage, page);
 
     return res.status(200).json({
