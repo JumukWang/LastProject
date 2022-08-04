@@ -60,46 +60,6 @@ const studySchema = new Schema({
 studySchema.plugin(AutoIncrement, { inc_field: 'roomId' });
 const Room = mongoose.model('Room', studySchema);
 
-async function mainRoomList(perPage, page) {
-  return Room.find({})
-    .sort({ createAt: -1 })
-    .skip(perPage * (page - 1))
-    .limit(perPage);
-}
-
-async function allRoomList(roomId) {
-  return Room.find({ roomId });
-}
-
-async function roomNumber(roomId) {
-  return Room.findOne({ roomId });
-}
-
-async function roomLikeUserUpdate(roomId, userId) {
-  return Room.updateOne({ roomId }), { $push: { likeUser: userId } };
-}
-
-async function roomdisLikeUserUpdate(roomId, userId) {
-  return Room.updateOne({ roomId }), { $pull: { likeUser: userId } };
-}
-
-async function roomTagName(tagName, perPage, page) {
-  return Room.find({ tagName })
-    .sort({ createAt: -1 })
-    .skip(perPage * (page - 1))
-    .limit(perPage);
-}
-async function roomTagLength(tagName) {
-  return Room.find({ tagName });
-}
-
 module.exports = {
   Room,
-  allRoomList,
-  roomNumber,
-  roomLikeUserUpdate,
-  roomTagName,
-  roomTagLength,
-  mainRoomList,
-  roomdisLikeUserUpdate,
 };

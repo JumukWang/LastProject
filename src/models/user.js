@@ -49,29 +49,9 @@ async function nicknameCheck(nickname) {
   return User.findOne({ nickname });
 }
 
-async function userRoomLike(userId, roomId) {
-  return User.updateOne({ userId }, { $push: { userLike: roomId } });
-}
-
-async function userMypage(userId) {
-  return User.findOne({ userId: Number(userId) });
-}
-
-async function userInfoUpdate(userId, nickname, hashPassword, passwordCheck, imgUrl) {
-  return User.updateOne({ userId }, { $set: { nickname, password: hashPassword, passwordCheck, imgUrl } });
-}
-
-async function userFind() {
-  return User.find({}, { userId: 1, nickname: 1, email: 1 });
-}
-
 module.exports = {
   User,
   newUser,
   findByUser,
-  userRoomLike,
   nicknameCheck,
-  userMypage,
-  userInfoUpdate,
-  userFind,
 };
