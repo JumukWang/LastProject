@@ -4,8 +4,8 @@ exports.logging = (req, res, next) => {
   let logStr = {};
 
   try {
+    // api 요청 체크
     logStr.url = req.url;
-
     logStr.method = req.method;
     switch (req.method) {
       case 'GET':

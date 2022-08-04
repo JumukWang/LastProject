@@ -10,7 +10,7 @@ async function main(req, res) {
     const mainLength = roomLength.length;
     const roomList = await roomData.mainRoomList(perPage, page);
 
-    res.status(200).json({
+    return res.status(200).json({
       result: true,
       roomList,
       mainLength,
