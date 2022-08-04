@@ -50,7 +50,7 @@ async function nicknameCheck(nickname) {
 }
 
 async function userRoomLike(userId, roomId) {
-  return User.updateOne({ userId }, { $pull: { userLike: roomId } });
+  return User.updateOne({ userId }, { $push: { userLike: roomId } });
 }
 
 async function userMypage(userId) {

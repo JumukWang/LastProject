@@ -4,43 +4,81 @@ const { timeSet, changeTime, timeConversion } = require('./studytime');
 // 메인 페이지 만들기
 async function roomCreate(req, res) {
   try {
-    const roomUrl = req.file; //추가
-    const imgFile = await roomUrl.transforms[0].location; //추가
-    const host = Number(req.params.userId);
     const { tagName, title, content, password, date, lock } = req.body;
-    let stringTag = tagName.toString();
-    const arrTag = stringTag.split(',');
-    if (lock === 'false') {
-      let flag = false;
-      const newPublicRoom = await Room.create({
-        title,
-        content,
-        date,
-        tagName: arrTag,
-        imgUrl: imgFile,
-        lock: flag,
-      });
-      await newPublicRoom.save();
-      const roomNum = Number(newPublicRoom.roomId);
-      await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-      await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
-      return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
-    }
-    if (lock === 'true') {
-      let flag = true;
-      const newPrivaeRoom = await Room.create({
-        title,
-        password,
-        content,
-        date,
-        tagName: arrTag,
-        imgUrl: imgFile,
-        lock: flag,
-      });
-      const roomNum = Number(newPrivaeRoom.roomId);
-      await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
-      await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
-      return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPrivaeRoom });
+    const roomUrl = req.file; //추가
+    const host = Number(req.params.userId);
+
+    if (roomUrl) {
+      const imgFile = await roomUrl.transforms[0].location; //추가
+      let stringTag = tagName.toString();
+      const arrTag = stringTag.split(',');
+      if (lock === 'false') {
+        let flag = false;
+        const newPublicRoom = await Room.create({
+          title,
+          content,
+          date,
+          tagName: arrTag,
+          imgUrl: imgFile,
+          lock: flag,
+        });
+        await newPublicRoom.save();
+        const roomNum = Number(newPublicRoom.roomId);
+        await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+        await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+        return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
+      }
+      if (lock === 'true') {
+        let flag = true;
+        const newPrivaeRoom = await Room.create({
+          title,
+          password,
+          content,
+          date,
+          tagName: arrTag,
+          imgUrl: imgFile,
+          lock: flag,
+        });
+        const roomNum = Number(newPrivaeRoom.roomId);
+        await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+        await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+        return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPrivaeRoom });
+      }
+    } else {
+      let stringTag = tagName.toString();
+      const arrTag = stringTag.split(',');
+      if (lock === 'false') {
+        let flag = false;
+        const newPublicRoom = await Room.create({
+          title,
+          content,
+          date,
+          tagName: arrTag,
+          imgUrl: 'https://lastproject01.s3.ap-northeast-2.amazonaws.com/uploadRoom/3421659600578248.png',
+          lock: flag,
+        });
+        await newPublicRoom.save();
+        const roomNum = Number(newPublicRoom.roomId);
+        await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+        await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+        return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPublicRoom });
+      }
+      if (lock === 'true') {
+        let flag = true;
+        const newPrivaeRoom = await Room.create({
+          title,
+          password,
+          content,
+          date,
+          tagName: arrTag,
+          imgUrl: 'https://lastproject01.s3.ap-northeast-2.amazonaws.com/uploadRoom/3421659600578248.png',
+          lock: flag,
+        });
+        const roomNum = Number(newPrivaeRoom.roomId);
+        await Room.updateOne({ roomId: roomNum }, { $set: { hostId: host } });
+        await User.updateOne({ userId: host }, { $push: { hostRoom: roomNum } });
+        return res.status(201).send({ msg: '스터디룸을 생성하였습니다.', roomInfo: newPrivaeRoom });
+      }
     }
   } catch (error) {
     return res.status(400).send({

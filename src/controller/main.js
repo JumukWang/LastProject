@@ -41,7 +41,7 @@ async function roomLike(req, res) {
       likeStatus = true;
       msg = `${title}방을 찜 했어요!`;
     } else {
-      await roomData.roomLikeUserUpdate(roomId, userId);
+      await roomData.roomdisLikeUserUpdate(roomId, userId);
       await userData.userRoomLike(userId, roomId);
       likeStatus = false;
       msg = `${title}방 찜 해제`;

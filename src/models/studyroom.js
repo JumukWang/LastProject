@@ -39,7 +39,6 @@ const studySchema = new Schema({
   },
   likeUser: {
     type: Array,
-    default: [1],
   },
   createAt: {
     type: Date,
@@ -80,9 +79,13 @@ async function roomLikeUserUpdate(roomId, userId) {
   return Room.updateOne({ roomId }), { $push: { likeUser: userId } };
 }
 
+async function roomdisLikeUserUpdate(roomId, userId) {
+  return Room.updateOne({ roomId }), { $pull: { likeUser: userId } };
+}
+
 async function roomTagName(tagName, perPage, page) {
   return Room.find({ tagName })
-    .sord({ createAt: -1 })
+    .sort({ createAt: -1 })
     .skip(perPage * (page - 1))
     .limit(perPage);
 }
@@ -90,4 +93,13 @@ async function roomTagLength(tagName) {
   return Room.find({ tagName });
 }
 
-module.exports = { Room, allRoomList, roomNumber, roomLikeUserUpdate, roomTagName, roomTagLength, mainRoomList };
+module.exports = {
+  Room,
+  allRoomList,
+  roomNumber,
+  roomLikeUserUpdate,
+  roomTagName,
+  roomTagLength,
+  mainRoomList,
+  roomdisLikeUserUpdate,
+};
