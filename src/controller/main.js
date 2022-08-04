@@ -30,10 +30,7 @@ async function roomLike(req, res) {
   try {
     const roomId = Number(req.params.roomId);
     const userId = Number(req.params.userId);
-    // const nickname = req.nickname;
-    console.log(userId); //내 아이디
     const { likeUser, title } = await Room.findOne({ roomId });
-    console.log(likeUser); //방안에 유저아이디
 
     let likeStatus = '';
     let msg = '';
@@ -42,15 +39,11 @@ async function roomLike(req, res) {
     if (!likeUser.includes(userId)) {
       await Room.updateOne({ roomId }, { $push: { likeUser: userId } });
       await User.updateOne({ userId }, { $push: { userLike: roomId } });
-      const aaa = await Room.findOne({ roomId });
-      console.log(aaa.likeUser); //추가된 방안에 유저아이디
       likeStatus = true;
       msg = `${title}방을 찜 했어요!`;
     } else {
       await Room.updateOne({ roomId }, { $pull: { likeUser: userId } });
       await User.updateOne({ userId }, { $pull: { userLike: roomId } });
-      const aaa = await Room.findOne({ roomId });
-      console.log(aaa.likeUser); //추가된 방안에 유저아이디
       likeStatus = false;
       msg = `${title}방 찜 해제`;
     }
