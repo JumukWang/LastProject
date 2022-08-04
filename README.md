@@ -56,7 +56,7 @@ TimeStamp로 시간을 비교하여 타이머를 구현하는 과정에서 UTC�
 - 해결방안
 1. today start함수를 지정하여 UTC시간으로 날마다 갱신되는 오늘의 시작날짜와 시간을 정했습니다. 
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7420419c-4337-41b5-841a-3b2c70715770/Untitled.png)
+![Untitled](https://user-images.githubusercontent.com/102012411/182850308-95c6f355-3892-4b45-b02e-fe02dcd57ca1.png)
 
 1. UTC기준으로 측정되어 있는 것이므로 KST시간으로 변경하기 위해 -9을 해준 후 오늘과 내일 TimeStamp의 차이에 있는 시간대를 불러왔습니다. 또한 todayStart함수를 조정하여 UTC시간 기준으로 매일이 바뀌게 설정하였습니다. 
 
