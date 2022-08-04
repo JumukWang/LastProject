@@ -4,7 +4,7 @@ const { User } = require('../models');
 const logger = require('../config/winston');
 
 module.exports = async (req, res, next) => {
-  logger.info('req start');
+  logger.info('jwt req start');
   if (req.headers.authorization) {
     const authToken = req.headers.authorization.split('Bearer ')[1];
     const tokenRsult = tokenVerify(authToken); // 엑세스 토큰 넘어옴
@@ -27,7 +27,6 @@ module.exports = async (req, res, next) => {
     if (req.headers.authorization && req.headers.refreshtoken) {
       const authToken = req.headers.authorization.split('Bearer ')[1];
       const refreshToken = req.headers.refreshtoken;
-      logger.info('jwt refresh 인증의 시작 시작');
       // access token이 만료됐는지 검증
       const accessResult = tokenVerify(authToken);
       // access token 디코딩
@@ -43,7 +42,6 @@ module.exports = async (req, res, next) => {
       //access token decoding 값에서 id를 가져와 refresh token 검증
       let user = null;
       user = await User.findOne({ email: decode.email });
-      console.log(user.email);
       const refreshResult = refreshVerify(refreshToken, user.email);
       logger.info('jwt refresh 중간 인증 시작');
       if (accessResult.msg === 'jwt expired' && accessResult.result === false) {

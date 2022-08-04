@@ -49,7 +49,6 @@ io.on('connection', (socket) => {
       test: 'test',
       nickname: payload.nickname,
       profileImg: payload.profileImg,
-      //   profileImg: payload.profileImg,
     };
     const others = users[roomId].filter((id) => id !== socket.id);
 
