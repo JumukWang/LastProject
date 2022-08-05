@@ -1,6 +1,6 @@
 const { Room, User, Studytime } = require('../models');
-const moment = require('moment');
 const { timeSet, changeTime, timeConversion } = require('./studytime');
+const moment = require('moment');
 // 메인 페이지 만들기
 async function roomCreate(req, res) {
   try {

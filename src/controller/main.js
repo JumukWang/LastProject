@@ -1,4 +1,3 @@
-require('dotenv').config();
 const roomData = require('../models/studyroom');
 const userData = require('../models/user');
 

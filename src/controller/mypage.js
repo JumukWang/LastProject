@@ -1,4 +1,3 @@
-require('dotenv').config();
 const { User, Day, Studytime, Room } = require('../models');
 const Bcrypt = require('bcrypt');
 const config = require('../config');

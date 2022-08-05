@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 // today,week Start Point
 function timeSet() {
   // 1. 현재 날짜정보, 오늘 타임스탬프, 오늘 요일 출력
