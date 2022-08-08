@@ -78,13 +78,10 @@ const roomUpload = multer({
 const profileDelete = (profile_url) => {
   const filename = profile_url.split('/')[4];
 
-  s3.deleteObject(
-    {
-      Bucket: `${config.S3_BUCKET_NAME}/uploadProfile`,
-      Key: filename,
-    },
-    function (err, data) {},
-  );
+  s3.deleteObject({
+    Bucket: `${config.S3_BUCKET_NAME}/uploadProfile`,
+    Key: filename,
+  });
 };
 
 exports.profileUpload = multer(profileUpload);
