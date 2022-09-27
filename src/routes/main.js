@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
     const roomLength = await Room.find({});
     const mainLength = roomLength.length;
     const roomList = await Room.find({})
-        .sort({ createAt: -1 })
+        .sort({ _id: -1 })
         .skip(perPage * (page - 1))     //perPage가 6이라면 1page로 왔을 때 6*(1-1) = 0이라서 스킵할게 없으니 0부터 6까지 출력
         .limit(perPage)
 
